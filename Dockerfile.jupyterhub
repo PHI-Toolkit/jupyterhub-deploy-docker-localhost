@@ -7,6 +7,8 @@ RUN /opt/conda/bin/pip install \
     oauthenticator==0.5.* \
     dockerspawner==0.7.*
 
+RUN pip install jupyterhub-dummyauthenticator
+
 # install docker on the jupyterhub container
 RUN wget https://get.docker.com -q -O /tmp/getdocker && \
     chmod +x /tmp/getdocker && \
@@ -18,6 +20,7 @@ ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
 COPY ./secrets/*.crt $SSL_CERT
 COPY ./secrets/*.key $SSL_KEY
 RUN chmod 700 /srv/jupyterhub/secrets && \
-    chmod 600 /srv/jupyterhub/secrets/*
+    chmod 600 /srv/jupyterhub/secrets/* && \
+    touch /etc/proxy_token
 
 COPY ./userlist /srv/jupyterhub/userlist

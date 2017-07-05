@@ -1,6 +1,8 @@
-# jupyterhub-deploy-docker
+# jupyterhub-deploy-docker-localhost
 
-This repository provides a reference deployment of [JupyterHub](https://github.com/jupyter/jupyterhub), a multi-user [Jupyter Notebook](http://jupyter.org/) environment, on a **single host** using [Docker](https://docs.docker.com).  
+This repository is based on [JupyterHub Deploy Docker](https://github.com/PHI-Toolkit/jupyterhub-deploy-docker).
+
+This repository provides a reference deployment of [JupyterHub](https://github.com/jupyter/jupyterhub) for deployment and testing in a localhost environment, a multi-user [Jupyter Notebook](http://jupyter.org/) environment, on a **single host** using [Docker](https://docs.docker.com).  
 
 This deployment:
 
@@ -8,9 +10,21 @@ This deployment:
 * Uses [DockerSpawner](https://github.com/jupyter/dockerspawner) to spawn single-user Jupyter Notebook servers in separate Docker containers on the same host
 * Persists JupyterHub data in a Docker volume on the host
 * Persists user notebook directories in Docker volumes on the host
-* Uses [OAuthenticator](https://github.com/jupyter/oauthenticator) and [GitHub OAuth](https://developer.github.com/v3/oauth/) to authenticate users
+* Uses [OAuthenticator](https://github.com/jupyter/oauthenticator) and [GitHub OAuth](https://developer.github.com/v3/oauth/) to authenticate users - code commented out in jupyterhub_config.py
+* Uses Dummy Authenticator with password for turnkey testing - see jupyterhub_config.py
+* Replaces the original [scipy-notebook](https://github.com/jupyter/docker-stacks/tree/master/scipy-notebook) with [r-notebook](https://github.com/jupyter/docker-stacks/tree/master/r-notebook) as the base and then adds Python kernel and libraries based on jupyter/scipy-notebook from [Docker stacks](https://github.com/jupyter/docker-stacks). Additional
+* Creates a "shared" folder using a Docker data volume that users can use to share notebooks. (See Makefile)
+* Adds self signed certificate bash script, "create-certs.sh".
+* Set up script to launch additional python libraries (Python 2 and 3) in /srv/modules folder: launch-python-modules.sh
 
 ![JupyterHub single host Docker deployment](internal/jupyterhub-docker.png)
+
+## Key commands
+* make notebook_image: creates Jupyter singleuser notebook Docker image
+* make network: creates Docker external network for shared use
+* make volumes: creates Docker data volumes (shared, modules, geoserver)
+* docker-compose build: creates JupyterHub Docker image
+* docker-compose up: launches the system, then go to https://localhost.
 
 ## Use Cases
 

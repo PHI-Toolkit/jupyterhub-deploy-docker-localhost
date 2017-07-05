@@ -10,9 +10,13 @@ network:
 
 volumes:
 	@docker volume inspect $(DATA_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DATA_VOLUME_HOST)
+	@docker volume inspect jupyter-shared >/dev/null 2>&1 || docker volume create --name jupyter-shared
+	@docker volume inspect jupyter-modules >/dev/null 2>&1 || docker volume create --name jupyter-modules
+	@docker volume inspect jupyter-geoserver >/dev/null 2>&1 || docker volume create --name jupyter-geoserver
 
 self-signed-cert:
 	# make a self-signed cert
+	./create-certs.sh
 
 secrets/jupyterhub.crt:
 	@echo "Need an SSL certificate in secrets/jupyterhub.crt"
@@ -41,7 +45,9 @@ check-files: userlist $(cert_files)
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
-notebook_image: pull
+#notebook_image: pull
+notebook_image:
+	$(DOCKER_EXEC) build -t $(DOCKER_NOTEBOOK_IMAGE) -f ${NOTEBOOK_IMAGE_DOCKERFILE} .
 
 build: check-files network volumes
 	docker-compose build
