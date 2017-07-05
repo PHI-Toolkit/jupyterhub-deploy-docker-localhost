@@ -15,7 +15,7 @@ This deployment:
 * Replaces the original [scipy-notebook](https://github.com/jupyter/docker-stacks/tree/master/scipy-notebook) with [r-notebook](https://github.com/jupyter/docker-stacks/tree/master/r-notebook) as the base and then adds Python kernel and libraries based on jupyter/scipy-notebook from [Docker stacks](https://github.com/jupyter/docker-stacks). Additional
 * Creates a "shared" folder using a Docker data volume that users can use to share notebooks. (See Makefile)
 * Adds self signed certificate bash script, "create-certs.sh".
-* Set up script to launch additional python libraries (Python 2 and 3) in /srv/modules folder: launch-python-modules.sh
+* Set up script to launch additional python libraries (Python 2 and 3) in /srv/modules folder: load-python-modules.sh
 
 ![JupyterHub single host Docker deployment](internal/jupyterhub-docker.png)
 
@@ -23,6 +23,7 @@ This deployment:
 * make notebook_image: creates Jupyter singleuser notebook Docker image
 * make network: creates Docker external network for shared use
 * make volumes: creates Docker data volumes (shared, modules, geoserver)
+* make self-signed-cert
 * docker-compose build: creates JupyterHub Docker image
 * docker-compose up: launches the system, then go to https://localhost.
 
