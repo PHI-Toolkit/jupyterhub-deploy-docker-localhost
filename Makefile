@@ -10,9 +10,9 @@ network:
 
 volumes:
 	@docker volume inspect $(DATA_VOLUME_HOST) >/dev/null 2>&1 || docker volume create --name $(DATA_VOLUME_HOST)
-	@docker volume inspect jupyter-shared >/dev/null 2>&1 || docker volume create --name jupyter-shared
-	@docker volume inspect jupyter-modules >/dev/null 2>&1 || docker volume create --name jupyter-modules
-	@docker volume inspect jupyter-geoserver >/dev/null 2>&1 || docker volume create --name jupyter-geoserver
+	@docker volume inspect $(NOTEBOOK_SHARED_VOLUME) >/dev/null 2>&1 || docker volume create --name $(NOTEBOOK_SHARED_VOLUME)
+	@docker volume inspect $(NOTEBOOK_GEOSERVER_VOLUME) >/dev/null 2>&1 || docker volume create --name $(NOTEBOOK_GEOSERVER_VOLUME)
+	@docker volume inspect $(NOTEBOOK_MODULES_VOLUME) >/dev/null 2>&1 || docker volume create --name $(NOTEBOOK_MODULES_VOLUME)
 
 self-signed-cert:
 	# make a self-signed cert
