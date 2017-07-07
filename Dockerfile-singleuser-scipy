@@ -122,6 +122,9 @@ RUN pip install kernda --no-cache && \
 RUN conda install conda-build && \
     conda clean -tipsy
 
+RUN mkdir -p /home/jovyan/.cache && \
+    chmod -R a+w /home/jovyan/.cache
+
 RUN chmod a+w -R /home/jovyan/work/shared && \
     chmod a+w -R /home/jovyan/work/geoserver && \
     chmod a+w -R /home/jovyan/work/notebooks
