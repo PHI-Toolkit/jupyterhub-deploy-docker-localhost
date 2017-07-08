@@ -122,17 +122,31 @@ RUN pip install kernda --no-cache && \
 RUN conda install conda-build && \
     conda clean -tipsy
 
-RUN mkdir -p /home/jovyan/.cache && \
-    chmod -R a+w /home/jovyan/.cache
-
 RUN chmod a+w -R /home/jovyan/work/shared && \
     chmod a+w -R /home/jovyan/work/geoserver && \
     chmod a+w -R /home/jovyan/work/notebooks
 
-RUN chown -R jovyan:users /home/jovyan/work/shared && \
+RUN chown -R jovyan:users /home/jovyan && \
+    chown -R jovyan:users /home/jovyan/work/shared && \
     chown -R jovyan:users /home/jovyan/work/geoserver && \
     chown -R jovyan:users /home/jovyan/work/notebooks
 
+RUN mkdir -p /home/jovyan/.cache && \
+    chmod -R a+w /home/jovyan/.cache && \
+    chown -R jovyan:users /home/jovyan/.cache
+
+RUN git clone https://github.com/dunovank/jupyter-themes.git && \
+    cd jupyter-themes && \
+    python setup.py install && \
+    mkdir -p /opt/conda/lib/python3.6/site-packages/jupyterthemes && \
+    mkdir -p /opt/conda/lib/python3.6/site-packages/jupyterthemes-0.16.4-py3.6.egg/jupyterthemes && \
+    chmod -R a+w /opt/conda/lib/python3.6/site-packages/jupyterthemes && \
+    chmod -R a+w /opt/conda/lib/python3.6/site-packages/jupyterthemes-0.16.4-py3.6.egg/jupyterthemes
+
 USER jovyan
+
+RUN mkdir -p /home/jovyan/.jupyter/custom
+ADD custom.css /home/jovyan/.jupyter/custom/custom.css
+ADD geeks.png /home/jovyan/.jupyter/custom/geeks.png
 
 WORKDIR /home/jovyan/work
