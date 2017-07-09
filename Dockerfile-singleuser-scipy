@@ -17,13 +17,7 @@ RUN conda install -c conda-forge jupyterlab ipywidgets && \
 
 RUN conda update notebook jupyterhub jupyterlab
 
-COPY work .
-
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-RUN pwd
-RUN chmod a+x modules/*.sh && \
-    mkdir -p /srv/modules && \
-    mv modules/*.sh /srv/modules
 
 # libav-tools for matplotlib anim
 RUN apt-get update && \
@@ -122,6 +116,12 @@ RUN pip install kernda --no-cache && \
 RUN conda install conda-build && \
     conda clean -tipsy
 
+COPY work .
+
+RUN chmod a+x modules/*.sh && \
+    mkdir -p /srv/modules && \
+    mv modules/*.sh /srv/modules
+
 RUN chmod a+w -R /home/jovyan/work/shared && \
     chmod a+w -R /home/jovyan/work/geoserver && \
     chmod a+w -R /home/jovyan/work/notebooks && \
@@ -151,9 +151,9 @@ USER jovyan
 
 WORKDIR /home/jovyan/work
 
+RUN /srv/modules/load-python-modules.sh
+
 # Custom logo
 RUN mkdir -p /home/jovyan/.jupyter/custom
 ADD custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD geeks.png /home/jovyan/.jupyter/custom/geeks.png
-
-RUN /srv/modules/load-python-modules.sh
