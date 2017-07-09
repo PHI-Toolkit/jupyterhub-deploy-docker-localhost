@@ -27,7 +27,7 @@ RUN chmod a+x modules/*.sh && \
 
 # libav-tools for matplotlib anim
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libav-tools && \
+    apt-get install -y --no-install-recommends libav-tools nano && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -136,6 +136,7 @@ RUN mkdir -p /home/jovyan/.cache && \
     chmod -R a+w /home/jovyan/.cache && \
     chown -R jovyan:users /home/jovyan/.cache
 
+# Jupyter Themes
 RUN git clone https://github.com/dunovank/jupyter-themes.git && \
     cd jupyter-themes && \
     python setup.py install && \
@@ -150,6 +151,9 @@ USER jovyan
 
 WORKDIR /home/jovyan/work
 
+# Custom logo
 RUN mkdir -p /home/jovyan/.jupyter/custom
 ADD custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD geeks.png /home/jovyan/.jupyter/custom/geeks.png
+
+RUN /srv/modules/load-python-modules.sh
