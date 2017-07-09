@@ -1,5 +1,6 @@
-#FROM jupyter/scipy-notebook:bb222f49222e
+# based on docker stacks
 FROM jupyter/r-notebook
+MAINTAINER herman.tolentino@gmail.com
 
 USER root
 
