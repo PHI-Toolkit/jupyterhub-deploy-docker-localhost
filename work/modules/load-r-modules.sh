@@ -2,7 +2,7 @@
 export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 sudo apt-get update
 sudo apt-get install -y libmariadb-client-lgpl-dev
-sudo apt-get install -y libmagick++-dev libcairo2- mesa-common-dev
+sudo apt-get install -y libmagick++-dev libmagick++-6.q16-dev libcairo2- mesa-common-dev
 sudo apt-get install -y libglu1-mesa-dev
 sudo apt-get install -y libudunits2-dev libgdal-dev
 sudo apt-get clean
