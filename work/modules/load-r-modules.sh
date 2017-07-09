@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 sudo apt-get update
+sudo apt-get install -y aptitude
 sudo apt-get install -y libmariadb-client-lgpl-dev
-sudo apt-get install -y libmagick++-dev libcairo2- mesa-common-dev
+sudo aptitude -y libmagick++-dev
+sudo apt-get install -y libcairo2- mesa-common-dev
 sudo apt-get install -y libglu1-mesa-dev
 sudo apt-get install -y libudunits2-dev libgdal-dev
 sudo apt-get clean
+sudo apt-get autoremove -y
 sudo rm -rf /var/lib/apt/lists/*
 
 # conda install
