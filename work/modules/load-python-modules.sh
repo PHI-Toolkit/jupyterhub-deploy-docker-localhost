@@ -24,13 +24,13 @@ sudo $CONDA3_BIN/conda install --yes -c conda-forge geos osmnx gmaps
 sudo $CONDA3_BIN/conda install --yes -c ioam holoviews=1.8.0 geoviews=1.3.0
 sudo $CONDA3_BIN/conda install --yes xarray
 
+sudo $CONDA3_BIN/conda install --yes -c bokeh datashader=0.5.0
 sudo $CONDA3_BIN/conda install --yes -c conda-forge iris ipyleaflet pyshp pandas-datareader obspy basemap \
       basemap-data-hires elasticsearch
 sudo $CONDA3_BIN/conda install --yes -c conda-forge jupyter_contrib_nbextensions jupyter_dashboards
 sudo $CONDA3_BIN/conda install --yes -c blaze blaze
 sudo $CONDA3_BIN/conda install --yes -c anaconda scrapy simplejson
 sudo $CONDA3_BIN/conda install --yes -c anaconda biopython
-sudo $CONDA3_BIN/conda install --yes -c bokeh datashader=0.5.0
 sudo $CONDA3_BIN/conda install --yes -c https://conda.anaconda.org/biocore scikit-bio
 sudo $JUPYTER3_BIN/jupyter nbextension enable --py --sys-prefix ipyleaflet
 sudo $CONDA3_BIN/conda install --yes -c conda-forge jupyter_cms
@@ -54,13 +54,13 @@ sudo $CONDA2_BIN/conda install --yes xarray
 source deactivate
 
 source activate /opt/conda/envs/python2
+sudo $CONDA2_BIN/conda install --yes -c bokeh datashader=0.5.0
 sudo $CONDA2_BIN/conda install --yes -c conda-forge iris ipyleaflet pyshp pandas-datareader obspy basemap \
       basemap-data-hires elasticsearch
 sudo $CONDA2_BIN/conda install --yes -c conda-forge jupyter_contrib_nbextensions jupyter_dashboards
 sudo $CONDA2_BIN/conda install --yes -c blaze blaze
 sudo $CONDA2_BIN/conda install --yes -c anaconda scrapy simplejson
 sudo $CONDA2_BIN/conda install --yes -c anaconda biopython
-sudo $CONDA2_BIN/conda install --yes -c bokeh datashader=0.5.0
 sudo $JUPYTER2_BIN/jupyter nbextension enable --py --sys-prefix ipyleaflet
 sudo $CONDA2_BIN/conda install --yes -c conda-forge jupyter_cms
 source deactivate
