@@ -23,8 +23,6 @@ sudo $CONDA3_BIN/conda install --yes -c conda-forge ipyleaflet
 sudo $CONDA3_BIN/conda install --yes -c conda-forge jupyter_contrib_nbextensions jupyter_dashboards
 sudo $CONDA3_BIN/conda install --yes -c blaze blaze
 sudo $CONDA3_BIN/conda install --yes -c anaconda scrapy simplejson
-#sudo $CONDA3_BIN/conda install --yes -c anaconda biopython
-sudo $CONDA3_BIN/conda install --yes -c https://conda.anaconda.org/biocore scikit-bio
 sudo $JUPYTER3_BIN/jupyter nbextension enable --py --sys-prefix ipyleaflet
 sudo $CONDA3_BIN/conda install --yes -c conda-forge jupyter_cms
 sudo $CONDA3_BIN/conda remove --quiet --yes --force qt pyqt
