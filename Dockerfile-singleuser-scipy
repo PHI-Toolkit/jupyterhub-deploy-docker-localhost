@@ -152,6 +152,7 @@ USER jovyan
 WORKDIR /home/jovyan/work
 
 RUN /srv/modules/load-python3-modules.sh
+RUN /srv/modules/load-python2-modules.sh
 
 # Custom logo
 RUN mkdir -p /home/jovyan/.jupyter/custom
