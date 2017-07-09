@@ -12,7 +12,7 @@ This deployment:
 * Persists user notebook directories in Docker volumes on the host
 * Uses [OAuthenticator](https://github.com/jupyter/oauthenticator) and [GitHub OAuth](https://developer.github.com/v3/oauth/) to authenticate users - code commented out in jupyterhub_config.py
 * Uses Dummy Authenticator with password for turnkey testing - see jupyterhub_config.py
-* Replaces the original [scipy-notebook](https://github.com/jupyter/docker-stacks/tree/master/scipy-notebook) with [r-notebook](https://github.com/jupyter/docker-stacks/tree/master/r-notebook) as the base and then adds Python kernel and libraries based on jupyter/scipy-notebook from [Docker stacks](https://github.com/jupyter/docker-stacks). Additional libraries are installed using the "load-python-modules.sh" bash script in the **/srv/modules** folder. You can access this fodler by launching a new terminal from the Jupyter Notebook interface.
+* Replaces the original [scipy-notebook](https://github.com/jupyter/docker-stacks/tree/master/scipy-notebook) with [r-notebook](https://github.com/jupyter/docker-stacks/tree/master/r-notebook) as the base and then adds Python kernel and libraries based on jupyter/scipy-notebook from [Docker stacks](https://github.com/jupyter/docker-stacks). Additional libraries are installed using the "load-pythonX-modules.sh" and "load-r-modules.sh" bash scripts in the **/srv/modules** folder. You can access this folder by launching a new terminal from the Jupyter Notebook interface. You can also install the Julia kernel and an essential machine learning and visualization library using Julia scripts in the same folder ("install-julia-kernel.sh" and "load-julia-modules.sh").
 * Creates a **shared** folder using a Docker data volume that users can use to share notebooks. (See Makefile)
 * Adds self signed certificate to a **secrets** folder using the provided bash script, "create-certs.sh".
 * Set up script to launch additional python libraries (Python 2 and 3) in /srv/modules folder: load-python-modules.sh
@@ -21,17 +21,21 @@ This deployment:
 **Figure 1**: Schematic for JupyterHub deployment
 ![JupyterHub single host Docker deployment](internal/jupyterhub-docker.png)
 
-## Key commands
-* **make notebook_image**: creates Jupyter singleuser notebook Docker image
-* **make network**: creates Docker external network for shared use
-* make volumes: creates Docker data volumes (shared, modules, geoserver)
-* **make self-signed-cert**: creates the **secrets** folder on the host system and self-signed key and certificate for testing
-* **docker-compose build**: creates JupyterHub Docker image
-* **docker-compose up**: launches the system, then go to https://localhost to log in and view the notebook (user is **jovyan**, look for password in the "jupyterhub_config.py" file)
-* **docker-compose up -d**: launches the system and runs it in the background
-* **docker-compose logs -f -t --tail='all'**: view logs in real time (useful for debugging)
-* **docker-compose down**: stop running containers
-* **docker ps**: view running containers
+## Steps:
+* Step 1: **git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost.git** and then **cd jupyterhub-deploy-docker-localhost**
+* Step 2: **make notebook_image**: creates Jupyter singleuser notebook Docker image
+* Step 3: **make network**: creates Docker external network for shared use
+* Step 4: make volumes: creates Docker data volumes (shared, modules, geoserver)
+* Step 5: **make self-signed-cert**: creates the **secrets** folder on the host system and self-signed key and certificate for testing
+* Step 6: **docker-compose build**: creates JupyterHub Docker image
+* Step 7: **docker-compose up**: launches the hub
+* Step 6 (option): **docker-compose up -d**: launches the system and runs it in the background
+* Step 7: Launch browser and type "https://localhost" in the URL field, then log in and view the notebook (user is **jovyan**, look for password in the "jupyterhub_config.py" file)
+* Other steps:
+ * **docker-compose logs -f -t --tail='all'**: view logs of the hub in real time (useful for debugging)
+ * **docker logs jupyter-jovyan -f -t --tail='all'** to view the logs in real time of the singleuser notebook server spawned by the hub for user "jovyan"
+ * **docker-compose down**: stop running containers (hub and singleuser notebook servers)
+ * **docker ps**: view running containers
 
 **Figure 2**: Jupyter Notebook classic user interface
 ![Classic user interface](internal/classicview.png)
