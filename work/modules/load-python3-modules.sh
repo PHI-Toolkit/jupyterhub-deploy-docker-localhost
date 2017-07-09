@@ -19,11 +19,9 @@ sudo $CONDA3_BIN/conda install --yes xarray
 sudo $CONDA3_BIN/conda install --yes -c bokeh datashader=0.5.0
 sudo $CONDA3_BIN/conda install --yes -c conda-forge iris pyshp pandas-datareader obspy basemap \
       basemap-data-hires elasticsearch
-sudo $CONDA3_BIN/conda install --yes -c conda-forge ipyleaflet
 sudo $CONDA3_BIN/conda install --yes -c conda-forge jupyter_contrib_nbextensions jupyter_dashboards
 sudo $CONDA3_BIN/conda install --yes -c blaze blaze
 sudo $CONDA3_BIN/conda install --yes -c anaconda scrapy simplejson
-sudo $JUPYTER3_BIN/jupyter nbextension enable --py --sys-prefix ipyleaflet
 sudo $CONDA3_BIN/conda install --yes -c conda-forge jupyter_cms
 sudo $CONDA3_BIN/conda remove --quiet --yes --force qt pyqt
 sudo $CONDA3_BIN/conda clean -tipsy
