@@ -24,3 +24,6 @@ RUN chmod 700 /srv/jupyterhub/secrets && \
     touch /etc/proxy_token
 
 COPY ./userlist /srv/jupyterhub/userlist
+COPY geeks.png /opt/conda/share/jupyter/hub/static/images/
+RUN cp /opt/conda/share/jupyter/hub/static/images/jupyter.png /opt/conda/share/jupyter/hub/static/images/jupyter.png.bak && \
+    cp /opt/conda/share/jupyter/hub/static/images/geeks.png /opt/conda/share/jupyter/hub/static/images/jupyter.png
