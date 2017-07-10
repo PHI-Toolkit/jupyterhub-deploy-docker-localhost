@@ -3,7 +3,7 @@ export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
 sudo apt-get update
 sudo apt-get install -y aptitude
 sudo apt-get install -y libmariadb-client-lgpl-dev
-sudo aptitude -y libmagick++-dev
+sudo aptitude install -y libmagick++-dev
 sudo apt-get install -y libcairo2- mesa-common-dev
 sudo apt-get install -y libglu1-mesa-dev
 sudo apt-get install -y libudunits2-dev libgdal-dev
