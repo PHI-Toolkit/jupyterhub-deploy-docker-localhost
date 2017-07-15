@@ -33,6 +33,7 @@ RUN chmod -R a+w /opt/conda/ && \
     chown -R root:users /opt/conda && \
     chmod g+s /opt/conda
 
+USER jovyan
 RUN conda install --quiet --yes \
     'nomkl' \
     'ipywidgets=6.0*' \
@@ -60,13 +61,20 @@ RUN conda install --quiet --yes \
     conda remove --quiet --yes --force qt pyqt && \
     conda clean -tipsy
 
-# Activate ipywidgets extension in the environment that runs the notebook server
+# Activate ipywidgets extension in the environment that runs the notebook server\
+USER root
 RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
 # Install Python 2 packages
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
 # use notebook-friendly backends in these images
-RUN conda create --quiet --yes -p $CONDA_DIR/envs/python2 python=2.7 \
+
+USER jovyan
+
+RUN conda create --quiet --yes -p $CONDA_DIR/envs/python2 python=2.7 && \
+    source deactivate
+RUN source activate python2 && \
+    conda install --yes \
     'nomkl' \
     'ipython=5.3*' \
     'ipywidgets=6.0*' \
@@ -93,19 +101,18 @@ RUN conda create --quiet --yes -p $CONDA_DIR/envs/python2 python=2.7 \
     'beautifulsoup4=4.5.*' \
     'xlrd' && \
     conda remove -n python2 --quiet --yes --force qt pyqt && \
-    conda clean -tipsy
+    conda clean -tipsy && \
+    source deactivate
 
-USER $NB_USER
 
 # Add shortcuts to distinguish pip for python2 and python3 envs
+USER root
 RUN ln -s $CONDA_DIR/envs/python2/bin/pip $CONDA_DIR/bin/pip2 && \
     ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip3
 
 # Import matplotlib the first time to build the font cache.
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 RUN MPLBACKEND=Agg $CONDA_DIR/envs/python2/bin/python -c "import matplotlib.pyplot"
-
-USER root
 
 # Install Python 2 kernel spec globally to avoid permission problems when NB_UID
 # switching at runtime and to allow the notebook server running out of the root
@@ -116,24 +123,27 @@ RUN pip install kernda --no-cache && \
     kernda -o -y /usr/local/share/jupyter/kernels/python2/kernel.json && \
     pip uninstall kernda -y
 
+USER jovyan
 RUN conda install conda-build && \
     conda clean -tipsy
 
+USER jovyan
+
 COPY work .
 
-RUN chmod a+x modules/*.sh && \
-    mkdir -p /srv/modules && \
-    mv modules/*.sh /srv/modules
+RUN sudo chmod a+x modules/*.sh && \
+    sudo mkdir -p /srv/modules && \
+    sudo mv modules/*.sh /srv/modules
 
-RUN chmod a+w -R /home/jovyan/work/shared && \
-    chmod a+w -R /home/jovyan/work/geoserver && \
-    chmod a+w -R /home/jovyan/work/notebooks && \
-    chmod a+w /home/jovyan/work/notebooks/*.ipynb
+RUN sudo chmod a+w -R /home/jovyan/work/shared && \
+    sudo chmod a+w -R /home/jovyan/work/geoserver && \
+    sudo chmod a+w -R /home/jovyan/work/notebooks && \
+    sudo chmod a+w /home/jovyan/work/notebooks/*.ipynb
 
-RUN chown -R jovyan:users /home/jovyan && \
-    chown -R jovyan:users /home/jovyan/work/shared && \
-    chown -R jovyan:users /home/jovyan/work/geoserver && \
-    chown -R jovyan:users /home/jovyan/work/notebooks
+RUN sudo chown -R jovyan:users /home/jovyan && \
+    sudo chown -R jovyan:users /home/jovyan/work/shared && \
+    sudo chown -R jovyan:users /home/jovyan/work/geoserver && \
+    sudo chown -R jovyan:users /home/jovyan/work/notebooks
 
 RUN mkdir -p /home/jovyan/.cache && \
     chmod -R a+w /home/jovyan/.cache && \
@@ -150,20 +160,20 @@ RUN git clone https://github.com/dunovank/jupyter-themes.git && \
     cd .. && \
     rm -fvR jupyter-themes
 
-USER jovyan
+#USER jovyan
 
 WORKDIR /home/jovyan/work
 
-RUN /srv/modules/load-python3-modules.sh
-RUN /srv/modules/load-python2-modules.sh
-RUN /srv/modules/load-r-modules.sh
-RUN /srv/modules/install-julia-kernel.sh
-RUN /srv/modules/load-julia-modules.sh
+#RUN /srv/modules/load-python3-modules.sh
+#RUN /srv/modules/load-python2-modules.sh
+#RUN /srv/modules/load-r-modules.sh
+#RUN /srv/modules/install-julia-kernel.sh
+#RUN /srv/modules/load-julia-modules.sh
 
 # Custom logo, create backup CSS file to enable restore if jupyter-themes overwrites it and the GEEKS logo
 RUN mkdir -p /home/jovyan/.jupyter/custom
-
 ADD custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD geeks.png /home/jovyan/.jupyter/custom/geeks.png
 RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/* && \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup
+RUN jupyter labextension install @jupyterlab/google-drive
