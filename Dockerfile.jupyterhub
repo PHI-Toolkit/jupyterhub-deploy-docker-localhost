@@ -17,8 +17,8 @@ RUN wget https://get.docker.com -q -O /tmp/getdocker && \
 # Copy TLS certificate and key
 ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
 ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
-COPY ./secrets/*.crt $SSL_CERT
-COPY ./secrets/*.key $SSL_KEY
+COPY ./secrets/jupyterhub.crt $SSL_CERT
+COPY ./secrets/jupyterhub.key $SSL_KEY
 RUN chmod 700 /srv/jupyterhub/secrets && \
     chmod 600 /srv/jupyterhub/secrets/* && \
     touch /etc/proxy_token
