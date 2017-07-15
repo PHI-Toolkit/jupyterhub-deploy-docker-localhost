@@ -36,6 +36,7 @@ This deployment:
  * **docker logs jupyter-jovyan -f -t --tail='all'** to view the logs in real time of the singleuser notebook server spawned by the hub for user "jovyan"
  * **docker-compose down**: stop running containers (hub and singleuser notebook servers)
  * **docker ps**: view running containers
+ * Change the Hub and Notebook logo: (1) create a new logo (see geeks.png as example) and save this under a filename of your choice in the **css** directory (2) assign the filename as the value of the LOGO_IMAGE environment variable in the **.env** file.
 
 **Figure 2**: Jupyter Notebook classic user interface
 ![Classic user interface](internal/classicview.png)

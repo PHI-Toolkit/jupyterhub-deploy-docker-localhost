@@ -160,22 +160,23 @@ RUN git clone https://github.com/dunovank/jupyter-themes.git && \
     cd .. && \
     rm -fvR jupyter-themes
 
-#USER jovyan
-
 WORKDIR /home/jovyan/work
 
 # Uncomment the following lines to load the Julia kernel and Python, R and Julia modules
 # You can also load the following inside the runnng Notebook single-user container through terminal
-RUN /srv/modules/load-python3-modules.sh
-RUN /srv/modules/load-python2-modules.sh
-RUN /srv/modules/load-r-modules.sh
+#RUN /srv/modules/load-python3-modules.sh
+#RUN /srv/modules/load-python2-modules.sh
+#RUN /srv/modules/load-r-modules.sh
 #RUN /srv/modules/install-julia-kernel.sh
 #RUN /srv/modules/load-julia-modules.sh
 
 # Custom logo, create backup CSS file to enable restore if jupyter-themes overwrites it and the GEEKS logo
+ENV LOGO_IMAGE geeks.png
 RUN mkdir -p /home/jovyan/.jupyter/custom
-ADD custom.css /home/jovyan/.jupyter/custom/custom.css
-ADD geeks.png /home/jovyan/.jupyter/custom/geeks.png
-RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/* && \
+ADD css/custom.css /home/jovyan/.jupyter/custom/custom.css
+ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
+RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup
+
+# Google-drive testing
 RUN jupyter labextension install @jupyterlab/google-drive
