@@ -12,7 +12,7 @@ pip install dask[complete] smopy gmplot
 
 conda install --yes -c anaconda mysql-connector-python=2.0.4
 conda install --yes -c conda-forge bokeh=0.12.4
-conda install --yes -c conda-forge geos osmnx gmaps
+conda install --yes -c conda-forge geos osmnx gmaps geopy
 conda install --yes -c ioam holoviews=1.8.0 geoviews=1.3.0
 conda install --yes xarray
 
