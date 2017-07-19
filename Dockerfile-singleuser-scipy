@@ -133,7 +133,7 @@ COPY work .
 
 RUN sudo chmod a+x modules/*.sh && \
     sudo mkdir -p /srv/modules && \
-    sudo mv modules/*.sh /srv/modules
+    sudo mv modules/* /srv/modules/.
 
 RUN sudo chmod a+w -R /home/jovyan/work/shared && \
     sudo chmod a+w -R /home/jovyan/work/geoserver && \
@@ -164,9 +164,10 @@ WORKDIR /home/jovyan/work
 
 # Uncomment the following lines to load the Julia kernel and Python, R and Julia modules
 # You can also load the following inside the runnng Notebook single-user container through terminal
-#RUN /srv/modules/load-python3-modules.sh
-#RUN /srv/modules/load-python2-modules.sh
-#RUN /srv/modules/load-r-modules.sh
+RUN /srv/modules/load-python3-modules.sh
+RUN /srv/modules/load-python2-modules.sh
+RUN /srv/modules/load-r-modules.sh
+RUN /srv/modules/restore-tutorial.sh
 #RUN /srv/modules/install-julia-kernel.sh
 #RUN /srv/modules/load-julia-modules.sh
 
@@ -178,5 +179,8 @@ ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
 RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup
 
+# Jupyter contrib extensions
+
 # Google-drive testing
 RUN jupyter labextension install @jupyterlab/google-drive
+ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
