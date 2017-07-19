@@ -6,7 +6,8 @@ source activate /opt/conda/envs/python2
 pip install --upgrade pip
 pip install lightning-python pymongo psycopg2 \
   missingno plotly folium toyplot TextBlob geopandas mplleaflet cartodb \
-  bubbles python-arango findspark epipy scikit-surprise graphviz cachey
+  bubbles python-arango findspark epipy scikit-surprise graphviz cachey \
+  sklearn-pandas
 pip install dask[complete] smopy gmplot
 
 conda install --yes -c anaconda mysql-connector-python=2.0.4

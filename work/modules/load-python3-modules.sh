@@ -4,7 +4,8 @@
 pip3 install --upgrade pip
 pip3 install lightning-python pymongo psycopg2 \
       missingno plotly folium toyplot TextBlob geopandas mplleaflet cartodb \
-      bubbles python-arango findspark epipy scikit-surprise ipynb graphviz cachey
+      bubbles python-arango findspark epipy scikit-surprise ipynb graphviz cachey \
+      sklearn-pandas
 pip3 install dask[complete] smopy gmplot
 
 conda install --yes -c anaconda mysql-connector-python=2.0.4
