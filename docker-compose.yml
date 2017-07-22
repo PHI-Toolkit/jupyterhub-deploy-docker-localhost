@@ -9,8 +9,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.jupyterhub
+      args:
+        LOGO_IMAGE: geeks.png
     image: jupyterhub
     container_name: jupyterhub
+    env_file: .env
     volumes:
       # Bind Docker socket on the host so we can connect to the daemon from
       # within the container
@@ -19,6 +22,7 @@ services:
       - "data:${DATA_VOLUME_CONTAINER}"
     ports:
       - "443:443"
+      #- "8000:8000"
     environment:
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}

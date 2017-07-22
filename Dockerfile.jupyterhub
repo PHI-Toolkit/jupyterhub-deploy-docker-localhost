@@ -24,7 +24,7 @@ RUN chmod 700 /srv/jupyterhub/secrets && \
     touch /etc/proxy_token
 
 # change jupyterhub logo
-ENV LOGO_IMAGE geeks.png
+ARG LOGO_IMAGE
 COPY ./userlist /srv/jupyterhub/userlist
 COPY css/$LOGO_IMAGE /opt/conda/share/jupyter/hub/static/images/
 RUN cp /opt/conda/share/jupyter/hub/static/images/jupyter.png /opt/conda/share/jupyter/hub/static/images/jupyter.png.bak && \

@@ -16,8 +16,6 @@ RUN conda install -c conda-forge jupyterlab ipywidgets && \
     conda install jupyter_client && \
     jupyter serverextension enable --py jupyterlab --sys-prefix
 
-RUN conda update notebook jupyterhub jupyterlab
-
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # libav-tools for matplotlib anim
@@ -172,15 +170,18 @@ RUN /srv/modules/restore-tutorial.sh
 #RUN /srv/modules/load-julia-modules.sh
 
 # Custom logo, create backup CSS file to enable restore if jupyter-themes overwrites it and the GEEKS logo
-ENV LOGO_IMAGE geeks.png
+ARG LOGO_IMAGE
 RUN mkdir -p /home/jovyan/.jupyter/custom
 ADD css/custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
 RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup
 
-# Jupyter contrib extensions
-
-# Google-drive testing
-RUN jupyter labextension install @jupyterlab/google-drive
+# Address iopub data error message
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
+
+# Google-drive nbtranslate testing
+RUN jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user
+RUN jupyter nbextension enable nbTranslate/main
+RUN conda update jupyterlab && \
+    jupyter labextension install @jupyterlab/google-drive
