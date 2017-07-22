@@ -17,6 +17,7 @@ This deployment:
 * Adds self signed certificate to a **secrets** folder using the provided bash script, "create-certs.sh".
 * Set up script to launch additional python libraries (Python 2 and 3) in /srv/modules folder: load-python-modules.sh
 * Preview of [JupyterLab](https://github.com/jupyterlab/jupyterlab) (to access the jupyterlab interface, replace the "tree" in the URL with "lab", for example, https://localhost/user/jovyan/tree becomes https://localhost/user/jovyan/lab)
+* Allows you to change the default Jupyter logo. Just change the image file name in the *.env* file in the environment variable called *LOGO_IMAGE*.
 
 **Figure 1**: Schematic for JupyterHub deployment
 ![JupyterHub single host Docker deployment](internal/jupyterhub-docker.png)
@@ -48,7 +49,7 @@ This deployment:
 
 Possible use cases for this deployment may include, but are not limited to:
 
-* A JupyterHub demo environment that you can spin up relatively quickly.
+* A JupyterHub demo environment that you can spin up relatively quickly on your local machine (https://localhost).
 * A multi-user Jupyter Notebook environment for small classes, teams, or departments.
 
 ## Disclaimer
@@ -100,7 +101,13 @@ OAUTH_CALLBACK_URL=https://<myhost.mydomain>/hub/oauth_callback
 **Note:** The `.env` file is a special file that Docker Compose uses to lookup environment variables.
 If you choose to place the GitHub secrets in this file,
 you should ensure that this file remains private
-(e.g., do not commit the secrets to source control).
+(e.g., do not commit the secrets to source control) and include it in the *.gitignore* file.
+
+## Running behind an nginx proxy
+* Use this **nginx-proxy** GitHub repository: https://github.com/PHI-Toolkit/nginx-proxy. The *Dockerfile* and *docker-compose.yml* files have been modified for this JupyterHub and Jupyter Notebooks deployment.
+* Comment out the TLS lines in the *jupyterhub_config.py* file
+* Add *VIRTUAL_HOST: myhost.mydomain* to the environment section of the *docker-compose.yml* file.
+* Comment out the *- "444:443"* line and uncomment the *- "8000:8000"* line in the *docker-compose.yml* file. The **nginx-proxy** *docker-compose.yml* file reads the *secrets* folder of this deployment where *jupyterhub.crt* and *jupyterhub.key* files are created after running the *create-certs.sh* bash script. If using **letsencrypt** you can also place the corresponding *.crt* and *.key* files in the same directory. This maintains SSL termination for the whole set up.
 
 ## Build the JupyterHub Docker image
 
