@@ -180,8 +180,6 @@ RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
 # Address iopub data error message
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
-# Google-drive nbtranslate testing
-RUN jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user
-RUN jupyter nbextension enable nbTranslate/main
+# Google-drive testing
 RUN conda update jupyterlab && \
     jupyter labextension install @jupyterlab/google-drive
