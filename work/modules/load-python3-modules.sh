@@ -26,5 +26,8 @@ conda install --yes -c conda-forge jupyter_contrib_nbextensions jupyter_dashboar
 conda install --yes -c blaze blaze
 conda install --yes -c anaconda scrapy simplejson
 conda install --yes -c conda-forge jupyter_cms
+
+conda install --yes -c conda-force gdal
+
 conda remove --quiet --yes --force qt pyqt
 conda clean -tipsy
