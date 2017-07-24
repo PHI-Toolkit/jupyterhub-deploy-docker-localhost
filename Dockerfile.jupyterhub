@@ -25,6 +25,7 @@ RUN chmod 700 /srv/jupyterhub/secrets && \
 
 # change jupyterhub logo
 ARG LOGO_IMAGE
+RUN echo $LOGO_IMAGE
 COPY ./userlist /srv/jupyterhub/userlist
 COPY css/$LOGO_IMAGE /opt/conda/share/jupyter/hub/static/images/
 RUN cp /opt/conda/share/jupyter/hub/static/images/jupyter.png /opt/conda/share/jupyter/hub/static/images/jupyter.png.bak && \

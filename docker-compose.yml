@@ -10,7 +10,7 @@ services:
       context: .
       dockerfile: Dockerfile.jupyterhub
       args:
-        LOGO_IMAGE: geeks.png
+        LOGO_IMAGE: ${LOGO_IMAGE}
     image: jupyterhub
     container_name: jupyterhub
     env_file: .env
@@ -32,12 +32,11 @@ services:
       DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
       # Using this run command (optional)
       DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
-      # change hub logo
-      LOGO_IMAGE: ${LOGO_IMAGE}
       # Required to authenticate users using GitHub OAuth
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
       OAUTH_CALLBACK_URL: ${OAUTH_CALLBACK_URL}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
 
