@@ -47,7 +47,7 @@ pull:
 
 #notebook_image: pull
 notebook_image:
-$(DOCKER_EXEC) build -t $(DOCKER_NOTEBOOK_IMAGE) --build-arg LOGO_IMAGE=${LOGO_IMAGE} -f ${NOTEBOOK_IMAGE_DOCKERFILE} .
+	$(DOCKER_EXEC) build -t $(DOCKER_NOTEBOOK_IMAGE) --build-arg LOGO_IMAGE=${LOGO_IMAGE} -f ${NOTEBOOK_IMAGE_DOCKERFILE} .
 
 build: check-files network volumes
 	docker-compose build
