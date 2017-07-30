@@ -182,5 +182,5 @@ RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 # Google-drive testing
-RUN conda update jupyterlab && \
-    jupyter labextension install @jupyterlab/google-drive
+RUN conda update jupyterlab
+RUN jupyter labextension install @jupyterlab/google-drive
