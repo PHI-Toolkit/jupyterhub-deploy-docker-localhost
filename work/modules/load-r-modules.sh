@@ -14,7 +14,7 @@ sudo rm -rf /var/lib/apt/lists/*
 # conda install
 conda install --yes -c r r-xml
 conda install --yes gdal
-conda install --yes -c bioconda r-plotly=4.5.6
+conda install --yes -c bioconda r-plotly
 conda install --yes -c r r-randomforest=4.6_12 r-e1071=1.6_7 r-rpart=4.1.8 r-xml=3.98_1.5 r-quantmod=0.4_7 \
   r-rvest=0.3.2 r-reshape2=1.4.2 r-tm=0.6_2 r-maps=3.1.1 r-htmlwidgets=0.8
 conda remove --quiet --yes --force qt pyqt
