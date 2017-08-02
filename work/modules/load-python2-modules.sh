@@ -17,7 +17,7 @@ conda install --yes -c anaconda mysql-connector-python=2.0.4 qgrid
 conda install --yes -c conda-forge bokeh
 conda install --yes -c anaconda bkcharts
 conda install --yes -c conda-forge geos osmnx gmaps geopy
-conda install --yes -c ioam holoviews=1.8.0 geoviews=1.3.0
+conda install --yes -c ioam holoviews=1.8.0 geoviews
 conda install --yes -c r rpy2
 conda install --yes xarray
 
