@@ -164,6 +164,7 @@ WORKDIR /home/jovyan/work
 # You can also load the following inside the runnng Notebook single-user container through terminal
 RUN /srv/modules/load-python3-modules.sh
 RUN /srv/modules/load-python2-modules.sh
+RUN /srv/modules/install-python-geospatial.sh
 RUN /srv/modules/load-r-modules.sh
 RUN /srv/modules/restore-tutorial.sh
 #RUN /srv/modules/install-julia-kernel.sh

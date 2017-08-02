@@ -12,6 +12,10 @@ conda install --yes pyshp
 conda install -c https://conda.anaconda.org/ioos --yes descartes
 conda install --yes matplotlib
 conda install --yes shapely
+conda install -c ioos mplleaflet
+conda remove --quiet --yes --force qt pyqt
+conda clean -tipsy
+
 
 source activate python2
 conda install -c conda-forge --yes gdal
@@ -26,4 +30,7 @@ conda install --yes pyshp
 conda install -c https://conda.anaconda.org/ioos --yes descartes
 conda install --yes matplotlib
 conda install --yes shapely
+conda install -c ioos mplleaflet
+conda remove --quiet --yes --force qt pyqt
+conda clean -tipsy
 source deactivate
