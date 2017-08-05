@@ -13,9 +13,16 @@ conda install -c https://conda.anaconda.org/ioos --yes descartes
 conda install --yes matplotlib
 conda install --yes shapely
 conda install -c ioos mplleaflet
+conda install --yes -c conda-forge geos osmnx gmaps geopy
+conda install --yes -c ioam holoviews=1.8.0 geoviews
+conda install obspy geopandas mplleaflet cartopy
 conda remove --quiet --yes --force qt pyqt
 conda clean -tipsy
 
+git clone https://github.com/jwass/geopandas_osm.git
+cd geopandas_osm
+python setup.py install
+cd ..
 
 source activate python2
 conda install -c conda-forge --yes gdal
@@ -31,6 +38,13 @@ conda install -c https://conda.anaconda.org/ioos --yes descartes
 conda install --yes matplotlib
 conda install --yes shapely
 conda install -c ioos mplleaflet
+conda install --yes -c conda-forge geos osmnx gmaps geopy
+conda install --yes -c ioam holoviews=1.8.0 geoviews
+conda install obspy geopandas mplleaflet cartopy
+git clone https://github.com/jwass/geopandas_osm.git
+cd geopandas_osm
+python setup.py install
+cd ..
 conda remove --quiet --yes --force qt pyqt
 conda clean -tipsy
 source deactivate
