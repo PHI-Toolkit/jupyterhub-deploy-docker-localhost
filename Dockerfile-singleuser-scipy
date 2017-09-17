@@ -121,8 +121,6 @@ RUN MPLBACKEND=Agg $CONDA_DIR/envs/python2/bin/python -c "import matplotlib.pypl
 RUN pip install kernda --no-cache && \
     $CONDA_DIR/envs/python2/bin/python -m ipykernel install && \
     kernda -o -y /usr/local/share/jupyter/kernels/python2/kernel.json && \
-    $CONDA_DIR/envs/python3/bin/python -m ipykernel install && \
-    kernda -o -y /usr/local/share/jupyter/kernels/python3/kernel.json && \
     pip uninstall kernda -y
 
 USER jovyan
