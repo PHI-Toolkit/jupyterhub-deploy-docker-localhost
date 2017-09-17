@@ -5,7 +5,7 @@ pip3 install --upgrade pip
 pip3 install lightning-python pymongo psycopg2 \
       missingno plotly folium toyplot TextBlob \
       bubbles python-arango findspark epipy scikit-surprise ipynb graphviz cachey \
-      sklearn-pandas
+      sklearn-pandas cufflinks googletrans fuzzywuzzy python-Levenshtein hyper fbprophet
 pip3 install dask[complete] smopy gmplot RISE
 
 jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user
@@ -18,6 +18,7 @@ conda install -c anaconda bkcharts
 #conda install --yes -c ioam holoviews=1.8.0 geoviews
 conda install --yes -c r rpy2
 conda install --yes xarray
+conda install --yes -c hargup/label/pypi hashlib
 
 conda install --yes -c bokeh datashader=0.5.0
 conda install --yes -c conda-forge iris pyshp pandas-datareader basemap \

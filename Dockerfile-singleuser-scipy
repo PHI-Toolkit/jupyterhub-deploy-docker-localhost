@@ -20,7 +20,8 @@ RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # libav-tools for matplotlib anim
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libav-tools libgeos-dev nano && \
+    apt-get install -y --no-install-recommends libav-tools libgeos-dev nano \
+    libffi-dev g++ libssl-dev libfreetype6-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -32,6 +33,7 @@ RUN chmod -R a+w /opt/conda/ && \
     chmod g+s /opt/conda
 
 USER jovyan
+
 RUN conda install --quiet --yes \
     'nomkl' \
     'ipywidgets=6.0*' \
@@ -53,7 +55,6 @@ RUN conda install --quiet --yes \
     'sqlalchemy=1.1*' \
     'hdf5=1.8.17' \
     'h5py=2.6*' \
-    'vincent=0.4.*' \
     'beautifulsoup4=4.5.*' \
     'icu' \
     'xlrd'  && \
@@ -96,7 +97,6 @@ RUN source activate python2 && \
     'h5py=2.6*' \
     'sqlalchemy=1.1*' \
     'pyzmq' \
-    'vincent=0.4.*' \
     'beautifulsoup4=4.5.*' \
     'icu' \
     'xlrd' && \
@@ -121,6 +121,8 @@ RUN MPLBACKEND=Agg $CONDA_DIR/envs/python2/bin/python -c "import matplotlib.pypl
 RUN pip install kernda --no-cache && \
     $CONDA_DIR/envs/python2/bin/python -m ipykernel install && \
     kernda -o -y /usr/local/share/jupyter/kernels/python2/kernel.json && \
+    $CONDA_DIR/envs/python3/bin/python -m ipykernel install && \
+    kernda -o -y /usr/local/share/jupyter/kernels/python3/kernel.json && \
     pip uninstall kernda -y
 
 USER jovyan
@@ -133,49 +135,47 @@ COPY work .
 
 RUN sudo chmod a+x modules/*.sh && \
     sudo mkdir -p /srv/modules && \
-    sudo mv modules/* /srv/modules/.
-
-RUN sudo chmod a+w -R /home/jovyan/work/shared && \
+    sudo mv modules/* /srv/modules/. && \
+    sudo chmod a+w -R /home/jovyan/work/shared && \
     sudo chmod a+w -R /home/jovyan/work/geoserver && \
     sudo chmod a+w -R /home/jovyan/work/notebooks && \
-    sudo chmod a+w /home/jovyan/work/notebooks/*.ipynb
-
-RUN sudo chown -R jovyan:users /home/jovyan && \
+    sudo chmod a+w /home/jovyan/work/notebooks/*.ipynb && \
+    sudo chown -R jovyan:users /home/jovyan && \
     sudo chown -R jovyan:users /home/jovyan/work/shared && \
     sudo chown -R jovyan:users /home/jovyan/work/geoserver && \
-    sudo chown -R jovyan:users /home/jovyan/work/notebooks
-
-RUN mkdir -p /home/jovyan/.cache && \
+    sudo chown -R jovyan:users /home/jovyan/work/notebooks && \
+    mkdir -p /home/jovyan/.cache && \
     chmod -R a+w /home/jovyan/.cache && \
     chown -R jovyan:users /home/jovyan/.cache
 
 # Jupyter Themes
-RUN git clone https://github.com/dunovank/jupyter-themes.git && \
-    cd jupyter-themes && \
-    python setup.py install && \
-    mkdir -p /opt/conda/lib/python3.6/site-packages/jupyterthemes && \
-    mkdir -p /opt/conda/lib/python3.6/site-packages/jupyterthemes-0.16.4-py3.6.egg/jupyterthemes && \
-    chmod -R a+w /opt/conda/lib/python3.6/site-packages/jupyterthemes && \
-    chmod -R a+w /opt/conda/lib/python3.6/site-packages/jupyterthemes-0.16.4-py3.6.egg/jupyterthemes && \
-    cd .. && \
-    rm -fvR jupyter-themes
+#RUN git clone https://github.com/dunovank/jupyter-themes.git && \
+#    cd jupyter-themes && \
+#    python setup.py install && \
+#    mkdir -p /opt/conda/lib/python3.6/site-packages/jupyterthemes && \
+#    mkdir -p /opt/conda/lib/python3.6/site-packages/jupyterthemes-0.16.4-py3.6.egg/jupyterthemes && \
+#    chmod -R a+w /opt/conda/lib/python3.6/site-packages/jupyterthemes && \
+#    chmod -R a+w /opt/conda/lib/python3.6/site-packages/jupyterthemes-0.16.4-py3.6.egg/jupyterthemes && \
+#    cd .. && \
+#    rm -fvR jupyter-themes
 
 WORKDIR /home/jovyan/work
 
 # Uncomment the following lines to load the Julia kernel and Python, R and Julia modules
 # You can also load the following inside the runnng Notebook single-user container through terminal
-RUN /srv/modules/load-python3-modules.sh
-RUN /srv/modules/load-python2-modules.sh
-RUN /srv/modules/install-python-geospatial.sh
+RUN /srv/modules/load-python3-modules.sh && \
+    /srv/modules/load-python2-modules.sh && \
+    /srv/modules/install-python-geospatial.sh
 RUN /srv/modules/load-r-modules.sh
+RUN /srv/modules/install-scijava-kernel.sh
 RUN /srv/modules/restore-tutorial.sh
 #RUN /srv/modules/install-julia-kernel.sh
 #RUN /srv/modules/load-julia-modules.sh
 
 # Custom logo, create backup CSS file to enable restore if jupyter-themes overwrites it and the GEEKS logo
 ARG LOGO_IMAGE
-RUN echo $LOGO_IMAGE
-RUN mkdir -p /home/jovyan/.jupyter/custom
+RUN echo $LOGO_IMAGE && \
+    mkdir -p /home/jovyan/.jupyter/custom
 ADD css/custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
 RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
@@ -184,6 +184,10 @@ RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
 # Address iopub data error message
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
-# Google-drive testing
-RUN conda update jupyterlab
-RUN jupyter labextension install @jupyterlab/google-drive
+USER root
+RUN conda update jupyterlab && \
+    conda clean -tipsy && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+USER jovyan
+#RUN jupyter labextension install @jupyterlab/google-drive

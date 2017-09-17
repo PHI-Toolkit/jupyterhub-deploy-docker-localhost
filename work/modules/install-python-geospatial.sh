@@ -1,5 +1,6 @@
 #!/bin/bash
 # based on http://mappingandco.com/blog/setting-up-a-geospatial-python-tool-box-with-conda/
+
 conda install -c conda-forge --yes gdal
 conda install --yes pyproj
 conda install -c http://conda.anaconda.org/rbacher --yes spectral
@@ -23,6 +24,7 @@ git clone https://github.com/jwass/geopandas_osm.git
 cd geopandas_osm
 python setup.py install
 cd ..
+rm -fvR geopandas_osm
 
 source activate python2
 conda install -c conda-forge --yes gdal
@@ -45,6 +47,8 @@ git clone https://github.com/jwass/geopandas_osm.git
 cd geopandas_osm
 python setup.py install
 cd ..
+rm -fvR geopandas_osm
+
 conda remove --quiet --yes --force qt pyqt
 conda clean -tipsy
 source deactivate

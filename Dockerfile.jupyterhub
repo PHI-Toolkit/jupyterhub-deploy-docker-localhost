@@ -5,7 +5,8 @@ FROM jupyterhub/jupyterhub-onbuild:0.7.2
 # Install dockerspawner and its dependencies
 RUN /opt/conda/bin/pip install \
     oauthenticator==0.5.* \
-    dockerspawner==0.7.*
+    dockerspawner==0.7.* \
+    git+https://github.com/jupyterhub/wrapspawner
 
 RUN pip install jupyterhub-dummyauthenticator
 

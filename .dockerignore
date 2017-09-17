@@ -2,4 +2,7 @@
 .gitignore
 examples/
 internal/
+docs/
+secrets/
 README.md
+LICENSE.md
