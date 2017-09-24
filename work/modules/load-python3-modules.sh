@@ -5,7 +5,7 @@ pip3 install --upgrade pip
 pip3 install lightning-python pymongo psycopg2 \
       missingno plotly folium toyplot TextBlob \
       bubbles python-arango findspark epipy scikit-surprise ipynb graphviz cachey \
-      sklearn-pandas cufflinks googletrans fuzzywuzzy python-Levenshtein hyper fbprophet
+      sklearn-pandas cufflinks googletrans fuzzywuzzy python-Levenshtein hyper
 pip3 install dask[complete] smopy gmplot RISE
 
 jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user

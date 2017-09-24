@@ -18,10 +18,12 @@ RUN wget https://get.docker.com -q -O /tmp/getdocker && \
 # Copy TLS certificate and key
 ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.crt
 ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
-COPY ./secrets/jupyterhub.crt $SSL_CERT
-COPY ./secrets/jupyterhub.key $SSL_KEY
-RUN chmod 700 /srv/jupyterhub/secrets && \
-    chmod 600 /srv/jupyterhub/secrets/* && \
+#COPY secrets/jupyterhub.crt /srv/jupyterhub/secrets/jupyterhub.crt
+#COPY secrets/jupyterhub.key /srv/jupyterhub/secrets/jupyterhub.key
+RUN mkdir -p /srv/jupyterhub/secrets && \
+    touch /srv/jupyterhub/secrets/dummy.txt && \
+    chmod 700 -R /srv/jupyterhub/secrets && \
+    chmod 600 -R /srv/jupyterhub/secrets/* && \
     touch /etc/proxy_token
 
 # change jupyterhub logo
@@ -31,3 +33,5 @@ COPY ./userlist /srv/jupyterhub/userlist
 COPY css/$LOGO_IMAGE /opt/conda/share/jupyter/hub/static/images/
 RUN cp /opt/conda/share/jupyter/hub/static/images/jupyter.png /opt/conda/share/jupyter/hub/static/images/jupyter.png.bak && \
     cp /opt/conda/share/jupyter/hub/static/images/$LOGO_IMAGE /opt/conda/share/jupyter/hub/static/images/jupyter.png
+
+VOLUME /srv/jupyterhub/secrets/

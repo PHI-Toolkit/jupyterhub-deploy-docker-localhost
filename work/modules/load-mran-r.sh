@@ -1,11 +1,11 @@
 #!/bin/bash
 cd /tmp
-wget https://mran.microsoft.com/install/mro/3.4.0/microsoft-r-open-3.4.0.tar.gz
-tar zxvf microsoft-r-open-3.4.0.tar.gz
+wget https://mran.microsoft.com/install/mro/3.4.1/microsoft-r-open-3.4.1.tar.gz
+tar zxvf microsoft-r-open-3.4.1.tar.gz
 cd microsoft-r-open
 sudo ./install.sh -a
 cd ..
-sudo rm microsoft-r-open-3.4.0.tar.gz
+sudo rm microsoft-r-open-3.4.1.tar.gz
 sudo rm -fvR microsoft-r-open
 cd /home/jovyan/work
 sudo mkdir -p /usr/local/lib/R/site-library

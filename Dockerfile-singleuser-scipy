@@ -1,5 +1,5 @@
 # based on docker stacks
-FROM jupyter/r-notebook
+FROM jupyter/minimal-notebook
 MAINTAINER herman.tolentino@gmail.com
 
 USER root
@@ -12,31 +12,55 @@ RUN ln -sf /bin/bash /bin/sh && \
     ln -s /bin/tar /bin/gtar
 
 # install jupyterlab, jupyter_client
-RUN conda install -c conda-forge jupyterlab ipywidgets && \
-    conda install jupyter_client && \
-    jupyter serverextension enable --py jupyterlab --sys-prefix
-
-RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
 # libav-tools for matplotlib anim
-RUN apt-get update && \
+RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    conda install --yes -c conda-forge jupyterlab jupyter_client && \
+    jupyter serverextension enable --py jupyterlab --sys-prefix && \
+    apt-get update && \
     apt-get install -y --no-install-recommends libav-tools libgeos-dev nano \
     libffi-dev g++ libssl-dev libfreetype6-dev && \
     apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    chmod -R a+w /opt/conda/ && \
+    chown -R root:users /opt/conda && \
+    chmod g+s /opt/conda
+
+# R pre-requisites
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    fonts-dejavu \
+    gfortran \
+    gcc && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+USER $NB_USER
+
+# R packages
+RUN conda install --quiet --yes \
+    'r-base=3.3.2' \
+    'r-irkernel=0.7*' \
+    'r-plyr=1.8*' \
+    'r-devtools=1.12*' \
+    'r-tidyverse=1.0*' \
+    'r-shiny=0.14*' \
+    'r-rmarkdown=1.2*' \
+    'r-forecast=7.3*' \
+    'r-rsqlite=1.1*' \
+    'r-reshape2=1.4*' \
+    'r-nycflights13=0.2*' \
+    'r-caret=6.0*' \
+    'r-rcurl=1.95*' \
+    'r-crayon=1.3*' \
+    'r-randomforest=4.6*' && \
+    conda clean -tipsy
 
 # Install Python 3 packages
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
 # use notebook-friendly backends in these images
-RUN chmod -R a+w /opt/conda/ && \
-    chown -R root:users /opt/conda && \
-    chmod g+s /opt/conda
 
-USER jovyan
-
-RUN conda install --quiet --yes \
+RUN conda install --quiet -c conda-forge --yes \
     'nomkl' \
-    'ipywidgets=6.0*' \
+    'ipywidgets=7.0*' \
     'pandas=0.19*' \
     'numexpr=2.6*' \
     'matplotlib=2.0*' \
@@ -57,7 +81,40 @@ RUN conda install --quiet --yes \
     'h5py=2.6*' \
     'beautifulsoup4=4.5.*' \
     'icu' \
+    'missingno' \
+    'blaze' \
+    'pandas-datareader' \
+    'textblob' \
+    'jupyter_contrib_nbextensions' \
     'xlrd'  && \
+    conda install -c conda-forge -c ioam -c bioconda -c anaconda --yes \
+    'gdal' \
+    'pyproj' \
+    'pillow' \
+    'fiona' \
+    'rasterio' \
+    'geojson' \
+    'pyshp' \
+    'shapely' \
+    'obspy' \
+    'geopandas' \
+    'mplleaflet' \
+    'plotly' \
+    'folium' \
+    'holoviews' \
+    'geoviews' \
+    'xarray' \
+    'iris' \
+    'bkcharts' \
+    'basemap' \
+    'basemap-data-hires' \
+    'networkx' \
+    'osmnx' \
+    'cartopy' && \
+    pip install --upgrade pip && \
+    pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy && \
+    jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
+    jupyter nbextension enable nbTranslate/main && \
     conda remove --quiet --yes --force qt pyqt && \
     conda clean -tipsy
 
@@ -74,10 +131,10 @@ USER jovyan
 RUN conda create --quiet --yes -p $CONDA_DIR/envs/python2 python=2.7 && \
     source deactivate
 RUN source activate python2 && \
-    conda install --yes \
+    conda install --yes -c conda-forge \
     'nomkl' \
     'ipython=5.3*' \
-    'ipywidgets=6.0*' \
+    'ipywidgets=7.0*' \
     'pandas=0.19*' \
     'numexpr=2.6*' \
     'matplotlib=2.0*' \
@@ -99,26 +156,61 @@ RUN source activate python2 && \
     'pyzmq' \
     'beautifulsoup4=4.5.*' \
     'icu' \
+    'missingno' \
+    'blaze' \
+    'pandas-datareader' \
+    'textblob' \
+    'jupyter_contrib_nbextensions' \
     'xlrd' && \
+    conda install -c conda-forge -c ioam -c bioconda -c anaconda --yes \
+    'gdal' \
+    'pyproj' \
+    'pillow' \
+    'fiona' \
+    'rasterio' \
+    'geojson' \
+    'pyshp' \
+    'shapely' \
+    'obspy' \
+    'geopandas' \
+    'mplleaflet' \
+    'plotly' \
+    'folium' \
+    'holoviews' \
+    'geoviews' \
+    'xarray' \
+    'iris' \
+    'bkcharts' \
+    'basemap' \
+    'basemap-data-hires' \
+    'networkx' \
+    'osmnx' \
+    'cartopy' && \
+    pip install --upgrade pip && \
+    pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy && \
+    jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
+    jupyter nbextension enable nbTranslate/main && \
     conda remove -n python2 --quiet --yes --force qt pyqt && \
     conda clean -tipsy && \
     source deactivate
 
 
 # Add shortcuts to distinguish pip for python2 and python3 envs
-USER root
-RUN ln -s $CONDA_DIR/envs/python2/bin/pip $CONDA_DIR/bin/pip2 && \
-    ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip3
-
 # Import matplotlib the first time to build the font cache.
-ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
-RUN MPLBACKEND=Agg $CONDA_DIR/envs/python2/bin/python -c "import matplotlib.pyplot"
+# fix-permissions $CONDA_DIR
 
 # Install Python 2 kernel spec globally to avoid permission problems when NB_UID
 # switching at runtime and to allow the notebook server running out of the root
 # environment to find it. Also, activate the python2 environment upon kernel
 # launch.
-RUN pip install kernda --no-cache && \
+
+USER root
+ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
+RUN ln -s $CONDA_DIR/envs/python2/bin/pip $CONDA_DIR/bin/pip2 && \
+    ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip3 && \
+    MPLBACKEND=Agg $CONDA_DIR/envs/python2/bin/python -c "import matplotlib.pyplot" && \
+    MPLBACKEND=Agg $CONDA_DIR/bin/python -c "import matplotlib.pyplot" && \
+    pip install kernda --no-cache && \
     $CONDA_DIR/envs/python2/bin/python -m ipykernel install && \
     kernda -o -y /usr/local/share/jupyter/kernels/python2/kernel.json && \
     pip uninstall kernda -y
@@ -161,12 +253,12 @@ WORKDIR /home/jovyan/work
 
 # Uncomment the following lines to load the Julia kernel and Python, R and Julia modules
 # You can also load the following inside the runnng Notebook single-user container through terminal
-RUN /srv/modules/load-python3-modules.sh && \
-    /srv/modules/load-python2-modules.sh && \
-    /srv/modules/install-python-geospatial.sh
-RUN /srv/modules/load-r-modules.sh
-RUN /srv/modules/install-scijava-kernel.sh
-RUN /srv/modules/restore-tutorial.sh
+#RUN /srv/modules/load-python3-modules.sh && \
+#    /srv/modules/load-python2-modules.sh && \
+#    /srv/modules/install-python-geospatial.sh
+#RUN /srv/modules/load-r-modules.sh
+#RUN /srv/modules/install-scijava-kernel.sh
+#RUN /srv/modules/restore-tutorial.sh
 #RUN /srv/modules/install-julia-kernel.sh
 #RUN /srv/modules/load-julia-modules.sh
 
