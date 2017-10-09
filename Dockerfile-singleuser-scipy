@@ -18,7 +18,9 @@ RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     jupyter serverextension enable --py jupyterlab --sys-prefix && \
     apt-get update && \
     apt-get install -y --no-install-recommends libav-tools libgeos-dev nano \
-    libffi-dev g++ libssl-dev libfreetype6-dev && \
+    libffi-dev g++ libssl-dev libfreetype6-dev \
+    python-dev libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr \
+    flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     chmod -R a+w /opt/conda/ && \
@@ -52,6 +54,9 @@ RUN conda install --quiet --yes \
     'r-rcurl=1.95*' \
     'r-crayon=1.3*' \
     'r-randomforest=4.6*' && \
+    conda install -c conda-forge --yes \
+    'r-visnetwork' \
+    'r-igraph ' && \
     conda clean -tipsy
 
 # Install Python 3 packages
@@ -238,24 +243,10 @@ RUN sudo chmod a+x modules/*.sh && \
     chmod -R a+w /home/jovyan/.cache && \
     chown -R jovyan:users /home/jovyan/.cache
 
-# Jupyter Themes
-#RUN git clone https://github.com/dunovank/jupyter-themes.git && \
-#    cd jupyter-themes && \
-#    python setup.py install && \
-#    mkdir -p /opt/conda/lib/python3.6/site-packages/jupyterthemes && \
-#    mkdir -p /opt/conda/lib/python3.6/site-packages/jupyterthemes-0.16.4-py3.6.egg/jupyterthemes && \
-#    chmod -R a+w /opt/conda/lib/python3.6/site-packages/jupyterthemes && \
-#    chmod -R a+w /opt/conda/lib/python3.6/site-packages/jupyterthemes-0.16.4-py3.6.egg/jupyterthemes && \
-#    cd .. && \
-#    rm -fvR jupyter-themes
-
 WORKDIR /home/jovyan/work
 
 # Uncomment the following lines to load the Julia kernel and Python, R and Julia modules
 # You can also load the following inside the runnng Notebook single-user container through terminal
-#RUN /srv/modules/load-python3-modules.sh && \
-#    /srv/modules/load-python2-modules.sh && \
-#    /srv/modules/install-python-geospatial.sh
 #RUN /srv/modules/load-r-modules.sh
 #RUN /srv/modules/install-scijava-kernel.sh
 #RUN /srv/modules/restore-tutorial.sh
