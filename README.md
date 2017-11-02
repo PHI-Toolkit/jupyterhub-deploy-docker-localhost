@@ -1,142 +1,180 @@
-# jupyterhub-deploy-docker-localhost
+**[Technical Overview](#technical-overview)** |
+**[Prerequisites](#prerequisites)** |
+**[Authenticator setup](#authenticator-setup)** |
+**[Build the JupyterHub Docker image](#build-the-jupyterhub-docker-image)** |
+**[Spawner: Prepare the Jupyter Notebook Image](#spawner-prepare-the-jupyter-notebook-image)** |
+**[Run JupyterHub](#run-jupyterhub)** |
+**[Behind the scenes](#behind-the-scenes)** |
+**[FAQ](#faq)**
 
-This repository is based on [JupyterHub Deploy Docker](https://github.com/PHI-Toolkit/jupyterhub-deploy-docker).
+# jupyterhub-deploy-docker
 
-This repository provides a reference deployment of [JupyterHub](https://github.com/jupyter/jupyterhub) for deployment and testing in a localhost environment, a multi-user [Jupyter Notebook](http://jupyter.org/) environment, on a **single host** using [Docker](https://docs.docker.com).  
+**jupyterhub-deploy-docker** provides a reference
+deployment of [JupyterHub](https://github.com/jupyter/jupyterhub), a
+multi-user [Jupyter Notebook](http://jupyter.org/) environment, on a
+**single host** using [Docker](https://docs.docker.com).  
 
-This deployment:
+Possible **use cases** include:
 
-* Runs the [JupyterHub components](https://jupyterhub.readthedocs.org/en/latest/getting-started.html#overview) in a Docker container on the host
-* Uses [DockerSpawner](https://github.com/jupyter/dockerspawner) to spawn single-user Jupyter Notebook servers in separate Docker containers on the same host
-* Persists JupyterHub data in a Docker volume on the host
-* Persists user notebook directories in Docker volumes on the host
-* Uses [OAuthenticator](https://github.com/jupyter/oauthenticator) and [GitHub OAuth](https://developer.github.com/v3/oauth/) to authenticate users - code commented out in jupyterhub_config.py
-* Uses Dummy Authenticator with password for turnkey testing - see jupyterhub_config.py
-* Replaces the original [scipy-notebook](https://github.com/jupyter/docker-stacks/tree/master/scipy-notebook) with [r-notebook](https://github.com/jupyter/docker-stacks/tree/master/r-notebook) as the base and then adds Python kernel and libraries based on jupyter/scipy-notebook from [Docker stacks](https://github.com/jupyter/docker-stacks). Additional libraries are installed using the "load-pythonX-modules.sh" and "load-r-modules.sh" bash scripts in the **/srv/modules** folder. You can access this folder by launching a new terminal from the Jupyter Notebook interface. You can also install the Julia kernel and an essential machine learning and visualization library using Julia scripts in the same folder ("install-julia-kernel.sh" and "load-julia-modules.sh").
-* Creates a **shared** folder using a Docker data volume that users can use to share notebooks. (See Makefile)
-* Adds self signed certificate to a **secrets** folder using the provided bash script, "create-certs.sh".
-* Set up script to launch additional python libraries (Python 2 and 3) in /srv/modules folder: load-python-modules.sh
-* Preview of [JupyterLab](https://github.com/jupyterlab/jupyterlab) (to access the jupyterlab interface, replace the "tree" in the URL with "lab", for example, https://localhost/user/jovyan/tree becomes https://localhost/user/jovyan/lab)
-* Allows you to change the default Jupyter logo. Just change the image file name in the *.env* file in the environment variable called *LOGO_IMAGE*.
-
-**Figure 1**: Schematic for JupyterHub deployment
-![JupyterHub single host Docker deployment](internal/jupyterhub-docker.png)
-
-## Steps:
-* Step 1: **git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost.git** and then **cd jupyterhub-deploy-docker-localhost**
-* Step 2: **make notebook_image**: creates Jupyter singleuser notebook Docker image
-* Step 3: **make network**: creates Docker external network for shared use
-* Step 4: make volumes: creates Docker data volumes (shared, modules, geoserver)
-* Step 5: **make self-signed-cert**: creates the **secrets** folder on the host system and self-signed key and certificate for testing
-* Step 6: **docker-compose build**: creates JupyterHub Docker image
-* Step 7: **docker-compose up**: launches the hub
-* Step 6 (option): **docker-compose up -d**: launches the system and runs it in the background
-* Step 7: Launch browser and type "https://localhost" in the URL field, then log in and view the notebook (user is **jovyan**, look for password in the "jupyterhub_config.py" file)
-* Other steps:
- * **docker-compose logs -f -t --tail='all'**: view logs of the hub in real time (useful for debugging)
- * **docker logs jupyter-jovyan -f -t --tail='all'** to view the logs in real time of the singleuser notebook server spawned by the hub for user "jovyan"
- * **docker-compose down**: stop running containers (hub and singleuser notebook servers)
- * **docker ps**: view running containers
- * Change the Hub and Notebook logo: (1) create a new logo (see geeks.png as example) and save this under a filename of your choice in the **css** directory (2) assign the filename as the value of the LOGO_IMAGE environment variable in the **.env** file.
-
-**Figure 2**: Jupyter Notebook classic user interface
-![Classic user interface](internal/classicview.png)
-
-**Figure 3**: Jupyter Notebook jupyterlab user interface
-![JupytterLab user interface](internal/labview.png)
-
-## Use Cases
-
-Possible use cases for this deployment may include, but are not limited to:
-
-* A JupyterHub demo environment that you can spin up relatively quickly on your local machine (https://localhost).
-* A multi-user Jupyter Notebook environment for small classes, teams, or departments.
+* Creating a JupyterHub demo environment that you can spin up relatively
+  quickly.
+* Providing a multi-user Jupyter Notebook environment for small classes,
+  teams, or departments.
 
 ## Disclaimer
 
-This deployment is **NOT** intended for a production environment.  
+This deployment is **NOT** intended for a production environment. 
+It is a reference implementation that does not meet traditional 
+requirements in terms of availability nor scalability. 
+
+If you are looking for a more robust solution to host JupyterHub, or
+you require scaling beyond a single host, please check out the
+excellent [zero-to-jupyterhub-k8s](https://github.com/jupyterhub/zero-to-jupyterhub-k8s)
+project.
+
+
+## Technical Overview
+
+Key components of this reference deployment are:
+
+* **Host**: Runs the [JupyterHub components](https://jupyterhub.readthedocs.org/en/latest/getting-started.html#overview)
+  in a Docker container on the host.
+
+* **Authenticator**: Uses [OAuthenticator](https://github.com/jupyter/oauthenticator)
+  and [GitHub OAuth](https://developer.github.com/v3/oauth/) to
+  authenticate users.
+
+* **Spawner**:Uses [DockerSpawner](https://github.com/jupyter/dockerspawner)
+  to spawn single-user Jupyter Notebook servers in separate Docker
+  containers on the same host.
+
+* **Persistence of Hub data**: Persists JupyterHub data in a Docker
+  volume on the host.
+
+* **Persistence of user notebook directories**: Persists user notebook
+  directories in Docker volumes on the host.
+
+![JupyterHub single host Docker deployment](internal/jupyterhub-docker.png)
+
 
 ## Prerequisites
 
-* This deployment uses Docker for all the things, via  [Docker Compose](https://docs.docker.com/compose/overview/).
-  It requires [Docker Engine](https://docs.docker.com/engine) 1.12.0 or higher.
-  See the [installation instructions](https://docs.docker.com/engine/installation/) for your environment.
-* This example configures JupyterHub for HTTPS connections (the default).
-   As such, you must provide TLS certificate chain and key files to the JupyterHub server.
-   If you do not have your own certificate chain and key, you can either
-   [create self-signed versions](https://jupyter-notebook.readthedocs.org/en/latest/public_server.html#using-ssl-for-encrypted-communication),
-   or obtain real ones from [Let's Encrypt](https://letsencrypt.org)
-   (see the [letsencrypt example](examples/letsencrypt/README.md) for instructions).
+### Docker
 
-From here on, we'll assume you are set up with docker,
-via a local installation or [docker-machine](./docs/docker-machine.md).
-At this point,
+This deployment uses Docker, via [Docker Compose](https://docs.docker.com/compose/overview/), for all the things.
+[Docker Engine](https://docs.docker.com/engine) 1.12.0 or higher is
+required.
 
-    docker ps
+1. Use [Docker's installation instructions](https://docs.docker.com/engine/installation/)
+   to set up Docker for your environment.
 
-should work.
+2. To verify your docker installation, whether running docker as a local
+   installation or using [docker-machine](./docs/docker-machine.md),
+   enter these commands:
+
+   ```bash
+   docker version
+   docker ps
+   ```
+
+### HTTPS and SSL/TLS certificate
+
+This deployment configures JupyterHub to use HTTPS. You must provide a
+certificate and key file in the JupyterHub configuration. To configure:
+
+1. Obtain the domain name that you wish to use for JupyterHub, for
+   example, `myfavoritesite.com` or `jupiterplanet.org`.
+
+1. If you do not have an existing certificate and key, you can:
+
+   - obtain one from [Let's Encrypt](https://letsencrypt.org) using
+     the [certbot](https://certbot.eff.org) client,
+   - use the helper script in this repo's [letsencrypt example](examples/letsencrypt/README.md), or
+   - [create a self-signed certificate](https://jupyter-notebook.readthedocs.org/en/latest/public_server.html#using-ssl-for-encrypted-communication).
+
+1. Copy the certificate and key files to a
+   directory named `secrets` in this repository's root directory.  These will be
+   added to the JupyterHub Docker image at build time. For example, create a
+   `secrets` directory in the root of this repo and copy the certificate and
+   key files (`jupyterhub.crt` and `jupyterhub.key`) to this directory:
+
+   ```bash
+   mkdir -p secrets
+   cp jupyterhub.crt jupyterhub.key secrets/
+   ```
 
 
-## Setup GitHub Authentication
+## Authenticator setup
 
 This deployment uses GitHub OAuth to authenticate users.
-It requires that you create a [GitHub application](https://github.com/settings/applications/new).
-You will need to specify an OAuth callback URL in the following form:
 
-```
-https://<myhost.mydomain>/hub/oauth_callback
-```
+It requires that you create and register a [GitHub OAuth application](https://github.com/settings/applications/new)
+by filling out a form on the GitHub site:
 
-You must pass the secrets that GitHub provides for your application to JupyterHub at runtime.
-You can do this by setting the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`,
-and `OAUTH_CALLBACK_URL` environment variables when you run the JupyterHub container,
-or you can add them to the `.env` file in the root directory of this repository.  For example,
+![GitHub OAuth application form](docs/oauth-form.png)
 
-```
-GITHUB_CLIENT_ID=<github_client_id>
-GITHUB_CLIENT_SECRET=<github_client_secret>
-OAUTH_CALLBACK_URL=https://<myhost.mydomain>/hub/oauth_callback
-```
+In this form, you will specify the OAuth application's callback URL in
+this format: `https://<myhost.mydomain>/hub/oauth_callback`.
 
-**Note:** The `.env` file is a special file that Docker Compose uses to lookup environment variables.
-If you choose to place the GitHub secrets in this file,
-you should ensure that this file remains private
-(e.g., do not commit the secrets to source control) and include it in the *.gitignore* file.
+After you submit the GitHub form, GitHub registers your OAuth application and
+assigns a unique Client ID and Client Secret. The Client Secret should be
+kept private.
 
-## Running behind an nginx proxy
-* Use this **nginx-proxy** GitHub repository: https://github.com/PHI-Toolkit/nginx-proxy. The *Dockerfile* and *docker-compose.yml* files have been modified for this JupyterHub and Jupyter Notebooks deployment.
-* Comment out the TLS lines in the *jupyterhub_config.py* file
-* Add *VIRTUAL_HOST: myhost.mydomain* to the environment section of the *docker-compose.yml* file.
-* Comment out the *- "444:443"* line and uncomment the *- "8000:8000"* line in the *docker-compose.yml* file. The **nginx-proxy** *docker-compose.yml* file reads the *secrets* folder of this deployment where *jupyterhub.crt* and *jupyterhub.key* files are created after running the *create-certs.sh* bash script. If using **letsencrypt** you can also place the corresponding *.crt* and *.key* files in the same directory. This maintains SSL termination for the whole set up.
+At JupyterHub's runtime, you must pass the GitHub OAuth Client ID, Client
+Secret and OAuth callback url. You can do this by either:
+
+- setting the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and
+  `OAUTH_CALLBACK_URL` environment variables when you run the
+  JupyterHub container, or
+- add them to an `oauth.env` file in the `secrets` directory of this repository.
+  You may need to create both the `secrets` directory and the `oauth.env` file.
+  For example, add the following lines in the `oauth.env` file:
+
+  `oauth.env` file
+  ```
+  GITHUB_CLIENT_ID=<github_client_id>
+  GITHUB_CLIENT_SECRET=<github_client_secret>
+  OAUTH_CALLBACK_URL=https://<myhost.mydomain>/hub/oauth_callback
+  ```
+
+  **Note:** The `oauth.env` file is a special file that Docker Compose uses
+  to lookup environment variables. If you choose to place the GitHub
+  OAuth application settings in this file, you should make sure that the
+  file remains private (be careful to not commit the `oauth.env` file with
+  these secrets to source control).
+
 
 ## Build the JupyterHub Docker image
 
-Configure JupyterHub and build it into a Docker image.
+Finish configuring JupyterHub and then build the hub's Docker image. (We'll
+build the Jupyter Notebook image in the next section.)
 
-1. Copy the TLS certificate chain and key files for the JupyterHub server to a directory named `secrets` within this repository directory. These will be added to the JupyterHub Docker image at build time.  If you do not have a certificate chain and key, you can either [create self-signed versions](https://jupyter-notebook.readthedocs.org/en/latest/public_server.html#using-ssl-for-encrypted-communication), or obtain real ones from [Let's Encrypt](https://letsencrypt.org) (see the [letsencrypt example](examples/letsencrypt/README.md) for instructions).
+1. Configure `userlist`: Create a `userlist` file of authorized JupyterHub
+   users. The list should contain GitHub usernames, and this file should
+   designate at least one `admin` user. For instance, the example file below
+   contains three users, `jtyberg`, `jenny`, and `guido`, and one designated
+   administrator, `jtyberg`:
 
-    ```
-    mkdir -p secrets
-    cp jupyterhub.crt jupyterhub.key secrets/
-    ```
-
-1. Create a `userlist` file with a list of authorized users.  At a minimum, this file should contain a single admin user.  The username should be a GitHub username.  For example, a **userlist**
-template is provided that has the following entry:
-
+   `userlist` file
    ```
-   jovyan admin
+   jtyberg admin
+   jenny
+   guido
    ```
 
-   The admin user will have the ability to add more users in the JupyterHub admin console.
+   The admin user will have the ability to add more users through JupyterHub's
+   admin console.
 
-1. Use [docker-compose](https://docs.docker.com/compose/reference/) to build the
-   JupyterHub Docker image on the active Docker machine host:
+1. Use [docker-compose](https://docs.docker.com/compose/reference/) to build
+   the JupyterHub Docker image on the active Docker machine host by running
+   the `make build` command:
 
-    ```
-    make build
-    ```
+   ```bash
+   make build
+   ```
 
-## Prepare the Jupyter Notebook Image
+
+## Spawner: Prepare the Jupyter Notebook Image
 
 You can configure JupyterHub to spawn Notebook servers from any Docker image, as
 long as the image's `ENTRYPOINT` and/or `CMD` starts a single-user instance of
@@ -166,9 +204,10 @@ Notebook server that is compatible with JupyterHub).
 
 You can pull the image using the following command:
 
-```
+```bash
 make notebook_image
 ```
+
 
 ## Run JupyterHub
 
@@ -176,25 +215,36 @@ Run the JupyterHub container on the host.
 
 To run the JupyterHub container in detached mode:
 
-```
+```bash
 docker-compose up -d
 ```
 
 Once the container is running, you should be able to access the JupyterHub console at
 
+**file**
 ```
 https://myhost.mydomain
 ```
 
 To bring down the JupyterHub container:
 
-```
+```bash
 docker-compose down
 ```
+
+---
 
 ## Behind the scenes
 
 `make build` does a few things behind the scenes, to set up the environment for JupyterHub:
+
+### Create a JupyterHub Data Volume
+
+Create a Docker volume to persist JupyterHub data.   This volume will reside on the host machine.  Using a volume allows user lists, cookies, etc., to persist across JupyterHub container restarts.
+
+```bash
+docker volume create --name jupyterhub-data
+```
 
 ### Create a Docker Network
 
@@ -205,17 +255,11 @@ Create a Docker network for inter-container communication.  The benefits of usin
 
 Here we create a Docker network named `jupyterhub-network`.  Later, we will configure the JupyterHub and single-user Jupyter Notebook containers to run attached to this network.
 
-```
+```bash
 docker network create jupyterhub-network
 ```
 
-### Create a JupyterHub Data Volume
-
-Create a Docker volume to persist JupyterHub data.   This volume will reside on the host machine.  Using a volume allows user lists, cookies, etc., to persist across JupyterHub container restarts.
-
-```
-docker volume create --name jupyterhub-data
-```
+---
 
 ## FAQ
 
@@ -223,7 +267,7 @@ docker volume create --name jupyterhub-data
 
 Use `docker logs <container>`.  For example, to view the logs of the `jupyterhub` container
 
-```
+```bash
 docker logs jupyterhub
 ```
 
@@ -237,7 +281,7 @@ JupyterHub reads the Notebook image name from `jupyterhub_config.py`, which
 reads the Notebook image name from the `DOCKER_NOTEBOOK_IMAGE` environment
 variable:
 
-```
+```python
 # DockerSpawner setting in jupyterhub_config.py
 c.DockerSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 ```
@@ -245,6 +289,7 @@ c.DockerSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 By default, the`DOCKER_NOTEBOOK_IMAGE` environment variable is set in the
 `.env` file.
 
+**file**
 ```
 # Setting in the .env file
 DOCKER_NOTEBOOK_IMAGE=jupyter/scipy-notebook:2d878db5cbff
@@ -256,7 +301,7 @@ by setting the `DOCKER_NOTEBOOK_IMAGE` variable to a different Notebook
 image in the environment where you launch JupyterHub. For example, the
 following setting would be used to spawn single-user `pyspark` notebook servers:
 
-```
+```bash
 export DOCKER_NOTEBOOK_IMAGE=jupyterhub/pyspark-notebook:2d878db5cbff
 
 docker-compose up -d
@@ -284,25 +329,25 @@ There are multiple ways to [backup and restore](https://docs.docker.com/engine/u
 
 Suppose you have the following running containers:
 
-```
-docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Names}}"
+```bash
+    docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Names}}"
 
-CONTAINER ID        IMAGE                    NAMES
-bc02dd6bb91b        jupyter/minimal-notebook jupyter-jtyberg
-7b48a0b33389        jupyterhub               jupyterhub
+    CONTAINER ID        IMAGE                    NAMES
+    bc02dd6bb91b        jupyter/minimal-notebook jupyter-jtyberg
+    7b48a0b33389        jupyterhub               jupyterhub
 ```
 
 In this deployment, the user's notebook directories (`/home/jovyan/work`) are backed by Docker volumes.
 
-```
-docker inspect -f '{{ .Mounts }}' jupyter-jtyberg
+```bash
+    docker inspect -f '{{ .Mounts }}' jupyter-jtyberg
 
-[{jtyberg /var/lib/docker/volumes/jtyberg/_data /home/jovyan/work local rw true rprivate}]
+    [{jtyberg /var/lib/docker/volumes/jtyberg/_data /home/jovyan/work local rw true rprivate}]
 ```
 
 We can backup the user's notebook directory by running a separate container that mounts the user's volume and creates a tarball of the directory.  
 
-```
+```bash
 docker run --rm \
   -u root \
   -v /tmp:/backups \

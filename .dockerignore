@@ -3,6 +3,15 @@
 examples/
 internal/
 docs/
-secrets/
+secrets/accounts
+secrets/archive
+secrets/csr
+secrets/live
+secrets/renewal
+secrets/renewal-hooks
+secrets/fullchain.pem
+secrets/privkey.pem
+secrets/oauth.env
+secrets/postgres.env
 README.md
 LICENSE.md

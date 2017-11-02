@@ -5,46 +5,70 @@
 version: "2"
 
 services:
+  hub-db:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    image: postgres:9.5
+    container_name: jupyterhub-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: ${DB_VOLUME_CONTAINER}
+      JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
+    env_file:
+      - secrets/postgres.env
+    volumes:
+      - "db:${DB_VOLUME_CONTAINER}"
+
   hub:
+    depends_on:
+      - hub-db
     build:
       context: .
       dockerfile: Dockerfile.jupyterhub
       args:
+        JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
         LOGO_IMAGE: ${LOGO_IMAGE}
+    restart: always
     image: jupyterhub
     container_name: jupyterhub
-    env_file: .env
     volumes:
       # Bind Docker socket on the host so we can connect to the daemon from
       # within the container
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "data:${DATA_VOLUME_CONTAINER}"
-      - "./secrets:/srv/jupyterhub/secrets"
     ports:
       - "443:443"
-      #- "8000:8000"
+    links:
+      - hub-db
     environment:
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
       # JupyterHub will spawn this Notebook image for users
-      DOCKER_NOTEBOOK_IMAGE: ${DOCKER_NOTEBOOK_IMAGE}
+      DOCKER_NOTEBOOK_IMAGE: ${LOCAL_NOTEBOOK_IMAGE}
       # Notebook directory inside user image
       DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
       # Using this run command (optional)
       DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
-      # Required to authenticate users using GitHub OAuth
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
-      OAUTH_CALLBACK_URL: ${OAUTH_CALLBACK_URL}
-      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      # Postgres db info
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: hub-db
+    env_file:
+      - secrets/postgres.env
+      - secrets/oauth.env
+      - .env
     command: >
-      jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+      jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py
 
 volumes:
   data:
     external:
       name: ${DATA_VOLUME_HOST}
+  db:
+    external:
+      name: ${DB_VOLUME_HOST}
 
 networks:
   default:
