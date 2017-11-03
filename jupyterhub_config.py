@@ -58,6 +58,10 @@ c.JupyterHub.port = 443
 c.JupyterHub.ssl_key = os.environ['SSL_KEY']
 c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
+# Dummy Authenticator  do not use this for production!
+#c.JupyterHub.authenticator_class = 'dummyauthenticator.DummyAuthenticator'
+#c.DummyAuthenticator.password = "geeks@localhost"
+
 # Authenticate users with GitHub OAuth
 c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
 c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']

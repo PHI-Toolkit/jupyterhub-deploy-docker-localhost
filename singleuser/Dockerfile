@@ -113,6 +113,7 @@ RUN conda install --quiet -c conda-forge --yes \
     'jupyter_contrib_nbextensions' \
     'xlrd'  && \
     conda install -c conda-forge -c ioam -c bioconda -c anaconda --yes \
+    'rpy2' \
     'pyproj' \
     'pillow' \
     'fiona' \
