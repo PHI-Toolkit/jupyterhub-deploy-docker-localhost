@@ -138,7 +138,7 @@ RUN conda install --quiet -c conda-forge --yes \
     'cartopy' \
     'proj4' && \
     pip install --upgrade pip && \
-    pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy && \
+    pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy python-Levenshtein && \
     jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
     jupyter nbextension enable nbTranslate/main && \
     conda remove --quiet --yes --force qt pyqt && \

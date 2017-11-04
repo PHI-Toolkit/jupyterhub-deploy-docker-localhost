@@ -1,7 +1,8 @@
 #!/bin/bash
-export JH_FQDN="localhost"
-export JH_EMAIL="geeks@localhost"
-export JH_SECRETS="/full/path/to/secrets"
+# change the values of the exported variables as needed
+export JH_FQDN="notebook2.epispider.io"
+export JH_EMAIL="herman.tolentino@gmail.com"
+export JH_SECRETS="/home/herman/workspace/jupyterhub-deploy-docker/secrets"
 export JH_COMMAND="letsencrypt.sh --domain $JH_FQDN --email $JH_EMAIL --volume $JH_SECRETS"
 echo $JH_FQDN $JH_EMAIL $JH_SECRETS
 docker run --rm -it \

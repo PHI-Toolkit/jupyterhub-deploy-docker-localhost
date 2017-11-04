@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.postgres
-    image: postgres:9.5
+    image: postgres-hub
     container_name: jupyterhub-db
     restart: always
     environment:

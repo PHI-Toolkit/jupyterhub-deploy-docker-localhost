@@ -1,5 +1,5 @@
 #!/bin/bash
-source /secrets/postgres.env
+
 echo "";
 echo "Running initdb.sh.";
 if [ -z "$JPY_PSQL_PASSWORD" ]; then

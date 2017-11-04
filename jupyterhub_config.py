@@ -13,7 +13,7 @@ c = get_config()
 # Spawn single-user servers as Docker containers
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 # Spawn containers from this image
-c.DockerSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
+c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 # JupyterHub requires a single-user instance of the Notebook server, so we
 # default to using the `start-singleuser.sh` script included in the
 # jupyter/docker-stacks *-notebook images as the Docker run command when
@@ -58,11 +58,15 @@ c.JupyterHub.port = 443
 c.JupyterHub.ssl_key = os.environ['SSL_KEY']
 c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
-# Dummy Authenticator  do not use this for production!
+# Authenticators: pick one from 1, 2 or 3 and comment out the others
+# 1. Dummy Authenticator  do not use this for production!
 #c.JupyterHub.authenticator_class = 'dummyauthenticator.DummyAuthenticator'
 #c.DummyAuthenticator.password = "geeks@localhost"
 
-# Authenticate users with GitHub OAuth
+# 2. JupyterHub tmpauthenticator
+#c.JupyterHub.authenticator_class = tmpauthenticator.TmpAuthenticator
+
+# 3. Authenticate users with GitHub OAuth
 c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
 c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
@@ -78,6 +82,14 @@ c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
     db=os.environ['POSTGRES_DB'],
 )
 
+# services
+c.JupyterHub.services = [
+    {
+        'name': 'cull-idle',
+        'admin': True,
+        'command': 'python cull_idle_servers.py --timeout=3600'.split(),
+    }
+]
 # Do not comment out this line below!
 c.JupyterHub.proxy_auth_token = open('/etc/proxy_token','r').read().replace('\n','')
 
