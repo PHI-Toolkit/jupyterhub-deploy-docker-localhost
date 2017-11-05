@@ -7,8 +7,9 @@ This code base to deploy Jupyter Notebooks using JupyterHub is based on the refe
 
 ## Create secrets directory
 Type the following on your Linux command line:
-> `mkdir secrets`
-> `pwd`
+> `mkdir secrets`  
+> `pwd`  
+
 You will copy the result of `pwd` later to your `letsencrypt-certs.sh` file,
 
 ## Obtain Domain name
@@ -23,13 +24,12 @@ If you intend to use JupyterHub on your laptop for localhost use, there is no ne
 
 ## Create SSL Certificate (two options)
 ### Self-signed certificate (localhost or with domain name)
-> `$`
-> `$ chmod a+x create-certs.sh`
+> `$ chmod a+x create-certs.sh`  
 > `$ ./create-certs.sh`
 
 ### Obtain "Lets Encrypt" SSL Certificate
-> `$`
-> `$ chmod a+x letsencrypt-certs.sh`
+> `$`  
+> `$ chmod a+x letsencrypt-certs.sh`  
 > `$ ./letsencrypt-certs.sh`
 
 ## Obtain your GitHub Account
@@ -61,7 +61,7 @@ This JupyterHub deployment uses the PostgreSQL database as a backend (instead of
 
 ## Create Docker networks and volumes
 Type the following Linux commands on the command line:
-> `$ make networks`
+> `$ make network`
 > `$ make volumes`
 
 ## Build the Notebook Server Docker Image
@@ -76,3 +76,6 @@ Type the following command on the command line:
 * If localhost, go to https://localhost in your browser. If using a domain name, go to https://mydomain.com.
 * Sign in to GitHub using your account
 
+# Upgrading from JupyterHub 0.7* to 0.8*
+Delete the old `jupyterhub_cookie_secret` file:
+> `$ sudo rm /var/lib/docker/volumes/jupyterhub-data/_data/jupyterhub_cookie_secret`
