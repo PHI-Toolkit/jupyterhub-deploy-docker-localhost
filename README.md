@@ -61,7 +61,7 @@ This JupyterHub deployment uses the PostgreSQL database as a backend (instead of
 
 ## Create Docker networks and volumes
 Type the following Linux commands on the command line:
-> `$ make network`
+> `$ make network`  
 > `$ make volumes`
 
 ## Build the Notebook Server Docker Image
