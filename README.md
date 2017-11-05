@@ -73,6 +73,11 @@ Type the following command on the command line:
 > `$ docker-compose build`
 
 ## Launch JupyterHub and Browse Your Brand New Notebook Server
+* To troubleshoot potential issues during first launch, use the following command:
+> `$ docker-compose up`  
+* To launch jupyterhub and run it in the background:
+> `$ docker-compose up -d`  
+
 * If localhost, go to https://localhost in your browser. If using a domain name, go to https://mydomain.com.
 * Sign in to GitHub using your account
 
