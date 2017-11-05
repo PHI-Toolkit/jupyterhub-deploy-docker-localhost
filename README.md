@@ -85,9 +85,11 @@ Type the following command on the command line:
 Delete the old `jupyterhub_cookie_secret` file:
 > `$ sudo rm /var/lib/docker/volumes/jupyterhub-data/_data/jupyterhub_cookie_secret`
 
-# JupyterHub Logs - Issues
-## Old base64 cookie-secret detected in /data/jupyterhub_cookie_secret.
+# JupyterHub Logs / Launch Issues
+## Logs: Old base64 cookie-secret detected in /data/jupyterhub_cookie_secret.
 * While jupyterhub is running, type the following commands:
 > `$ docker exec -it jupyterhub /bin/bash`  
 * This brings you to the jupyterhub bash prompt. Type the following command to regenerate a new cookie secret:
 > `# openssl rand -hex 32 > "/data/jupyterhub_cookie_secret"`
+## Browser: 403 : Forbidden
+* Add your GitHub username to the `userlist` file as described above.
