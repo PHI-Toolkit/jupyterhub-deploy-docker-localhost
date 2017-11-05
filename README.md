@@ -12,7 +12,7 @@
 **jupyterhub-deploy-docker** provides a reference
 deployment of [JupyterHub](https://github.com/jupyter/jupyterhub), a
 multi-user [Jupyter Notebook](http://jupyter.org/) environment, on a
-**single host** using [Docker](https://docs.docker.com).  
+**single host** using [Docker](https://docs.docker.com).
 
 Possible **use cases** include:
 
@@ -23,9 +23,9 @@ Possible **use cases** include:
 
 ## Disclaimer
 
-This deployment is **NOT** intended for a production environment. 
-It is a reference implementation that does not meet traditional 
-requirements in terms of availability nor scalability. 
+This deployment is **NOT** intended for a production environment.
+It is a reference implementation that does not meet traditional
+requirements in terms of availability nor scalability.
 
 If you are looking for a more robust solution to host JupyterHub, or
 you require scaling beyond a single host, please check out the
@@ -85,12 +85,15 @@ certificate and key file in the JupyterHub configuration. To configure:
 1. Obtain the domain name that you wish to use for JupyterHub, for
    example, `myfavoritesite.com` or `jupiterplanet.org`.
 
-1. If you do not have an existing certificate and key, you can:
+1. If you do not have an existing certificate and key, you can use any of the following:
 
-   - obtain one from [Let's Encrypt](https://letsencrypt.org) using
+   - Obtain one from [Let's Encrypt](https://letsencrypt.org) using
      the [certbot](https://certbot.eff.org) client,
-   - use the helper script in this repo's [letsencrypt example](examples/letsencrypt/README.md), or
-   - [create a self-signed certificate](https://jupyter-notebook.readthedocs.org/en/latest/public_server.html#using-ssl-for-encrypted-communication).
+   - Use the helper script in this repo's [letsencrypt example](examples/letsencrypt/README.md).
+   - [Create a self-signed certificate](https://jupyter-notebook.readthedocs.org/en/latest/public_server.html#using-ssl-for-encrypted-communication). You can use the bash script, `create-certs.sh`, to create the `secrets` directory, and the hub key and certificate, `jupyterhub.key` and `jupyterhub.crt`, respectively. Before using this script, execute the following command:
+```bash
+chmod a+x create-certs.sh
+```
 
 1. Copy the certificate and key files to a
    directory named `secrets` in this repository's root directory.  These will be
@@ -102,7 +105,7 @@ certificate and key file in the JupyterHub configuration. To configure:
    mkdir -p secrets
    cp jupyterhub.crt jupyterhub.key secrets/
    ```
-
+   If you used the `create-certs.sh` script, the `secrets` directory is created for you.
 
 ## Authenticator setup
 
@@ -180,19 +183,19 @@ You can configure JupyterHub to spawn Notebook servers from any Docker image, as
 long as the image's `ENTRYPOINT` and/or `CMD` starts a single-user instance of
 Jupyter Notebook server that is compatible with JupyterHub.
 
-To specify which Notebook image to spawn for users, you set the value of the  
+To specify which Notebook image to spawn for users, you set the value of the
 `DOCKER_NOTEBOOK_IMAGE` environment variable to the desired container image.
 You can set this variable in the `.env` file, or alternatively, you can
 override the value in this file by setting `DOCKER_NOTEBOOK_IMAGE` in the
 environment where you launch JupyterHub.
 
 Whether you build a custom Notebook image or pull an image from a public or
-private Docker registry, the image must reside on the host.  
+private Docker registry, the image must reside on the host.
 
 If the Notebook image does not exist on host, Docker will attempt to pull the
 image the first time a user attempts to start his or her server.  In such cases,
 JupyterHub may timeout if the image being pulled is large, so it is better to
-pull the image to the host before running JupyterHub.  
+pull the image to the host before running JupyterHub.
 
 This deployment defaults to the
 [jupyter/scipy-notebook](https://hub.docker.com/r/jupyter/scipy-notebook/)
@@ -325,7 +328,7 @@ kernels.
 
 ### How can I backup a user's notebook directory?
 
-There are multiple ways to [backup and restore](https://docs.docker.com/engine/userguide/containers/dockervolumes/#backup-restore-or-migrate-data-volumes) data in Docker containers.  
+There are multiple ways to [backup and restore](https://docs.docker.com/engine/userguide/containers/dockervolumes/#backup-restore-or-migrate-data-volumes) data in Docker containers.
 
 Suppose you have the following running containers:
 
@@ -345,7 +348,7 @@ In this deployment, the user's notebook directories (`/home/jovyan/work`) are ba
     [{jtyberg /var/lib/docker/volumes/jtyberg/_data /home/jovyan/work local rw true rprivate}]
 ```
 
-We can backup the user's notebook directory by running a separate container that mounts the user's volume and creates a tarball of the directory.  
+We can backup the user's notebook directory by running a separate container that mounts the user's volume and creates a tarball of the directory.
 
 ```bash
 docker run --rm \
