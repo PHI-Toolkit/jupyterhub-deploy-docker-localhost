@@ -9,6 +9,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.postgres
+      args:
+        JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
     image: postgres-hub
     container_name: jupyterhub-db
     restart: always
@@ -17,7 +19,8 @@ services:
       PGDATA: ${DB_VOLUME_CONTAINER}
       JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
     env_file:
-      - secrets/postgres.env
+      #- secrets/postgres.env
+      - .env
     volumes:
       - "db:${DB_VOLUME_CONTAINER}"
 
@@ -56,8 +59,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: hub-db
     env_file:
-      - secrets/postgres.env
-      - secrets/oauth.env
+      #- secrets/postgres.env
+      #- secrets/oauth.env
       - .env
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py
