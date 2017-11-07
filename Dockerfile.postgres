@@ -1,11 +1,8 @@
 FROM postgres:9.5
 
 #RUN mkdir /docker-entrypoint-initdb.d
-
+ARG JPY_PSQL_PASSWORD
+ENV JPY_PSQL_PASSWORD ${JPY_PSQL_PASSWORD}
 # initdb.sh will be run by the parent container's entrypoint on container
 # startup, prior to the the database being started.
 COPY initdb.sh /docker-entrypoint-initdb.d/init.sh
-COPY secrets /.
-
-# Uncomment and replace this with your own password.
-ENV JPY_PSQL_PASSWORD $JPY_PSQL_PASSWORD

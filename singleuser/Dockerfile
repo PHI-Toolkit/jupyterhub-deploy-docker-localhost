@@ -136,7 +136,8 @@ RUN conda install --quiet -c conda-forge --yes \
     'networkx' \
     'osmnx' \
     'cartopy' \
-    'proj4' && \
+    'proj4' \
+    'datashader' && \
     pip install --upgrade pip && \
     pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy python-Levenshtein && \
     jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \

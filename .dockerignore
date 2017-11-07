@@ -1,5 +1,6 @@
 .git
 .gitignore
+.ftpconfig
 examples/
 internal/
 docs/
@@ -13,5 +14,4 @@ secrets/fullchain.pem
 secrets/privkey.pem
 secrets/oauth.env
 secrets/postgres.env
-README.md
 LICENSE.md
