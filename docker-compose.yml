@@ -19,6 +19,10 @@ services:
       PGDATA: ${DB_VOLUME_CONTAINER}
       JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
     env_file:
+<<<<<<< HEAD
+=======
+      #- secrets/postgres.env
+>>>>>>> 5abf82dfd4986de2d984c7dd4784fad9daf83036
       - .env
     volumes:
       - "db:${DB_VOLUME_CONTAINER}"
@@ -58,6 +62,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: hub-db
     env_file:
+<<<<<<< HEAD
+=======
+      #- secrets/postgres.env
+      #- secrets/oauth.env
+>>>>>>> 5abf82dfd4986de2d984c7dd4784fad9daf83036
       - .env
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py

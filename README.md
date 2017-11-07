@@ -9,6 +9,7 @@ This code base to deploy Jupyter Notebooks using JupyterHub is based on the refe
 Type the following on your Linux command line:
 > `mkdir secrets`
 > `pwd`
+
 You will copy the result of `pwd` later to your `letsencrypt-certs.sh` file,
 
 ## Obtain Domain name
@@ -23,7 +24,6 @@ If you intend to use JupyterHub on your laptop for localhost use, there is no ne
 
 ## Create SSL Certificate (two options)
 ### Self-signed certificate (localhost or with domain name)
-> `$`
 > `$ chmod a+x create-certs.sh`
 > `$ ./create-certs.sh`
 
@@ -61,7 +61,7 @@ This JupyterHub deployment uses the PostgreSQL database as a backend (instead of
 
 ## Create Docker networks and volumes
 Type the following Linux commands on the command line:
-> `$ make networks`
+> `$ make network`
 > `$ make volumes`
 
 ## Build the Notebook Server Docker Image
@@ -73,5 +73,23 @@ Type the following command on the command line:
 > `$ docker-compose build`
 
 ## Launch JupyterHub and Browse Your Brand New Notebook Server
+* To troubleshoot potential issues during first launch, use the following command:
+> `$ docker-compose up`
+* To launch jupyterhub and run it in the background:
+> `$ docker-compose up -d`
+
 * If localhost, go to https://localhost in your browser. If using a domain name, go to https://mydomain.com.
 * Sign in to GitHub using your account
+
+# Upgrading from JupyterHub 0.7* to 0.8*
+Delete the old `jupyterhub_cookie_secret` file:
+> `$ sudo rm /var/lib/docker/volumes/jupyterhub-data/_data/jupyterhub_cookie_secret`
+
+# JupyterHub Logs / Launch Issues
+## Logs: Old base64 cookie-secret detected in /data/jupyterhub_cookie_secret.
+* While jupyterhub is running, type the following commands:
+> `$ docker exec -it jupyterhub /bin/bash`
+* This brings you to the jupyterhub bash prompt. Type the following command to regenerate a new cookie secret:
+> `# openssl rand -hex 32 > "/data/jupyterhub_cookie_secret"`
+## Browser: 403 : Forbidden
+* Add your GitHub username to the `userlist` file as described above.
