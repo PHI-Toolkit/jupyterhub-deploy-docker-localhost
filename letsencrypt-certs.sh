@@ -2,9 +2,10 @@
 # change the values of the exported variables as needed
 export JH_FQDN="mydomain.com"
 export JH_EMAIL="myname@mydomain.com"
-export JH_SECRETS="/path/to/secrets"
+export JH_SECRETS="`pwd`/secrets"
 export JH_COMMAND="letsencrypt.sh --domain $JH_FQDN --email $JH_EMAIL --volume $JH_SECRETS"
-echo $JH_FQDN $JH_EMAIL $JH_SECRETS
+export CERT_SERVER="" # set this to "--staging" if testing script settings
+echo $JH_FQDN $JH_EMAIL $JH_SECRETS $CERT_SERVER
 docker run --rm -it \
   -p 80:80 \
   -v $JH_SECRETS:/etc/letsencrypt \
@@ -13,7 +14,7 @@ docker run --rm -it \
   --non-interactive \
   --keep-until-expiring \
   --standalone \
-  --standalone-supported-challenges http-01 \
+  --preferred-challenges http \
   --agree-tos \
   --force-renewal \
   --domain "$JH_FQDN" \
