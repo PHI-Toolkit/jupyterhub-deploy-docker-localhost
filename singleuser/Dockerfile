@@ -139,8 +139,7 @@ RUN conda install --quiet -c conda-forge --yes \
     'proj4' \
     'datashader' && \
     pip install --upgrade pip && \
-    pip install -y cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy python-Levenshtein \
-      py2cytoscape visJS2jupyter && \
+    pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy python-Levenshtein && \
     jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
     jupyter nbextension enable nbTranslate/main && \
     conda remove --quiet --yes --force qt pyqt && \
