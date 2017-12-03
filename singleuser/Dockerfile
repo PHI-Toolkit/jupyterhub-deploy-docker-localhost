@@ -197,7 +197,8 @@ USER root
 
 RUN conda update jupyterlab && \
     conda clean -tipsy && \
-    aptitude install zip unzip && \
+    apt-get update && \
+    apt-get install -y zip unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER $NB_USER
