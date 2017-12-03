@@ -30,7 +30,7 @@ RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
       aptitude libmariadb-client-lgpl-dev fonts-dejavu gfortran gcc \
       libcairo2 mesa-common-dev libglu1-mesa-dev libudunits2-dev libgdal-dev \
       libjq-dev libv8-3.14-dev libprotobuf-dev protobuf-compiler libproj-dev \
-          libgeos++-dev && \
+          libgeos++-dev zip unzip && \
     export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib && \
     aptitude install -y libmagick++-dev && \
     apt-get clean && \
@@ -194,8 +194,10 @@ RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 USER root
+
 RUN conda update jupyterlab && \
     conda clean -tipsy && \
+    aptitude install zip unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER $NB_USER
