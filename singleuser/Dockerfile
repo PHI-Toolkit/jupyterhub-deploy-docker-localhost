@@ -58,21 +58,21 @@ RUN conda install --quiet --yes \
     'r-rcurl=1.95*' \
     'r-crayon=1.3*' \
     'r-randomforest=4.6*' && \
-    conda install -c conda-forge -c brown-data-science -c r -c blaze --yes \
+    conda install -c conda-forge --yes \
     'libspatialite' \
     'r-rsqlite' \
-    'r-rgdal' \
+    'r-rgdal' && \
+    conda install -c conda-forge -c brown-data-science -c r -c blaze --yes \
     'r-sp' \
-    'r-e1071=1.6_7' \
-    'r-rpart=4.1.8' \
-    'r-xml=3.98_1.5' \
-    'r-quantmod=0.4_7' \
-    'r-rvest=0.3.2' \
-    'r-maps=3.1.1' \
-    'r-htmlwidgets=0.8' \
+    'r-e1071' \
+    'r-rpart' \
+    'r-xml' \
+    'r-quantmod' \
+    'r-rvest' \
+    'r-maps' \
+    'r-htmlwidgets' \
     'r-visnetwork' \
     'r-igraph ' \
-    'r-topicmodels' \
     'r-tm' && \
     conda clean -tipsy
 RUN R -e "install.packages(c('text2vec','raster','rgeos'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
