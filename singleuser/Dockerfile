@@ -61,7 +61,8 @@ RUN conda install --quiet --yes \
     conda install -c conda-forge --yes \
     'libspatialite' \
     'r-rsqlite' \
-    'r-rgdal' && \
+    'r-rgdal' \
+    'r-sf' && \
     conda install -c conda-forge -c brown-data-science -c r -c blaze --yes \
     'r-sp' \
     'r-e1071' \
