@@ -1,3 +1,4 @@
+# Version: 20180223
 ARG DOCKER_NOTEBOOK_IMAGE
 FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
@@ -16,7 +17,7 @@ RUN ln -sf /bin/bash /bin/sh && \
 # libav-tools for matplotlib anim
 # install R libraries and pre-requisites
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    conda install --yes -c conda-forge jupyterlab jupyter_client && \
+    conda install --yes jupyterlab jupyter_client && \
     jupyter serverextension enable --py jupyterlab --sys-prefix && \
     apt-get update && \
     apt-get install -y software-properties-common && \
@@ -63,7 +64,7 @@ RUN conda install --quiet --yes \
     'r-rsqlite' \
     'r-rgdal' \
     'r-sf' && \
-    conda install -c conda-forge -c brown-data-science -c r -c blaze --yes \
+    conda install -c conda-forge -c brown-data-science -c r -c blaze -c bioconda --yes \
     'r-sp' \
     'r-e1071' \
     'r-rpart' \
@@ -74,22 +75,28 @@ RUN conda install --quiet --yes \
     'r-htmlwidgets' \
     'r-visnetwork' \
     'r-igraph ' \
+    'r-leaflet' \
     'r-tm' && \
     conda clean -tipsy
-RUN R -e "install.packages(c('text2vec','raster','rgeos'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
-    R -e "install.packages(c('leaflet','geojsonio','protolite'),repos='http://cran.rstudio.com')"
+# devtools install 'viridis' and 'cividis' to avoid
+RUN R -e "install.packages(c('text2vec','crayon'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
+    R -e "devtools::install_github('sjmgarnier/viridis')" && \
+    R -e "devtools::install_github('marcosci/cividis')" && \
+    R -e "install.packages(c('raster','rgeos'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
+    R -e "install.packages(c('geojsonio','protolite'),repos='http://cran.rstudio.com')"
 
 # Install Python 3 packages
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
 # use notebook-friendly backends in these images
-# Unversion hdf5' and 'h5py' for 'rgdal' compatibility
+# Unversion 'hdf5' and 'h5py' for 'rgdal' compatibility
+# Unversion 'matplotlib' for 'libkml', 'rgdal' and 'r-sf' compatibility
 USER $NB_USER
 RUN conda install --quiet -c conda-forge --yes \
     'nomkl' \
     'ipywidgets=7.0*' \
     'pandas=0.19*' \
     'numexpr=2.6*' \
-    'matplotlib=2.0*' \
+    'matplotlib' \
     'scipy=0.19*' \
     'seaborn=0.7*' \
     'scikit-learn=0.18*' \
@@ -203,4 +210,5 @@ RUN conda update jupyterlab && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER $NB_USER
-#RUN jupyter labextension install @jupyterlab/google-drive
+RUN jupyter labextension install @jupyterlab/hub-extension
+RUN jupyter labextension install @jupyterlab/google-drive

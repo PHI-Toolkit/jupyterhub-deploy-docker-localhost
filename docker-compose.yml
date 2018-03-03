@@ -5,6 +5,7 @@
 version: "2"
 
 services:
+
   hub-db:
     build:
       context: .
@@ -19,10 +20,7 @@ services:
       PGDATA: ${DB_VOLUME_CONTAINER}
       JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
     env_file:
-<<<<<<< HEAD
-=======
       #- secrets/postgres.env
->>>>>>> 5abf82dfd4986de2d984c7dd4784fad9daf83036
       - .env
     volumes:
       - "db:${DB_VOLUME_CONTAINER}"
@@ -47,6 +45,7 @@ services:
       - "data:${DATA_VOLUME_CONTAINER}"
     ports:
       - "443:443"
+      #- "8000:8000"
     links:
       - hub-db
     environment:
@@ -58,15 +57,15 @@ services:
       DOCKER_NOTEBOOK_DIR: ${DOCKER_NOTEBOOK_DIR}
       # Using this run command (optional)
       DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
+      JUPYTERHUB_SERVICE_HOST_IP: ${JUPYTERHUB_SERVICE_HOST_IP}
       # Postgres db info
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: hub-db
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_PORT}
     env_file:
-<<<<<<< HEAD
-=======
       #- secrets/postgres.env
       #- secrets/oauth.env
->>>>>>> 5abf82dfd4986de2d984c7dd4784fad9daf83036
       - .env
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py

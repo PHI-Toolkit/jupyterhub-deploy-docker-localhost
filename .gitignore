@@ -1,3 +1,12 @@
-secrets/
+secrets/accounts
+secrets/archive
+secrets/csr
+secrets/keys
+secrets/live
+secrets/renewal
 .DS_Store
 .gitignore
+userlist
+.ftpconfig
+.dockerignore
+.env

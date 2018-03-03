@@ -5,6 +5,9 @@ This code base to deploy Jupyter Notebooks using JupyterHub is based on the refe
 
 ## Install Docker and Docker Compose
 
+* Install Docker: https://docs.docker.com/install/
+* Install Docker Compose: https://docs.docker.com/compose/install/
+
 ## Create secrets directory
 Type the following on your Linux command line:
 > `mkdir secrets`
@@ -19,7 +22,7 @@ If you intend to use JupyterHub on your laptop for localhost use, there is no ne
 > `export JH_FQDN="mydomain.com"`
 * For the line below, replace email address with your email address
 > `export JH_EMAIL="myname@mydomain.com"`
-* For the line below, replace "/path/to" with full path (result of pwd)
+* For the line below, replace "/path/to" with full path (result of `pwd` earlier)
 > `export JH_SECRETS="/path/to/secrets"`
 
 ## Create SSL Certificate (two options)
@@ -78,8 +81,12 @@ Type the following command on the command line:
 * To launch jupyterhub and run it in the background:
 > `$ docker-compose up -d`
 
-* If localhost, go to https://localhost in your browser. If using a domain name, go to https://mydomain.com.
+* If localhost, go to https://localhost:8000 in your browser. If using a domain name, go to https://mydomain.com.
 * Sign in to GitHub using your account
+
+# Jupyterlab Google Drive Integration
+* Please follow the instructions here:
+https://github.com/jupyterlab/jupyterlab-google-drive/blob/master/docs/advanced.md
 
 # Upgrading from JupyterHub 0.7* to 0.8*
 Delete the old `jupyterhub_cookie_secret` file:

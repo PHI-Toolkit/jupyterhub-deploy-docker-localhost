@@ -14,6 +14,7 @@ volumes:
 
 self-signed-cert:
 	# make a self-signed cert
+	create-certs.sh
 
 secrets/postgres.env:
 	@echo "Generating postgres password in $@"
@@ -40,7 +41,7 @@ userlist:
 # Do not require cert/key files if SECRETS_VOLUME defined
 secrets_volume = $(shell echo $(SECRETS_VOLUME))
 ifeq ($(secrets_volume),)
-	cert_files=secrets/jupyterhub.crt secrets/jupyterhub.key
+	cert_files=secrets/jupyterhub.pem secrets/jupyterhub.key
 else
 	cert_files=
 endif

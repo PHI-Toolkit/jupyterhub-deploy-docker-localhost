@@ -1,8 +1,12 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
+# References:
+# 1. https://github.com/jupyterhub/jupyterhub/blob/master/docs/source/reference/config-examples.md
+# 2. https://github.com/jupyterhub/jupyterlab-hub
 # Configuration file for JupyterHub
+#
 import os
+import tmpauthenticator
 
 c = get_config()
 
@@ -19,14 +23,22 @@ c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 # jupyter/docker-stacks *-notebook images as the Docker run command when
 # spawning containers.  Optionally, you can override the Docker run command
 # using the DOCKER_SPAWN_CMD environment variable.
-spawn_cmd = os.environ.get('DOCKER_SPAWN_CMD', "start-singleuser.sh")
-c.DockerSpawner.extra_create_kwargs.update({ 'command': spawn_cmd })
+if os.environ['JUPYTER_UI'] == 'notebook':
+    spawn_cmd = os.environ.get('DOCKER_SPAWN_CMD', "start-singleuser.sh")
+    c.DockerSpawner.extra_create_kwargs.update({ 'command': spawn_cmd })
+else:
+    c.Spawner.default_url = '/lab'
+    c.Spawner.cmd = ['jupyter-labhub']
+
 # Connect containers to this Docker network
 network_name = os.environ['DOCKER_NETWORK_NAME']
 c.DockerSpawner.use_internal_ip = True
 c.DockerSpawner.network_name = network_name
 # Pass the network name as argument to spawned containers
-c.DockerSpawner.extra_host_config = { 'network_mode': network_name }
+c.DockerSpawner.extra_host_config = {
+        'network_mode': network_name,
+        'volume_driver': 'local'
+    }
 # Explicitly set notebook directory because we'll be mounting a host volume to
 # it.  Most jupyter/docker-stacks *-notebook images run the Notebook server as
 # user `jovyan`, and set the notebook directory to `/home/jovyan/work`.
@@ -43,7 +55,7 @@ c.DockerSpawner.volumes = {
     'jupyter-modules': '/home/jovyan/work/modules'
 }
 
-c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
+#c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
 # Remove containers once they are stopped
 c.DockerSpawner.remove_containers = True
 # For debugging arguments passed to spawned containers
@@ -51,24 +63,36 @@ c.DockerSpawner.debug = True
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = '0.0.0.0'
+c.JupyterHub.hub_connect_ip = os.environ['JUPYTERHUB_SERVICE_HOST_IP']
+#c.JupyterHub.hub_connect_ip = '172.19.0.3'
 c.JupyterHub.hub_port = 8080
 
 # TLS config
-c.JupyterHub.port = 443
-c.JupyterHub.ssl_key = os.environ['SSL_KEY']
-c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
+# If using GitHub Authenticator, make sure to:
+# 1. Update the GitHub credentials in the .env file
+# 2. Update the 'ports' entry in 'docker-compose.yml' for 'hub' service.
+#    Uncomment the '- 443:443' line.
+#    Comment out the '- 8000:8000' line.
+if os.environ['JUPYTERHUB_SSL'] == 'use_ssl':
+    c.JupyterHub.port = 443
+    c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+    c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
-# Authenticators: pick one from 1, 2 or 3 and comment out the others
+# Authenticators: pick one from 1, 2 or 3 below and comment out the others
+# DEFAULT is tmp_authenticator
+if os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'dummy_authenticator':
 # 1. Dummy Authenticator  do not use this for production!
-#c.JupyterHub.authenticator_class = 'dummyauthenticator.DummyAuthenticator'
-#c.DummyAuthenticator.password = "geeks@localhost"
-
-# 2. JupyterHub tmpauthenticator
-#c.JupyterHub.authenticator_class = tmpauthenticator.TmpAuthenticator
-
-# 3. Authenticate users with GitHub OAuth
-c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
-c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
+    c.JupyterHub.authenticator_class = 'dummyauthenticator.DummyAuthenticator'
+    c.DummyAuthenticator.password = "geeks@localhost"
+elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'github_authenticator':
+# 2. Authenticate users with GitHub OAuth
+    c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
+    c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
+else:
+# DEFAULT
+# 3. JupyterHub tmpauthenticator
+# this creates temporary users
+    c.JupyterHub.authenticator_class = tmpauthenticator.TmpAuthenticator
 
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
@@ -91,7 +115,7 @@ c.JupyterHub.services = [
     }
 ]
 # Do not comment out this line below!
-c.JupyterHub.proxy_auth_token = open('/etc/proxy_token','r').read().replace('\n','')
+c.ConfigurableHTTPProxy.auth_token = open('/etc/proxy_token','r').read().replace('\n','')
 
 # Whitlelist users and admins
 c.Authenticator.whitelist = whitelist = set()
