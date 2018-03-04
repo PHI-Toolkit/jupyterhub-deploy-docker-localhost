@@ -112,11 +112,7 @@ https://github.com/jupyterlab/jupyterlab-google-drive/blob/master/docs/advanced.
 # Summary
 In summary, there are a few steps to get started with Jupyter Notebooks:
 
-1. Decide whether to run as `localhost` or with domain name. (Best to try out `localhost` first.)
-
-  a. If `localhost`, run `create-certs.sh` script.
-  b. If with domain name: obtain domain name, run `letsencrypt-certs.sh` script.
-
+1. Decide whether to run as `localhost` or with domain name. (Best to try out `localhost` first.) If running as `localhost`, run `create-certs.sh` script. If using a domain name, obtain domain name first, then run `letsencrypt-certs.sh` script.
 2. Configure the `.env` and `userlist` files accordingly.
 3. Run `buildhub.sh` script.
 4. Run `starthub.sh` script.
