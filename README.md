@@ -62,7 +62,9 @@ If you will be using GitHub Oauth to authenticate users to JupyterHub, you need 
 * Copy these to right `.env` section:
 
 > `GITHUB_CLIENT_ID=<github client id>`
+
 > `GITHUB_CLIENT_SECRET=<github client secret>`
+
 > `OAUTH_CALLBACK_URL=https://mydomain.com/hub/oauth_callback`
 
 If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i.e., "https://localhost/hub/oauth_callback").
