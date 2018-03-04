@@ -25,6 +25,7 @@ If you intend to use JupyterHub on your laptop for localhost use, there is no ne
 ### Self-signed certificate
 Using a self-signed certificate is useful for testing or limited use (localhost).
 > `$ chmod +x create-certs.sh`
+
 > `$ ./create-certs.sh`
 
 ### Obtain "Lets Encrypt" SSL Certificate
