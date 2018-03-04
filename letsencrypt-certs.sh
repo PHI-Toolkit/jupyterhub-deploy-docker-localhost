@@ -1,5 +1,6 @@
 #!/bin/bash
 # change the values of the exported variables as needed
+mkdir -p
 export JH_FQDN="mydomain.com"
 export JH_EMAIL="myname@mydomain.com"
 export JH_SECRETS="`pwd`/secrets"
@@ -37,8 +38,7 @@ cp secrets/live/$JH_FQDN/fullchain.pem secrets/fullchain.pem
 cp secrets/live/$JH_FQDN/privkey.pem secrets/privkey.pem
 cp secrets/privkey.pem secrets/$JH_FQDN.key
 cp secrets/fullchain.pem secrets/$JH_FQDN.pem
-cp secrets/privkey.pem secrets/jupyterhub.pem
+cp secrets/privkey.pem secrets/jupyterhub.key
 cp secrets/fullchain.pem secrets/jupyterhub.pem
 cp secrets/jupyterhub.key secrets/default.key
 cp secrets/jupyterhub.pem secrets/default.pem
-rm secrets/*.pem
