@@ -59,7 +59,7 @@ If you will be using GitHub Oauth to authenticate users to JupyterHub, you need 
   * GitHub Client ID
   * GitHub Client Secret
   * GitHub Callback URL: This should be of the form https://mydomain.com/hub/oauth_callback if with a domain name (remember to replace "mydomain.com" with your domain name, as obtained from the step above.)
-* Copy these to right `.env` section:
+* Copy these to right `.env` section (about Line 23):
 
 > `GITHUB_CLIENT_ID=<github client id>`
 
@@ -73,7 +73,7 @@ If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i
 This JupyterHub deployment uses the PostgreSQL database as a backend (instead of sqlite).
 * Create the postgres password by typing the Linux command below:
 > `$ openssl rand -hex 32`
-* Copy the result of the command to the right `.env` section by replacing the `geeks@localhost` entry or current value with the cryptic, "hex" value:
+* Copy the result of the command to the right `.env` section (about Line 74) by replacing the `geeks@localhost` entry or current value with the cryptic, "hex" value:
 > `POSTGRES_PASSWORD=geeks@localhost`
 
 > `JPY_PSQL_PASSWORD=geeks@localhost`
@@ -104,6 +104,7 @@ This script does two things:
 
 This script launches both JupyterHub and Postgres DB backend in the background and launches log monitoring.
 
+Launch JupyterHub on your browser:
 * If localhost, go to https://localhost in your browser. If using a domain name, go to https://mydomain.com.
 * Sign in to GitHub using your account
 
