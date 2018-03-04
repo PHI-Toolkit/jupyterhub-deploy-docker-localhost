@@ -8,6 +8,7 @@ secrets/accounts
 secrets/archive
 secrets/csr
 secrets/live
+secrets/keys
 secrets/renewal
 secrets/renewal-hooks
 secrets/fullchain.pem
@@ -15,3 +16,5 @@ secrets/privkey.pem
 secrets/oauth.env
 secrets/postgres.env
 LICENSE.md
+.env
+.gitignore
