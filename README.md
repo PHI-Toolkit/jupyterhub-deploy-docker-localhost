@@ -73,18 +73,22 @@ If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i
 This JupyterHub deployment uses the PostgreSQL database as a backend (instead of sqlite).
 * Create the postgres password by typing the Linux command below:
 > `$ openssl rand -hex 32`
-* Copy the result of the command to the right `.env` section by replacing the `geeks@localhost` entry with the cryptic, "hex" value:
+* Copy the result of the command to the right `.env` section by replacing the `geeks@localhost` entry or current value with the cryptic, "hex" value:
 > `POSTGRES_PASSWORD=geeks@localhost`
+
 > `JPY_PSQL_PASSWORD=geeks@localhost`
 
 ## Create Docker networks and volumes
 Type the following Linux commands on the command line:
 > `$ make network`
+
 > `$ make volumes`
 
 ## Build the Notebook Server Docker Image
 Type the following command on the command line:
 > `$ make notebook_image`
+
+This command creates the Jupyter Notebook Docker image that will be "spawned" by JupyterHub.
 
 ## Build the PostgreSQL 9.5 and JupyterHub Docker images
 Type the following command on the command line:
