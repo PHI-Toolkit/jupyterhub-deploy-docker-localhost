@@ -117,10 +117,12 @@ Please see next section for instructions on how to configure Google Drive to wor
 * Please follow the instructions here:
 https://github.com/jupyterlab/jupyterlab-google-drive/blob/master/docs/advanced.md
 
+After you obtain Google API credentials, rename the file `drive.jupyterlab-settings-template` by removing the `-template` suffix, then update the file by filling up the empty string "" in "clientId":"" with your Client ID. It's the long string with cryptic characters that end in `.apps.googleusercontent.com`.
+
 # Summary
 In summary, there are a few steps to get started with Jupyter Notebooks:
 
-1. Decide whether to run as `localhost` or with domain name. (Best to try out `localhost` first.) If running as `localhost`, run `create-certs.sh` script. If using a domain name, obtain domain name first, then run `letsencrypt-certs.sh` script.
+1. Decide whether to run as `localhost` or with domain name. (Best to try out `localhost` first.) If running as `localhost`, run `create-certs.sh` script. If using a domain name, obtain domain name first, then modify and run `letsencrypt-certs.sh` script.
 2. Configure the `.env` and `userlist` files accordingly.
 3. Run `buildhub.sh` script.
 4. Run `starthub.sh` script.
@@ -137,3 +139,6 @@ Delete the old `jupyterhub_cookie_secret` file:
 > `# openssl rand -hex 32 > "/data/jupyterhub_cookie_secret"`
 ## Browser: 403 : Forbidden
 * Add your GitHub username to the `userlist` file as described above.
+
+## JupyterHub Logs: socket.gaierror: [Errno -2] Name or service not known
+*
