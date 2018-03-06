@@ -141,4 +141,4 @@ Delete the old `jupyterhub_cookie_secret` file:
 * Add your GitHub username to the `userlist` file as described above.
 
 ## JupyterHub Logs: socket.gaierror: [Errno -2] Name or service not known
-*
+* If you see this error in the logs it means the JUPYTERHUB_SERVICE_HOST_IP is misconfigured.
