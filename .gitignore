@@ -10,3 +10,5 @@ userlist
 .ftpconfig
 .dockerignore
 .env
+secrets/drive.jupyterlab-settings
+drive.jupyterlab-settings

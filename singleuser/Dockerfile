@@ -2,6 +2,7 @@
 ARG DOCKER_NOTEBOOK_IMAGE
 FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
+
 RUN python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
 
 USER root
@@ -203,12 +204,16 @@ ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 USER root
 
+RUN jupyter labextension install @jupyterlab/hub-extension && \
+    jupyter labextension install @jupyterlab/google-drive
+
 RUN conda update jupyterlab && \
     conda clean -tipsy && \
     apt-get update && \
     apt-get install -y zip unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY drive.jupyterlab-settings /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/drive.jupyterlab-settings
+
 USER $NB_USER
-RUN jupyter labextension install @jupyterlab/hub-extension
-RUN jupyter labextension install @jupyterlab/google-drive

@@ -18,3 +18,5 @@ secrets/postgres.env
 LICENSE.md
 .env
 .gitignore
+secrets/drive.jupyterlab-settings
+drive.jupyterlab-settings
