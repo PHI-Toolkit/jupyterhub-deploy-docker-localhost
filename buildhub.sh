@@ -23,11 +23,12 @@ rm $FILE1
 echo "JUPYTERHUB_SERVICE_HOST_IP is now set to:"
 echo $JUPYTERHUB_SERVICE_HOST_IP
 echo "..."
-sed -i "s/REPLACE_IP/$JUPYTERHUB_SERVICE_HOST_IP/g" .env
+sed -i -e "s/REPLACE_IP/$JUPYTERHUB_SERVICE_HOST_IP/g" .env
 docker rmi $(docker images -q jupyterhub:latest)
 docker rmi $(docker images -q postgres-hub:latest)
 docker rmi $(docker images -q jupyterhub-user:latest)
 echo "Rebuilding images..."
 docker-compose build
 make notebook_image
+rm .env-e
 echo "Build complete!"
