@@ -1,6 +1,6 @@
 #!/bin/bash
 # change the values of the exported variables as needed
-mkdir -p
+mkdir -p secrets
 export JH_FQDN="mydomain.com"
 export JH_EMAIL="myname@mydomain.com"
 export JH_SECRETS="`pwd`/secrets"
