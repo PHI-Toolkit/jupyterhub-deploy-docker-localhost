@@ -18,6 +18,9 @@ You will copy the result of `pwd` later to your `letsencrypt-certs.sh` file.
 ## Create `.env` and `userlist` files
 There are two template files for `.env` and `userlist`, `.env-template` and `userlist-template`. Rename these files by removing the `-template` suffix. These are the only two files you need to update.
 
+## Create the `drive.jupyterlab-settings` file in `singleuser` folder
+Rename `drive.jupyterlab-settings-template` to `drive.jupyterlab-settings`. The file `drive.jupyterlab-settings-template` is under the `singleuser` folder. 
+
 ## Obtain Domain name
 If you intend to use JupyterHub on your laptop for localhost use, there is no need to obtain a domain name and you can skip this step. If JuypterHub will be used with a domain name, obtain domain name.
 
