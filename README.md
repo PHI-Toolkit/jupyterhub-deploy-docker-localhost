@@ -19,7 +19,7 @@ You will copy the result of `pwd` later to your `letsencrypt-certs.sh` file.
 There are two template files for `.env` and `userlist`, `.env-template` and `userlist-template`. Rename these files by removing the `-template` suffix. These are the only two files you need to update.
 
 ## Create the `drive.jupyterlab-settings` file in `singleuser` folder
-Rename `drive.jupyterlab-settings-template` to `drive.jupyterlab-settings`. The file `drive.jupyterlab-settings-template` is under the `singleuser` folder. 
+Rename `drive.jupyterlab-settings-template` to `drive.jupyterlab-settings`. The file `drive.jupyterlab-settings-template` is under the `singleuser` folder.
 
 ## Obtain Domain name
 If you intend to use JupyterHub on your laptop for localhost use, there is no need to obtain a domain name and you can skip this step. If JuypterHub will be used with a domain name, obtain domain name.
@@ -121,6 +121,16 @@ Please see next section for instructions on how to configure Google Drive to wor
 https://github.com/jupyterlab/jupyterlab-google-drive/blob/master/docs/advanced.md
 
 After you obtain Google API credentials, rename the file `drive.jupyterlab-settings-template` by removing the `-template` suffix, then update the file by filling up the empty string "" in "clientId":"" with your Client ID. It's the long string with cryptic characters that end in `.apps.googleusercontent.com`.
+
+# Notes for Windows users
+
+Windows 10 users should do the following:
+1. To run the bash scripts in a bash shell on Windows 10, install the Linux Subsystem on Windows 10 here:
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+2. Use "Edge Channel" Docker version for Windows 10: https://download.docker.com/win/edge/Docker%20for%20Windows%20Installer.exe
+3. Check "Expose daemon on tcp://localhost:2375 without TLS as follows:
+![Windows 10 without TLS](./docs/25342.LINE.jpg)
+
 
 # Summary
 In summary, there are a few steps to get started with Jupyter Notebooks:
