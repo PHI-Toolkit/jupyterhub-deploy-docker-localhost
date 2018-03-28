@@ -51,6 +51,14 @@ This build of JupyterHub has three options for Authentication. Go to about Line 
 * dummy_authenticator (default)
 * github_authenticator (thru OAuth, requires obtaining GitHub credentials, see below)
 
+Possible scenarios for GitHub authentication (if you choose 'github_authenticator'):
+1. Default GitHub settings in .env - no need to change or update any .env settings
+2. Set up your own GitHub account and OAuth:
+
+   2.1 Set up GitHub account
+
+   2.2 Set up OAuth application (see below "Obtain GitHub Credentials")
+
 ## Obtain your GitHub Account Credentials
 If you will be using GitHub Oauth to authenticate users to JupyterHub, you need to sign up for a GitHub Account. Open the file `userlist` with your text editor and add your GitHub user name below "jovyan admin" as below:
 > `<github username> admin`
@@ -155,3 +163,6 @@ Delete the old `jupyterhub_cookie_secret` file:
 
 ## JupyterHub Logs: socket.gaierror: [Errno -2] Name or service not known
 * If you see this error in the logs it means the JUPYTERHUB_SERVICE_HOST_IP is misconfigured.
+
+## Windows user
+* There may be slight differences in how Chrome or Firefox behaves compared to installations on Linux or Mac (YMMV).
