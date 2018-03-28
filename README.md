@@ -22,7 +22,7 @@ There are two template files for `.env` and `userlist`, `.env-template` and `use
 Rename `drive.jupyterlab-settings-template` to `drive.jupyterlab-settings`. The file `drive.jupyterlab-settings-template` is under the `singleuser` folder.
 
 ## Obtain Domain name
-If you intend to use JupyterHub on your laptop for localhost use, there is no need to obtain a domain name and you can skip this step. If JuypterHub will be used with a domain name, obtain domain name.
+If you intend to use JupyterHub on your laptop for localhost use, there is no need to obtain a domain name and you can skip this step. If JuypterHub will be used with a domain name, obtain domain name (see "Using a Domain Name" below).
 
 ## Create SSL Certificate (two options)
 ### Self-signed certificate
@@ -31,10 +31,13 @@ Using a self-signed certificate is useful for testing or limited use (localhost)
 
 > `$ ./create-certs.sh`
 
+### Using a Domain Name
+If you want to use your own domain name, obtain one from a domain name registrar. You will use this domain name to replace instances of "mydomain.com" in configuration files below.
+
 ### Obtain "Lets Encrypt" SSL Certificate
 If using JupyterHub with a domain name, open the `letsencrypt-certs.sh` bash script with a text editor (e.g., nano) and edit the first few lines (lines 3, 4 and 5):
 
-* For the line below, replace "mydomain.com" with your domain name, "e.g., example.com"
+* For the line below, replace "mydomain.com" with your domain name, "e.g., example.com", that you obtained from a domain name registrar:
 > `export JH_FQDN="mydomain.com"`
 * For the line below, replace email address with your email address
 > `export JH_EMAIL="myname@mydomain.com"`
@@ -60,8 +63,11 @@ Possible scenarios for GitHub authentication (if you choose 'github_authenticato
    2.2 Set up OAuth application (see below "Obtain GitHub Credentials")
 
 ## Obtain your GitHub Account Credentials
-If you will be using GitHub Oauth to authenticate users to JupyterHub, you need to sign up for a GitHub Account. Open the file `userlist` with your text editor and add your GitHub user name below "jovyan admin" as below:
-> `<github username> admin`
+If you will be using GitHub Oauth to authenticate users to JupyterHub, you need to sign up for a GitHub Account:
+1. Go to https://www.github.com and create an account if you do not have one yet.
+2. Remember your GitHub user name. You will use this for #3 below.
+3. Open the file `userlist` with your text editor and add your GitHub user name below "jovyan admin" as below:
+> `<github user name> admin`
 
 ## Obtain GitHub OAuth Credentials
 * Log in to GitHub
@@ -69,8 +75,8 @@ If you will be using GitHub Oauth to authenticate users to JupyterHub, you need 
 * Record the following information:
   * GitHub Client ID
   * GitHub Client Secret
-  * GitHub Callback URL: This should be of the form https://mydomain.com/hub/oauth_callback if with a domain name (remember to replace "mydomain.com" with your domain name, as obtained from the step above.)
-* Copy these to right `.env` section (about Line 23):
+  * GitHub Callback URL: This should be of the form https://"mydomain.com"/hub/oauth_callback if with a domain name (remember to replace "mydomain.com" with your domain name, as obtained from the step above, "Using a Domain Name".)
+* Copy-paste each of these to right `.env` section (about Line 23):
 
 > `GITHUB_CLIENT_ID=<github client id>`
 
