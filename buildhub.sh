@@ -1,8 +1,10 @@
 #!/bin/bash
 if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
   echo "JupyterHub image does not exist."
-  docker-compose build
+else
+  docker rmi $(docker images -q jupyterhub:latest)
 fi
+docker-compose build
 # Get jupyterhub host IP address
 echo "Obtaining JupyterHub host ip address..."
 FILE1='secrets/jupyterhub_host_ip'

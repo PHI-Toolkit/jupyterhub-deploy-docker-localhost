@@ -1,5 +1,10 @@
 # Background
-This code base to deploy Jupyter Notebooks using JupyterHub is based on the reference implementation from https://github.com/jupyterhub/jupyterhub-deploy-docker.
+This code base to deploy Jupyter Notebooks using JupyterHub is based on the open source reference implementation from https://github.com/jupyterhub/jupyterhub-deploy-docker.
+
+It also uses Docker (https://www.docker.com/) containers to manage the three pieces of software needed to run this set up:
+1. JupyterHub - takes care of authentication and notebook spawning
+2. Jupyter Notebooks - notebook environment with 2 kernels: Python and R
+3. PostgreSQL - database backend to store notebook user data
 
 # Installation Guide
 
@@ -32,7 +37,7 @@ Using a self-signed certificate is useful for testing or limited use (localhost)
 > `$ ./create-certs.sh`
 
 ### Using a Domain Name
-If you want to use your own domain name, obtain one from a domain name registrar. You will use this domain name to replace instances of "mydomain.com" in configuration files below.
+If you want to use your own domain name, obtain one from a domain name registrar. You will use this domain name to replace instances of "mydomain.com" in configuration files and letsencrypt bash script below.
 
 ### Obtain "Lets Encrypt" SSL Certificate
 If using JupyterHub with a domain name, open the `letsencrypt-certs.sh` bash script with a text editor (e.g., nano) and edit the first few lines (lines 3, 4 and 5):
