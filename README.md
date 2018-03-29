@@ -131,10 +131,14 @@ Due to unconfigured Google Drive Integration, you will see something like this e
 Please see next section for instructions on how to configure Google Drive to work with your JupyterLab set up.
 
 # Jupyterlab Google Drive Integration
-* Please follow the instructions here:
+
+Please follow the instructions here:
 https://github.com/jupyterlab/jupyterlab-google-drive/blob/master/docs/advanced.md
 
-After you obtain Google API credentials, rename the file `drive.jupyterlab-settings-template` by removing the `-template` suffix, then update the file by filling up the empty string "" in "clientId":"" with your Client ID. It's the long string with cryptic characters that end in `.apps.googleusercontent.com`.
+These instructions will help you obtain your Google Client ID as in the figure below.
+![Google Drive Error](./docs/client-id-secret.png)
+
+After you obtain Google API credentials, rename the file `drive.jupyterlab-settings-template` by removing the `-template` suffix, then update the file by filling upthe empty string "" in "clientId":"" with your Google Client ID (copy-paste from the developer console as above) . It's the long string with cryptic characters that end in `.apps.googleusercontent.com`.
 
 # Notes for Windows users
 
