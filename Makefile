@@ -51,7 +51,7 @@ check-files: userlist $(cert_files) secrets/oauth.env secrets/postgres.env
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
-notebook_image: pull singleuser/Dockerfile
+notebook_image: #pull singleuser/Dockerfile
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
 		--build-arg LOGO_IMAGE=${LOGO_IMAGE} \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \

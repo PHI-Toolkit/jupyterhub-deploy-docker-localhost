@@ -8,13 +8,13 @@ FROM jupyterhub/jupyterhub-onbuild:$JUPYTERHUB_VERSION
 # Install dockerspawner, oauth, postgres
 RUN /opt/conda/bin/conda install -yq psycopg2=2.7 && \
     /opt/conda/bin/conda clean -tipsy && \
-    /opt/conda/bin/pip install --no-cache-dir \
+    /opt/conda/bin/pip install --no-cache-dir --upgrade \
         oauthenticator==0.7.* \
-        dockerspawner==0.9.*
+        dockerspawner==0.9.* \
+        pip
 
 # pick one authenticator in the .env file
-RUN pip install jupyterhub-tmpauthenticator
-RUN pip install jupyterhub-dummyauthenticator
+RUN pip install jupyterhub-tmpauthenticator jupyterhub-dummyauthenticator
 RUN mkdir -p /srv/jupyterhub/secrets/
 
 # Copy TLS certificate and key

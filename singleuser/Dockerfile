@@ -18,9 +18,9 @@ RUN ln -sf /bin/bash /bin/sh && \
 # libav-tools for matplotlib anim
 # install R libraries and pre-requisites
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    conda install --yes jupyterlab jupyter_client && \
-    jupyter serverextension enable --py jupyterlab --sys-prefix && \
-    apt-get update && \
+    pip install jupyterlab jupyter_client && \
+    jupyter serverextension enable --py jupyterlab --sys-prefix
+RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:opencpu/jq --yes && \
     add-apt-repository ppa:ubuntugis/ppa && \
@@ -66,6 +66,7 @@ RUN conda install --quiet --yes \
     'r-rgdal' \
     'r-sf' && \
     conda install -c conda-forge -c brown-data-science -c r -c blaze -c bioconda --yes \
+    'r-reticulate' \
     'r-sp' \
     'r-e1071' \
     'r-rpart' \
@@ -91,6 +92,7 @@ RUN R -e "install.packages(c('text2vec','crayon'), dependencies=TRUE, repos='htt
 # use notebook-friendly backends in these images
 # Unversion 'hdf5' and 'h5py' for 'rgdal' compatibility
 # Unversion 'matplotlib' for 'libkml', 'rgdal' and 'r-sf' compatibility
+# Specify pyqt version to avoid two choices
 USER $NB_USER
 RUN conda install --quiet -c conda-forge --yes \
     'nomkl' \
@@ -111,6 +113,8 @@ RUN conda install --quiet -c conda-forge --yes \
     'numba=0.31*' \
     'bokeh=0.12.9' \
     'sqlalchemy=1.1*' \
+    'pyqt=5.6*' \
+    'numpy' \
     'hdf5' \
     'h5py' \
     'beautifulsoup4=4.5.*' \
@@ -118,9 +122,11 @@ RUN conda install --quiet -c conda-forge --yes \
     'missingno' \
     'blaze' \
     'pandas-datareader' \
+    'wrapt' \
     'textblob' \
     'jupyter_contrib_nbextensions' \
-    'xlrd'  && \
+    'xlrd' \
+    'jupyter_kernel_gateway' && \
     conda install -c conda-forge -c ioam -c bioconda -c anaconda --yes \
     'rpy2' \
     'pyproj' \
@@ -138,18 +144,20 @@ RUN conda install --quiet -c conda-forge --yes \
     'holoviews' \
     'geoviews' \
     'xarray' \
-    'iris' \
+    #'iris=2.0*' \
     'bkcharts' \
     'basemap' \
     'basemap-data-hires' \
     'networkx' \
-    'osmnx' \
+    'osmnx=0.8*' \
     'cartopy' \
     'proj4' \
-    'datashader' && \
+    'datashader' \
+    'openpyxl' && \
     pip install --upgrade pip && \
-    pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy python-Levenshtein && \
-    jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
+    pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy python-Levenshtein \
+      jupyterlab_geojson jupyterlab_widgets altair==2.0.0rc1
+RUN jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
     jupyter nbextension enable nbTranslate/main && \
     conda remove --quiet --yes --force qt pyqt && \
     conda clean -tipsy
@@ -204,8 +212,9 @@ ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 USER root
 
-RUN jupyter labextension install @jupyterlab/hub-extension && \
-    jupyter labextension install @jupyterlab/google-drive
+RUN jupyter labextension install @jupyterlab/geojson-extension
+#    jupyter labextension install @jupyterlab/plotly-extension && \
+#    jupyter labextension install @jupyterlab/vega3-extension
 
 RUN conda update jupyterlab && \
     conda clean -tipsy && \
