@@ -1,4 +1,5 @@
 #!/bin/bash
+# 2018-05-12
 if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
   echo "JupyterHub image does not exist."
 else
@@ -29,8 +30,16 @@ sed -i -e "s/REPLACE_IP/$JUPYTERHUB_SERVICE_HOST_IP/g" .env
 docker rmi $(docker images -q jupyterhub:latest)
 docker rmi $(docker images -q postgres-hub:latest)
 docker rmi $(docker images -q jupyterhub-user:latest)
+if [ ! -f singleuser/drive.jupyterlab-settings ]; then
+    cp singleuser/drive.jupyterlab-settings-template singleuser/drive.jupyterlab-settings
+fi
+if [ ! -f userlist ]; then
+    cp userlist-template userlist
+fi
 echo "Rebuilding images..."
 docker-compose build
 make notebook_image
-rm .env-e
+if [ -f .env-e ]; then
+    rm .env-e
+fi
 echo "Build complete!"

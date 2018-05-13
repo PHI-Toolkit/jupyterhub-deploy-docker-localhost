@@ -21,7 +21,6 @@ services:
       JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
       POSTGRES_PASSWORD: ${JPY_PSQL_PASSWORD}
     env_file:
-      #- secrets/postgres.env
       - .env
     volumes:
       - "db:${DB_VOLUME_CONTAINER}"
@@ -59,14 +58,14 @@ services:
       # Using this run command (optional)
       DOCKER_SPAWN_CMD: ${DOCKER_SPAWN_CMD}
       JUPYTERHUB_SERVICE_HOST_IP: ${JUPYTERHUB_SERVICE_HOST_IP}
+      # Server time out
+      SERVER_TIMEOUT_SECONDS: ${SERVER_TIMEOUT_SECONDS}
       # Postgres db info
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: hub-db
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       VIRTUAL_PORT: ${VIRTUAL_PORT}
     env_file:
-      #- secrets/postgres.env
-      #- secrets/oauth.env
       - .env
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py

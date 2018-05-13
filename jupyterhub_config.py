@@ -130,12 +130,15 @@ c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
     db=os.environ['POSTGRES_DB'],
 )
 
-# services
+# services    
 c.JupyterHub.services = [
     {
         'name': 'cull-idle',
         'admin': True,
-        'command': 'python cull_idle_servers.py --timeout=3600'.split(),
+        'command': 'python cull_idle_servers.py --timeout={server_timeout_seconds}'.format(
+            server_timeout_seconds=os.environ['SERVER_TIMEOUT_SECONDS']
+            ).split(),
+
     }
 ]
 # Do not comment out this line below!

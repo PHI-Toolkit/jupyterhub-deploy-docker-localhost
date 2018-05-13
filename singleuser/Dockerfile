@@ -15,11 +15,16 @@ RUN ln -sf /bin/bash /bin/sh && \
     ln -s /bin/tar /bin/gtar
 
 # install jupyterlab, jupyter_client
-# libav-tools for matplotlib anim
-# install R libraries and pre-requisites
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     pip install jupyterlab jupyter_client && \
     jupyter serverextension enable --py jupyterlab --sys-prefix
+
+# Code below based on https://github.com/jenkinsci/docker/issues/543
+# For addressing errors: "E: Unable to fetch some archives", "Hash Sum mismatch"
+RUN mkdir -p /etc/apt/apt.conf.d/
+COPY 99fixbadproxy /etc/apt/apt.conf.d/
+
+# libav-tools for matplotlib anim
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:opencpu/jq --yes && \
@@ -44,6 +49,7 @@ RUN apt-get update && \
 USER $NB_USER
 
 # R packages
+# install R libraries and pre-requisites
 # These need to go together in conda install: 'libspatialite', 'r-rsqlite', 'r-rgdal'
 RUN conda install --quiet --yes \
     'r-base=3.3.2' \
@@ -102,22 +108,24 @@ RUN conda install --quiet -c conda-forge --yes \
     'matplotlib' \
     'scipy=0.19*' \
     'seaborn=0.7*' \
-    'scikit-learn=0.18*' \
-    'scikit-image=0.12*' \
+    'scikit-learn=0.19*' \
+    'scikit-image=0.13*' \
     'sympy=1.0*' \
-    'cython=0.25*' \
-    'patsy=0.4*' \
+    'cython=0.28*' \
+    'patsy=0.5*' \
     'statsmodels=0.8*' \
-    'cloudpickle=0.2*' \
+    'cloudpickle=0.5*' \
     'dill=0.2*' \
-    'numba=0.31*' \
+    'numba=0.38*' \
     'bokeh=0.12.9' \
-    'sqlalchemy=1.1*' \
+    'sqlalchemy=1.2*' \
     'pyqt=5.6*' \
+    'hdf5=1.10*' \
+    'h5py=2.7*' \
+    'vincent=0.4.*' \
+    'beautifulsoup4=4.6.*' \
+    'protobuf=3.*' \
     'numpy' \
-    'hdf5' \
-    'h5py' \
-    'beautifulsoup4=4.5.*' \
     'icu' \
     'missingno' \
     'blaze' \
@@ -144,12 +152,15 @@ RUN conda install --quiet -c conda-forge --yes \
     'holoviews' \
     'geoviews' \
     'xarray' \
-    #'iris=2.0*' \
+    'dask' \
+    'pyke' \
+    'netcdf4' \
+    'cf_units' \
+    'setuptools' \
     'bkcharts' \
     'basemap' \
     'basemap-data-hires' \
     'networkx' \
-    'osmnx=0.8*' \
     'cartopy' \
     'proj4' \
     'datashader' \
@@ -216,13 +227,15 @@ RUN jupyter labextension install @jupyterlab/geojson-extension
 #    jupyter labextension install @jupyterlab/plotly-extension && \
 #    jupyter labextension install @jupyterlab/vega3-extension
 
+# restore password for sudo access
 RUN conda update jupyterlab && \
     conda clean -tipsy && \
     apt-get update && \
-    apt-get install -y zip unzip && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    sed -i 's/ NOPASSWD://g' /etc/sudoers && \
+    mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/
 
-COPY drive.jupyterlab-settings /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/drive.jupyterlab-settings
+COPY ./drive.jupyterlab-settings /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/drive.jupyterlab-settings
 
 USER $NB_USER
