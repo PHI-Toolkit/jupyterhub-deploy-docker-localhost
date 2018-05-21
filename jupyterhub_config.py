@@ -97,7 +97,7 @@ c.JupyterHub.hub_port = 8080
 # 2. Update the 'ports' entry in 'docker-compose.yml' for 'hub' service.
 #    Uncomment the '- 443:443' line.
 #    Comment out the '- 8000:8000' line.
-if os.environ['JUPYTERHUB_SSL'] == 'use_ssl':
+if os.environ['JUPYTERHUB_SSL'] == 'use_ssl_le' or os.environ['JUPYTERHUB_SSL'] == 'use_ssl_ss':
     c.JupyterHub.port = 443
     c.JupyterHub.ssl_key = os.environ['SSL_KEY']
     c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
@@ -130,7 +130,7 @@ c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
     db=os.environ['POSTGRES_DB'],
 )
 
-# services    
+# services
 c.JupyterHub.services = [
     {
         'name': 'cull-idle',

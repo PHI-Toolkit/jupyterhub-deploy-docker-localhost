@@ -16,7 +16,7 @@ RUN ln -sf /bin/bash /bin/sh && \
 
 # install jupyterlab, jupyter_client
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    pip install jupyterlab jupyter_client && \
+    conda install -y jupyterlab jupyter_client && \
     jupyter serverextension enable --py jupyterlab --sys-prefix
 
 # Code below based on https://github.com/jenkinsci/docker/issues/543
@@ -164,10 +164,12 @@ RUN conda install --quiet -c conda-forge --yes \
     'cartopy' \
     'proj4' \
     'datashader' \
-    'openpyxl' && \
+    'openpyxl' \
+    'bqplot' \
+    'qgrid' && \
     pip install --upgrade pip && \
     pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy python-Levenshtein \
-      jupyterlab_geojson jupyterlab_widgets altair==2.0.0rc1
+      jupyterlab_geojson jupyterlab_widgets altair==2.0.0rc1 bqplot pylantern
 RUN jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
     jupyter nbextension enable nbTranslate/main && \
     conda remove --quiet --yes --force qt pyqt && \
@@ -223,19 +225,24 @@ ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 USER root
 
-RUN jupyter labextension install @jupyterlab/geojson-extension
-#    jupyter labextension install @jupyterlab/plotly-extension && \
-#    jupyter labextension install @jupyterlab/vega3-extension
+RUN conda update jupyterlab && \
+    jupyter labextension install @jupyterlab/geojson-extension && \
+    jupyter labextension install @jupyterlab/plotly-extension && \
+    jupyter labextension install @jupyterlab/vega3-extension && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
+    jupyter labextension install jupyterlab_bokeh && \
+    jupyter labextension install qgrid && \
+    jupyter labextension install @jpmorganchase/perspective-jupyterlab
+
 
 # restore password for sudo access
-RUN conda update jupyterlab && \
-    conda clean -tipsy && \
+RUN conda clean -tipsy && \
     apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    sed -i 's/ NOPASSWD://g' /etc/sudoers && \
-    mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/
+    sed -i 's/ NOPASSWD://g' /etc/sudoers
+    #mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/
 
-COPY ./drive.jupyterlab-settings /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/drive.jupyterlab-settings
+#COPY ./drive.jupyterlab-settings /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/drive.jupyterlab-settings
 
 USER $NB_USER

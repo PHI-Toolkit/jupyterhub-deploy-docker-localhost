@@ -1,12 +1,15 @@
 #!/bin/bash
 # change the values of the exported variables as needed
+source .env
+echo "Creating 'secrets' directory..."
 mkdir -p secrets
-export JH_FQDN="mydomain.com"
-export JH_EMAIL="myname@mydomain.com"
+echo "JH_FQDN = $JH_FQDN"
+echo "JH_EMAIL = $JH_EMAIL"
 export JH_SECRETS="`pwd`/secrets"
 export JH_COMMAND="letsencrypt.sh --domain $JH_FQDN --email $JH_EMAIL --volume $JH_SECRETS"
 export CERT_SERVER="" # set this to "--staging" if testing script settings
 echo $JH_FQDN $JH_EMAIL $JH_SECRETS $CERT_SERVER
+echo "Generating LetsEncrypt certificates..."
 docker run --rm -it \
   -p 80:80 \
   -v $JH_SECRETS:/etc/letsencrypt \

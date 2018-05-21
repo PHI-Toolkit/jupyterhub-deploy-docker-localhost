@@ -4,6 +4,10 @@ secrets/csr
 secrets/keys
 secrets/live
 secrets/renewal
+secrets/default.crt
+secrets/default.key
+secrets/jupyterhub.crt
+secrets/jupyterhub.key
 .DS_Store
 .gitignore
 userlist

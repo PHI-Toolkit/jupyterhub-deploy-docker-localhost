@@ -1,9 +1,22 @@
 #!/bin/bash
-# 2018-05-12
+# 2018-05-20
+source .env
 if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
   echo "JupyterHub image does not exist."
 else
+  echo "Deleting Docker images..."
   docker rmi $(docker images -q jupyterhub:latest)
+fi
+echo "Creating network and volumes..."
+make network volumes
+if [[ ! -d secrets ]]; then
+  if [ "$JUPYTERHUB_SSL" == "use_ssl_ss" ]; then
+    ./create-certs.sh
+  else
+    if [ "$JUPYTERHUB_SSL" == "use_ssl_le" ]; then
+      ./letsencrypt-certs.sh
+    fi
+  fi
 fi
 docker-compose build
 # Get jupyterhub host IP address
