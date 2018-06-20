@@ -1,5 +1,12 @@
 #!/bin/bash
-# 2018-05-20
+# 2018-05-29
+
+docker pull jupyter/datascience-notebook:e1677043235c
+docker pull jupyter/scipy-notebook:e1677043235c
+docker pull jupyter/r-notebook:e1677043235c
+docker pull jupyter/minimal-notebook:e1677043235c
+
+./stophub.sh
 source .env
 if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
   echo "JupyterHub image does not exist."
@@ -9,13 +16,19 @@ else
 fi
 echo "Creating network and volumes..."
 make network volumes
-if [[ ! -d secrets ]]; then
-  if [ "$JUPYTERHUB_SSL" == "use_ssl_ss" ]; then
-    ./create-certs.sh
-  else
-    if [ "$JUPYTERHUB_SSL" == "use_ssl_le" ]; then
-      ./letsencrypt-certs.sh
+if [ "$JUPYTERHUB_SSL" == "use_ssl_ss" ]; then
+  ./create-certs.sh
+else
+  if [ "$JUPYTERHUB_SSL" == "use_ssl_le" ]; then
+    if test `find "./secrets/live/$JH_FQDN/fullchain.pem" -mmin +108000`
+    then
+        echo "Files old enough, running letsencrypt."
+        ./letsencrypt-certs.sh
     fi
+  else
+    echo "no_ssl is deprecated. "
+    echo "Please select SSL option: use_ssl_ss or use_ssl_le in the .env file. Exiting..."
+    exit
   fi
 fi
 docker-compose build
@@ -40,9 +53,11 @@ echo "JUPYTERHUB_SERVICE_HOST_IP is now set to:"
 echo $JUPYTERHUB_SERVICE_HOST_IP
 echo "..."
 sed -i -e "s/REPLACE_IP/$JUPYTERHUB_SERVICE_HOST_IP/g" .env
+docker stop $(docker ps -a | grep jupyter- | awk '{print $1}')
+docker rm $(docker ps -a | grep jupyter- | awk '{print $1}')
 docker rmi $(docker images -q jupyterhub:latest)
 docker rmi $(docker images -q postgres-hub:latest)
-docker rmi $(docker images -q jupyterhub-user:latest)
+#docker rmi -f $(docker images -q jupyterhub-user:latest)
 if [ ! -f singleuser/drive.jupyterlab-settings ]; then
     cp singleuser/drive.jupyterlab-settings-template singleuser/drive.jupyterlab-settings
 fi
@@ -52,7 +67,12 @@ fi
 echo "Rebuilding images..."
 docker-compose build
 make notebook_image
-if [ -f .env-e ]; then
-    rm .env-e
+rc=$?
+if [[ $rc -ne 0 ]]; then
+  echo "Error was: $rc" >> errorlog.txt
+else
+  if [ -f .env-e ]; then
+      rm .env-e
+  fi
+  echo "Build complete!"
 fi
-echo "Build complete!"

@@ -1,0 +1,129 @@
+# Version: 20180601
+ARG DOCKER_NOTEBOOK_IMAGE
+FROM $DOCKER_NOTEBOOK_IMAGE
+ARG JUPYTERHUB_VERSION
+ARG NB_USER_PASS
+
+LABEL maintainer='herman.tolentino@gmail.com'
+
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
+
+USER root
+
+ENV DEBIAN_FRONTEND noninteractive
+
+WORKDIR /home/jovyan/work
+
+RUN ln -sf /bin/bash /bin/sh && \
+    ln -s /bin/tar /bin/gtar
+
+# install jupyterlab, jupyter_client
+RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    conda install -y jupyterlab jupyter_client jupyter_contrib_nbextensions jupyter_nbextensions_configurator \
+    jupyter_dashboards osmnx && \
+    jupyter serverextension enable --py jupyterlab --sys-prefix && \
+    conda clean -tipsy
+
+# Code below based on https://github.com/jenkinsci/docker/issues/543
+# For addressing errors: "E: Unable to fetch some archives", "Hash Sum mismatch"
+RUN mkdir -p /etc/apt/apt.conf.d/
+COPY 99fixbadproxy /etc/apt/apt.conf.d/
+
+USER $NB_USER
+
+RUN jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
+    jupyter nbextension enable nbTranslate/main
+    #jupyter contrib nbextension install --user
+
+# Activate ipywidgets extension in the environment that runs the notebook server\
+USER root
+RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
+    jupyter nbextensions_configurator enable --user && \
+    echo "$NB_USER:$NB_USER_PASS" | chpasswd
+
+ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
+
+USER $NB_USER
+RUN conda install conda-build && \
+    conda clean -tipsy
+
+COPY work .
+
+RUN sudo chmod a+x modules/*.sh && \
+    sudo mkdir -p /srv/modules && \
+    sudo mv modules/* /srv/modules/. && \
+    sudo chmod a+w -R /home/jovyan/work/shared && \
+    sudo chmod a+w -R /home/jovyan/work/geoserver && \
+    sudo chmod a+w -R /home/jovyan/work/notebooks && \
+    sudo chmod a+w /home/jovyan/work/notebooks/*.ipynb && \
+    sudo chown -R jovyan:users /home/jovyan && \
+    sudo chown -R jovyan:users /home/jovyan/work/shared && \
+    sudo chown -R jovyan:users /home/jovyan/work/geoserver && \
+    sudo chown -R jovyan:users /home/jovyan/work/notebooks && \
+    mkdir -p /home/jovyan/.cache && \
+    chmod -R a+w /home/jovyan/.cache && \
+    chown -R jovyan:users /home/jovyan/.cache && \
+    sudo chmod -R a+w /opt/conda/ && \
+    sudo chown -R root:users /opt/conda && \
+    sudo chmod g+s /opt/conda
+
+WORKDIR /home/jovyan/work
+
+# Uncomment the following lines to load the Julia kernel and Python, R and Julia modules
+# You can also load the following inside the runnng Notebook single-user container through terminal
+#RUN /srv/modules/install-scijava-kernel.sh
+#RUN /srv/modules/restore-tutorial.sh
+#RUN /srv/modules/install-python2-kernel.sh
+#RUN /srv/modules/install-julia-kernel.sh
+#RUN /srv/modules/load-julia-modules.sh
+
+# Custom logo, create backup CSS file to enable restore if jupyter-themes overwrites it and the GEEKS logo
+ARG LOGO_IMAGE
+RUN echo $LOGO_IMAGE && \
+    mkdir -p /home/jovyan/.jupyter/custom
+ADD css/custom.css /home/jovyan/.jupyter/custom/custom.css
+ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
+RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
+    cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup
+
+# Address iopub data error message
+ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
+
+#USER root
+
+RUN conda update jupyterlab && \
+    conda remove --quiet --yes --force qt pyqt && \
+    conda clean -tipsy
+
+USER root
+
+RUN pip install --upgrade pip
+RUN pip install googletrans fuzzywuzzy python-Levenshtein \
+        jupyterlab_geojson jupyterlab_widgets altair==2.0.0rc1 bqplot pylantern gtts \
+        jupyterlab-discovery perspective-python qgrid cite2c pivottablejs
+RUN jupyter nbextension enable --py --sys-prefix qgrid && \
+    python3 -m cite2c.install
+
+
+RUN jupyter labextension install @jupyterlab/hub-extension && \
+    jupyter labextension install @jupyterlab/geojson-extension && \
+    jupyter labextension install @jupyterlab/plotly-extension && \
+    jupyter labextension install @jupyterlab/vega3-extension && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
+    jupyter labextension install jupyterlab_bokeh && \
+    jupyter labextension install pylantern && \
+    jupyter labextension install qgrid && \
+    jupyter labextension install @pyviz/jupyterlab_pyviz
+
+# restore password for sudo access
+RUN conda clean -tipsy && \
+    apt-get update && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    sed -i 's/ NOPASSWD://g' /etc/sudoers
+    #mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/
+
+#COPY ./drive.jupyterlab-settings /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/drive.jupyterlab-settings
+
+USER $NB_USER

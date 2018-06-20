@@ -1,5 +1,6 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
+# Revision Date: 20180529
 
 include .env
 
@@ -46,17 +47,18 @@ else
 	cert_files=
 endif
 
-check-files: userlist $(cert_files) secrets/oauth.env secrets/postgres.env
+check-files: userlist $(cert_files) .env
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
 notebook_image: #pull singleuser/Dockerfile
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
-		--build-arg LOGO_IMAGE=${LOGO_IMAGE} \
+		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
-		singleuser
+		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
+		--file=singleuser/$(DOCKERFILE) singleuser
 
 build: check-files network volumes
 	docker-compose build

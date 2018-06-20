@@ -92,19 +92,17 @@ c.JupyterHub.hub_connect_ip = os.environ['JUPYTERHUB_SERVICE_HOST_IP']
 c.JupyterHub.hub_port = 8080
 
 # TLS config
-# If using GitHub Authenticator, make sure to:
-# 1. Update the GitHub credentials in the .env file
-# 2. Update the 'ports' entry in 'docker-compose.yml' for 'hub' service.
-#    Uncomment the '- 443:443' line.
-#    Comment out the '- 8000:8000' line.
-if os.environ['JUPYTERHUB_SSL'] == 'use_ssl_le' or os.environ['JUPYTERHUB_SSL'] == 'use_ssl_ss':
-    c.JupyterHub.port = 443
-    c.JupyterHub.ssl_key = os.environ['SSL_KEY']
-    c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
+# If using GitHub Authenticator, make sure to update .env file:
+# 1. Update the GitHub credentials section
+# 2. Update SSL option: use_ssl_le
+c.JupyterHub.port = 443
+c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
 # Authenticators: pick one from 1, 2 or 3 below and comment out the others
-# DEFAULT is tmp_authenticator
+# DEFAULT is dummy_authenticator
 if os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'dummy_authenticator':
+# DEFAULT in .env
 # 1. Dummy Authenticator  do not use this for production!
     c.JupyterHub.authenticator_class = 'dummyauthenticator.DummyAuthenticator'
     c.DummyAuthenticator.password = "geeks@localhost"
@@ -113,7 +111,6 @@ elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'github_authenticator':
     c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
     c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 else:
-# DEFAULT
 # 3. JupyterHub tmpauthenticator
 # this creates temporary users
     c.JupyterHub.authenticator_class = tmpauthenticator.TmpAuthenticator

@@ -1,8 +1,10 @@
 #!/bin/bash
 # change the values of the exported variables as needed
 source .env
-echo "Creating 'secrets' directory..."
-mkdir -p secrets
+if [[ ! -d secrets ]]; then
+    echo "Creating 'secrets' directory..."
+    mkdir -p secrets
+fi
 echo "JH_FQDN = $JH_FQDN"
 echo "JH_EMAIL = $JH_EMAIL"
 export JH_SECRETS="`pwd`/secrets"
@@ -25,23 +27,23 @@ docker run --rm -it \
   --email "$JH_EMAIL" \
   $CERT_SERVER
 
-# Set permissions so nobody can read the cert and key.
-# Also symlink the certs into the root of the /etc/letsencrypt
-# directory so that the FQDN doesn't have to be known later.
-docker run --rm -it \
-  -v $JH_SECRETS:/etc/letsencrypt \
-  --entrypoint=/bin/bash \
-  quay.io/letsencrypt/letsencrypt:latest \
-  -c "find /etc/letsencrypt/* -maxdepth 1 -type l -delete && \
-    ln -s /etc/letsencrypt/live/$JH_FQDN/* /etc/letsencrypt/ && \
-    find /etc/letsencrypt -type d -exec chmod 755 {} +"
-rm secrets/*.pem
-rm secrets/README
-cp secrets/live/$JH_FQDN/fullchain.pem secrets/fullchain.pem
-cp secrets/live/$JH_FQDN/privkey.pem secrets/privkey.pem
-cp secrets/privkey.pem secrets/$JH_FQDN.key
-cp secrets/fullchain.pem secrets/$JH_FQDN.pem
-cp secrets/privkey.pem secrets/jupyterhub.key
-cp secrets/fullchain.pem secrets/jupyterhub.pem
-cp secrets/jupyterhub.key secrets/default.key
-cp secrets/jupyterhub.pem secrets/default.pem
+  # Set permissions so nobody can read the cert and key.
+  # Also symlink the certs into the root of the /etc/letsencrypt
+  # directory so that the FQDN doesn't have to be known later.
+  docker run --rm -it \
+    -v $JH_SECRETS:/etc/letsencrypt \
+    --entrypoint=/bin/bash \
+    quay.io/letsencrypt/letsencrypt:latest \
+    -c "find /etc/letsencrypt/* -maxdepth 1 -type l -delete && \
+      ln -s /etc/letsencrypt/live/$JH_FQDN/* /etc/letsencrypt/ && \
+      find /etc/letsencrypt -type d -exec chmod 755 {} +"
+  rm secrets/*.pem
+  rm secrets/README
+  cp secrets/live/$JH_FQDN/fullchain.pem secrets/fullchain.pem
+  cp secrets/live/$JH_FQDN/privkey.pem secrets/privkey.pem
+  cp secrets/privkey.pem secrets/$JH_FQDN.key
+  cp secrets/fullchain.pem secrets/$JH_FQDN.pem
+  cp secrets/privkey.pem secrets/jupyterhub.key
+  cp secrets/fullchain.pem secrets/jupyterhub.pem
+  cp secrets/jupyterhub.key secrets/default.key
+  cp secrets/jupyterhub.pem secrets/default.pem

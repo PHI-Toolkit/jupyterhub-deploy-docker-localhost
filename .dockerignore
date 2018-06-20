@@ -15,8 +15,13 @@ secrets/fullchain.pem
 secrets/privkey.pem
 secrets/oauth.env
 secrets/postgres.env
+secrets/default.pem
+secrets/default.key
 LICENSE.md
 .env
+.env-e
 .gitignore
 secrets/drive.jupyterlab-settings
 drive.jupyterlab-settings
+*.tar
+errorlog.txt

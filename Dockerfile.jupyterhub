@@ -4,6 +4,7 @@
 # Version 20180115
 ARG JUPYTERHUB_VERSION
 FROM jupyterhub/jupyterhub-onbuild:$JUPYTERHUB_VERSION
+LABEL maintainer='herman.tolentino@gmail.com'
 
 # Install dockerspawner, oauth, postgres
 RUN /opt/conda/bin/conda install -yq psycopg2=2.7 && \
@@ -37,6 +38,8 @@ COPY userlist /srv/jupyterhub/userlist
 # change jupyterhub logo
 ARG LOGO_IMAGE
 RUN echo $LOGO_IMAGE
-COPY singleuser/css/$LOGO_IMAGE /opt/conda/share/jupyter/hub/static/images/.
-RUN cp /opt/conda/share/jupyter/hub/static/images/jupyter.png /opt/conda/share/jupyter/hub/static/images/jupyter.png.bak && \
-    cp /opt/conda/share/jupyter/hub/static/images/$LOGO_IMAGE /opt/conda/share/jupyter/hub/static/images/jupyter.png
+#RUN ls -la /opt/conda/share/jupyter/hub/static/images/
+COPY singleuser/css/*.png /opt/conda/share/jupyter/hub/static/images/
+#RUN cp /opt/conda/share/jupyter/hub/static/images/jupyter.png /opt/conda/share/jupyter/hub/static/images/jupyter.png.bak && \
+RUN cp /opt/conda/share/jupyter/hub/static/images/$LOGO_IMAGE /opt/conda/share/jupyter/hub/static/images/jupyter.png
+VOLUME /srv/jupyterhub/secrets

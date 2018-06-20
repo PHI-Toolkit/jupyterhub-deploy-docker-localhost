@@ -6,51 +6,44 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 2. Jupyter Notebooks - notebook environment with 2 kernels: Python and R
 3. PostgreSQL - database backend to store notebook user data
 
-# Installation Guide
+# Installation Guide - Quick
+
+## Create `.env` and `userlist` files
+There are two template files for `.env` and `userlist`, `.env-template` and `userlist-template`. Rename these files by removing the `-template` suffix. These are the only two files you need to update.
+
+For quick installation on local machine, with self-signed SSL certificate, edit the following `.env` file sections:
+1. Generate password for PostgreSQL
+2. Generate proxy auth token
+3. Run `buildhub.sh`
+4. Go to https://localhost when build script finishes without errors.
+
+# Installation Guide - Detailed
 
 ## Install Docker and Docker Compose
 
 * Install Docker: https://docs.docker.com/install/
 * Install Docker Compose: https://docs.docker.com/compose/install/
 
-## Create secrets directory
-Type the following on your Linux command line:
-> `$ mkdir secrets`
-> `$ pwd`
-
-You will copy the result of `pwd` later to your `letsencrypt-certs.sh` file.
-
 ## Create `.env` and `userlist` files
 There are two template files for `.env` and `userlist`, `.env-template` and `userlist-template`. Rename these files by removing the `-template` suffix. These are the only two files you need to update.
 
-## Create the `drive.jupyterlab-settings` file in `singleuser` folder
-Rename `drive.jupyterlab-settings-template` to `drive.jupyterlab-settings`. The file `drive.jupyterlab-settings-template` is under the `singleuser` folder.
-
 ## Obtain Domain name
 If you intend to use JupyterHub on your laptop for localhost use, there is no need to obtain a domain name and you can skip this step. If JuypterHub will be used with a domain name, obtain domain name (see "Using a Domain Name" below).
-
-## Create SSL Certificate (two options)
-### Self-signed certificate
-Using a self-signed certificate is useful for testing or limited use (localhost).
-> `$ chmod +x create-certs.sh`
-
-> `$ ./create-certs.sh`
 
 ### Using a Domain Name
 If you want to use your own domain name, obtain one from a domain name registrar. You will use this domain name to replace instances of "mydomain.com" in configuration files and letsencrypt bash script below.
 
 ### Obtain "Lets Encrypt" SSL Certificate
-If using JupyterHub with a domain name, open the `letsencrypt-certs.sh` bash script with a text editor (e.g., nano) and edit the first few lines (lines 3, 4 and 5):
+If using JupyterHub with a domain name, edit the `.env` file with a text editor (e.g., nano) and look for section below:
 
-* For the line below, replace "mydomain.com" with your domain name, "e.g., example.com", that you obtained from a domain name registrar:
-> `export JH_FQDN="mydomain.com"`
-* For the line below, replace email address with your email address
-> `export JH_EMAIL="myname@mydomain.com"`
-* For the line below, replace "/path/to" with full path (result of `pwd` earlier)
-> `export JH_SECRETS="/path/to/secrets"`
+> \# LetsEncrypt variables, for 'use_ssl_le' above<br/>
+> \# JH_FQDN - fully qualified domain name, e.g., example.com<br/>
+> \# JH_EMAIL - email address to use for LetsEncrypt<br/>
+> JH_FQDN=<br/>
+> JH_EMAIL=<br/>
 
-> `$ chmod +x letsencrypt-certs.sh`
-> `$ ./letsencrypt-certs.sh`
+Add your fully qualified domain name (FQDN) to `JH_FQDN` and your email address to
+`JH_EMAIL`.
 
 ## JupyterHub Authentication
 
@@ -94,31 +87,31 @@ If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i
 ## Generate Postgres password
 This JupyterHub deployment uses the PostgreSQL database as a backend (instead of sqlite).
 * Create the postgres password by typing the Linux command below:
-> `$ openssl rand -hex 32`
+   > `$ openssl rand -hex 32`
 * Copy the result of the command to the right `.env` section (about Line 74) by replacing the `geeks@localhost` entry or current value with the cryptic, "hex" value:
-> `POSTGRES_PASSWORD=geeks@localhost`
+   > `POSTGRES_PASSWORD=geeks@localhost`
 
-> `JPY_PSQL_PASSWORD=geeks@localhost`
+   > `JPY_PSQL_PASSWORD=geeks@localhost`
+* Use the same password between updates to Jupyter Notebook set up.
 
-## Create Docker networks and volumes
-Type the following Linux commands on the command line:
-> `$ make network`
+## Select whether to use custom Dockerfile or Docker Jupyter Stacks for your User Notebook Server
 
-> `$ make volumes`
+1. If using custom Dockerfile:<br/>
+    a. DOCKER_NOTEBOOK_IMAGE=jupyter/minimal-notebook:e1677043235c<br/>
+    b. DOCKERFILE=Dockerfile.custom
+2. If using Docker Jupyter Stacks (https://github.com/jupyter/docker-stacks)<br/>
+    a. DOCKER_NOTEBOOK_IMAGE can be any of the following:
+      `jupyter/scipy-notebook:e1677043235c`, `jupyter/r-notebook:e1677043235c`, or `jupyter/datascience-notebook:e1677043235c`<br/>
+    b. DOCKERFILE=Dockerfile.stacks
 
-## Build the Notebook Server Docker Image
-Type the following command on the command line:
-> `$ make notebook_image`
-
-This command creates the Jupyter Notebook Docker image that will be "spawned" by JupyterHub.
-
-## Build the PostgreSQL 9.5 and JupyterHub Docker images
+## Build the PostgreSQL 9.5, JupyterHub Docker, Jupyter Notebook Server images
 Type the following command on the command line:
 > `$ ./buildhub.sh`
 
 This script does two things:
 * Obtains the internal Docker network IP of the JupyterHub container.
 * Builds the final JupyterHub and Postgres DB images
+* Builds the notebook server image that is spawned by JupyterHub
 
 ## Launch JupyterHub and Browse Your Brand New Notebook Server
 * To troubleshoot potential issues during first launch, use the following command:
@@ -130,20 +123,10 @@ Launch JupyterHub on your browser:
 * If localhost, go to https://localhost in your browser. If using a domain name, go to https://mydomain.com.
 * Sign in to GitHub using your account
 
-Due to unconfigured Google Drive Integration, you will see something like this error message pop up after launching Jupyterlab. Just click "OK". You can configure Google Drive integration later.
-![Google Drive Error](./docs/GoogleDriveAPI-Error.png)
+To stop JupyterHub:
+> `$ ./stophub.sh`
 
-Please see next section for instructions on how to configure Google Drive to work with your JupyterLab set up.
-
-# Jupyterlab Google Drive Integration
-
-Please follow the instructions here:
-https://github.com/jupyterlab/jupyterlab-google-drive/blob/master/docs/advanced.md
-
-These instructions will help you obtain your Google Client ID as in the figure below.
-![Google Drive Error](./docs/client-id-secret.png)
-
-After you obtain Google API credentials, rename the file `drive.jupyterlab-settings-template` by removing the `-template` suffix, then update the file by filling upthe empty string "" in "clientId":"" with your Google Client ID (copy-paste from the developer console as above) . It's the long string with cryptic characters that end in `.apps.googleusercontent.com`.
+The above will shutdown all running containers, including user containers.
 
 # Notes for Windows users
 

@@ -1,9 +1,13 @@
-# Version: 20180223
+# Version: 20180601
 ARG DOCKER_NOTEBOOK_IMAGE
 FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
+ARG NB_USER_PASS
 
-RUN python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
+LABEL maintainer='herman.tolentino@gmail.com'
+
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
 
 USER root
 
@@ -12,16 +16,15 @@ ENV DEBIAN_FRONTEND noninteractive
 WORKDIR /home/jovyan/work
 
 RUN ln -sf /bin/bash /bin/sh && \
-    ln -s /bin/tar /bin/gtar
-
-# install jupyterlab, jupyter_client
-RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    ln -s /bin/tar /bin/gtar && \
+    echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+    # install jupyterlab, jupyter_client
     conda install -y jupyterlab jupyter_client && \
-    jupyter serverextension enable --py jupyterlab --sys-prefix
-
-# Code below based on https://github.com/jenkinsci/docker/issues/543
-# For addressing errors: "E: Unable to fetch some archives", "Hash Sum mismatch"
-RUN mkdir -p /etc/apt/apt.conf.d/
+    jupyter serverextension enable --py jupyterlab --sys-prefix && \
+    conda clean -tipsy && \
+    # Code below based on https://github.com/jenkinsci/docker/issues/543
+    # For addressing errors: "E: Unable to fetch some archives", "Hash Sum mismatch"
+    mkdir -p /etc/apt/apt.conf.d/
 COPY 99fixbadproxy /etc/apt/apt.conf.d/
 
 # libav-tools for matplotlib anim
@@ -85,9 +88,9 @@ RUN conda install --quiet --yes \
     'r-igraph ' \
     'r-leaflet' \
     'r-tm' && \
-    conda clean -tipsy
-# devtools install 'viridis' and 'cividis' to avoid
-RUN R -e "install.packages(c('text2vec','crayon'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
+    conda clean -tipsy && \
+    # devtools install 'viridis' and 'cividis' to avoid errors
+    R -e "install.packages(c('text2vec','crayon'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
     R -e "devtools::install_github('sjmgarnier/viridis')" && \
     R -e "devtools::install_github('marcosci/cividis')" && \
     R -e "install.packages(c('raster','rgeos'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
@@ -100,6 +103,7 @@ RUN R -e "install.packages(c('text2vec','crayon'), dependencies=TRUE, repos='htt
 # Unversion 'matplotlib' for 'libkml', 'rgdal' and 'r-sf' compatibility
 # Specify pyqt version to avoid two choices
 USER $NB_USER
+
 RUN conda install --quiet -c conda-forge --yes \
     'nomkl' \
     'ipywidgets=7.0*' \
@@ -133,6 +137,7 @@ RUN conda install --quiet -c conda-forge --yes \
     'wrapt' \
     'textblob' \
     'jupyter_contrib_nbextensions' \
+    'jupyter_nbextensions_configurator' \
     'xlrd' \
     'jupyter_kernel_gateway' && \
     conda install -c conda-forge -c ioam -c bioconda -c anaconda --yes \
@@ -166,27 +171,36 @@ RUN conda install --quiet -c conda-forge --yes \
     'datashader' \
     'openpyxl' \
     'bqplot' \
-    'qgrid' && \
+    'qgrid' \
+    'vega3' \
+    'vega_datasets' \
+    #'jupyter_dashboards' \
+    'osmnx=0.8.1' \
+    'numpy=1.14' && \
     pip install --upgrade pip && \
     pip install cufflinks sklearn-pandas epipy googletrans hyper fuzzywuzzy python-Levenshtein \
-      jupyterlab_geojson jupyterlab_widgets altair==2.0.0rc1 bqplot pylantern
-RUN jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
-    jupyter nbextension enable nbTranslate/main && \
+      jupyterlab_geojson jupyterlab_widgets altair==2.0.0rc1 bqplot pylantern gtts && \
     conda remove --quiet --yes --force qt pyqt && \
     conda clean -tipsy
 
+RUN \
+    jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
+    jupyter nbextension enable nbTranslate/main && \
+    jupyter contrib nbextension install --user
+
 # Activate ipywidgets extension in the environment that runs the notebook server\
 USER root
-RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
+RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
+    jupyter nbextensions_configurator enable --user
+
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 
 USER $NB_USER
-RUN conda install conda-build && \
-    conda clean -tipsy
-
 COPY work .
 
-RUN sudo chmod a+x modules/*.sh && \
+RUN conda install conda-build && \
+    conda clean -tipsy && \
+    sudo chmod a+x modules/*.sh && \
     sudo mkdir -p /srv/modules && \
     sudo mv modules/* /srv/modules/. && \
     sudo chmod a+w -R /home/jovyan/work/shared && \
@@ -223,17 +237,21 @@ RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
 # Address iopub data error message
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
-USER root
-
 RUN conda update jupyterlab && \
+    pip install jupyterlab-discovery && \
+    pip install perspective-python && \
+    jupyter labextension install @jpmorganchase/perspective-jupyterlab && \
+    #jupyter labextension install @jupyterlab/hub-extension && \
     jupyter labextension install @jupyterlab/geojson-extension && \
     jupyter labextension install @jupyterlab/plotly-extension && \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
     jupyter labextension install jupyterlab_bokeh && \
+    jupyter labextension install pylantern && \
     jupyter labextension install qgrid && \
-    jupyter labextension install @jpmorganchase/perspective-jupyterlab
+    jupyter labextension install @pyviz/jupyterlab_pyviz
 
+USER root
 
 # restore password for sudo access
 RUN conda clean -tipsy && \
