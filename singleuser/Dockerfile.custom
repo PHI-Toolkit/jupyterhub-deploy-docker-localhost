@@ -295,8 +295,6 @@ RUN conda update jupyterlab && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     sed -i 's/ NOPASSWD://g' /etc/sudoers
-    #mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/
 
-#COPY ./drive.jupyterlab-settings /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/drive.jupyterlab-settings
 
 USER $NB_USER
