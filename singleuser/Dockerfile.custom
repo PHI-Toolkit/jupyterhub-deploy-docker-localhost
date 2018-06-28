@@ -3,6 +3,9 @@ ARG DOCKER_NOTEBOOK_IMAGE
 FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
 ARG NB_USER_PASS
+ARG GITHUB_ACCESS_TOKEN
+ARG GITHUB_CLIENT_ID
+ARG GITHUB_CLIENT_SECRET
 
 LABEL maintainer='herman.tolentino@gmail.com'
 
@@ -30,16 +33,16 @@ COPY 99fixbadproxy /etc/apt/apt.conf.d/
 # libav-tools for matplotlib anim
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:opencpu/jq --yes && \
-    add-apt-repository ppa:ubuntugis/ppa && \
+    add-apt-repository -y ppa:opencpu/opencpu-2.0 --yes && \
+    add-apt-repository -y ppa:ubuntugis/ubuntugis-experimental && \
     apt-get update && \
-    apt-get install -y gdal-bin libav-tools libgeos-dev nano \
+    apt-get install -y gdal-bin libgeos-dev nano \
       libffi-dev g++ libssl-dev libfreetype6-dev \
       python-dev libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr \
       flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig \
       aptitude libmariadb-client-lgpl-dev fonts-dejavu gfortran gcc \
       libcairo2 mesa-common-dev libglu1-mesa-dev libudunits2-dev libgdal-dev \
-      libjq-dev libv8-3.14-dev libprotobuf-dev protobuf-compiler libproj-dev \
+      libv8-3.14-dev libprotobuf-dev protobuf-compiler libproj-dev \
           libgeos++-dev zip unzip && \
     export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib && \
     aptitude install -y libmagick++-dev && \
@@ -54,26 +57,34 @@ USER $NB_USER
 # R packages
 # install R libraries and pre-requisites
 # These need to go together in conda install: 'libspatialite', 'r-rsqlite', 'r-rgdal'
-RUN conda install --quiet --yes \
-    'r-base=3.3.2' \
-    'r-irkernel=0.7*' \
-    'r-plyr=1.8*' \
-    'r-devtools=1.12*' \
-    'r-tidyverse=1.0*' \
-    'r-shiny=0.14*' \
-    'r-rmarkdown=1.2*' \
-    'r-forecast=7.3*' \
-    'r-reshape2=1.4*' \
-    'r-nycflights13=0.2*' \
-    'r-caret=6.0*' \
-    'r-rcurl=1.95*' \
-    'r-crayon=1.3*' \
-    'r-randomforest=4.6*' && \
+# R pre-requisites
+RUN sudo apt-get update && \
+    sudo apt-get install -y --no-install-recommends \
+    fonts-dejavu \
+    tzdata \
+    gfortran \
+    gcc && \
+    sudo apt-get clean && \
+    sudo rm -rf /var/lib/apt/lists/* && \
+  conda install --quiet --yes \
+    'r-base=3.4.1' \
+    'r-irkernel' \
+    'r-plyr' \
+    'r-devtools' \
+    'r-tidyverse' \
+    'r-shiny' \
+    'r-rmarkdown' \
+    'r-forecast' \
+    'r-reshape2' \
+    'r-nycflights13' \
+    'r-caret' \
+    'r-rcurl' \
+    'r-crayon' \
+    'r-randomforest' && \
     conda install -c conda-forge --yes \
     'libspatialite' \
     'r-rsqlite' \
-    'r-rgdal' \
-    'r-sf' && \
+    'r-rgdal' && \
     conda install -c conda-forge -c brown-data-science -c r -c blaze -c bioconda --yes \
     'r-reticulate' \
     'r-sp' \
@@ -87,13 +98,17 @@ RUN conda install --quiet --yes \
     'r-visnetwork' \
     'r-igraph ' \
     'r-leaflet' \
-    'r-tm' && \
+    'r-tm' \
+    'r-sf' \
+    'r-rgeos' \
+    'r-raster' \
+    'r-text2vec' && \
     conda clean -tipsy && \
     # devtools install 'viridis' and 'cividis' to avoid errors
-    R -e "install.packages(c('text2vec','crayon'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
+    R -e "install.packages(c('crayon','jqr'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
     R -e "devtools::install_github('sjmgarnier/viridis')" && \
     R -e "devtools::install_github('marcosci/cividis')" && \
-    R -e "install.packages(c('raster','rgeos'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
+    #R -e "install.packages(c('raster','rgeos'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
     R -e "install.packages(c('geojsonio','protolite'),repos='http://cran.rstudio.com')"
 
 # Install Python 3 packages
@@ -140,7 +155,7 @@ RUN conda install --quiet -c conda-forge --yes \
     'jupyter_nbextensions_configurator' \
     'xlrd' \
     'jupyter_kernel_gateway' && \
-    conda install -c conda-forge -c ioam -c bioconda -c anaconda --yes \
+    conda install -c conda-forge -c ioam -c bioconda -c anaconda -c esri --yes \
     'rpy2' \
     'pyproj' \
     'pillow' \
@@ -153,7 +168,7 @@ RUN conda install --quiet -c conda-forge --yes \
     'geopandas' \
     'mplleaflet' \
     'plotly' \
-    'folium' \
+    #'folium' \
     'holoviews' \
     'geoviews' \
     'xarray' \
@@ -174,7 +189,7 @@ RUN conda install --quiet -c conda-forge --yes \
     'qgrid' \
     'vega3' \
     'vega_datasets' \
-    #'jupyter_dashboards' \
+    # osmnx and numpy versions that match
     'osmnx=0.8.1' \
     'numpy=1.14' && \
     pip install --upgrade pip && \
@@ -237,11 +252,20 @@ RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
 # Address iopub data error message
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
-RUN conda update jupyterlab && \
-    pip install jupyterlab-discovery && \
-    pip install perspective-python && \
-    jupyter labextension install @jpmorganchase/perspective-jupyterlab && \
-    #jupyter labextension install @jupyterlab/hub-extension && \
+RUN \
+    pip install jupyterlab-discovery perspective-python && \
+    pip install  --upgrade "ipython[all]" && \
+    sudo apt-get update && \
+    sudo apt-get install -y nodejs npm build-essential && \
+    sudo npm cache clean -f && \
+    sudo npm install -g n && \
+    sudo n stable
+
+RUN \
+    jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
+    jupyter labextension install jupyterlab_discovery && \
+    jupyter labextension enable jupyterlab_discovery && \
+    jupyter labextension install @jupyterlab/hub-extension && \
     jupyter labextension install @jupyterlab/geojson-extension && \
     jupyter labextension install @jupyterlab/plotly-extension && \
     jupyter labextension install @jupyterlab/vega3-extension && \
@@ -249,12 +273,24 @@ RUN conda update jupyterlab && \
     jupyter labextension install jupyterlab_bokeh && \
     jupyter labextension install pylantern && \
     jupyter labextension install qgrid && \
-    jupyter labextension install @pyviz/jupyterlab_pyviz
+    jupyter labextension install @pyviz/jupyterlab_pyviz && \
+    jupyter labextension install @mflevine/jupyterlab_html
+
+RUN \
+    git clone https://github.com/python-visualization/folium.git && \
+    pip install -r folium/requirements.txt && \
+    pip install ./folium && \
+    git clone https://github.com/python-visualization/branca.git && \
+    pip install -r branca/requirements.txt && \
+    pip install ./branca && \
+    git clone https://github.com/pallets/jinja.git && \
+    pip install ./jinja
 
 USER root
 
 # restore password for sudo access
-RUN conda clean -tipsy && \
+RUN conda update jupyterlab && \
+    conda clean -tipsy && \
     apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \

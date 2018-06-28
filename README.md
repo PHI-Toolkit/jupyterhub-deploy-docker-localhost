@@ -150,6 +150,14 @@ In summary, there are a few steps to get started with Jupyter Notebooks:
 Delete the old `jupyterhub_cookie_secret` file:
 > `$ sudo rm /var/lib/docker/volumes/jupyterhub-data/_data/jupyterhub_cookie_secret`
 
+# Changes
+
+## stacks-0.1
+
+* **IMAGE_TAG variable**: See the `.env` file. Sets the Jupyter Stacks minimal image version to use in case of Dockerfile.custom or the stacks version in case of Dockerfile.stacks. For example, the Docker image for the singleuser-notebook that uses image tag `5811dcb711ba` is based on Ubuntu Bionic. The tags can be found here: https://hub.docker.com/r/jupyter/base-notebook/tags/.
+
+* **GITHUB_ACCESS_TOKEN**: See `.env` file. Obtain your personal GitHub access token from https://github.com/settings/tokens.
+
 # JupyterHub Logs / Launch Issues
 ## Logs: Old base64 cookie-secret detected in /data/jupyterhub_cookie_secret.
 * While jupyterhub is running, type the following commands:

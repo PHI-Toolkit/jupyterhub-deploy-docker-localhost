@@ -58,6 +58,9 @@ notebook_image: #pull singleuser/Dockerfile
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
+		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
+		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
+		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
 		--file=singleuser/$(DOCKERFILE) singleuser
 
 build: check-files network volumes

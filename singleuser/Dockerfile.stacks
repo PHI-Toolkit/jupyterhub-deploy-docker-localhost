@@ -3,6 +3,9 @@ ARG DOCKER_NOTEBOOK_IMAGE
 FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
 ARG NB_USER_PASS
+ARG GITHUB_ACCESS_TOKEN
+ARG GITHUB_CLIENT_ID
+ARG GITHUB_CLIENT_SECRET
 
 LABEL maintainer='herman.tolentino@gmail.com'
 
@@ -70,14 +73,6 @@ RUN sudo chmod a+x modules/*.sh && \
 
 WORKDIR /home/jovyan/work
 
-# Uncomment the following lines to load the Julia kernel and Python, R and Julia modules
-# You can also load the following inside the runnng Notebook single-user container through terminal
-#RUN /srv/modules/install-scijava-kernel.sh
-#RUN /srv/modules/restore-tutorial.sh
-#RUN /srv/modules/install-python2-kernel.sh
-#RUN /srv/modules/install-julia-kernel.sh
-#RUN /srv/modules/load-julia-modules.sh
-
 # Custom logo, create backup CSS file to enable restore if jupyter-themes overwrites it and the GEEKS logo
 ARG LOGO_IMAGE
 RUN echo $LOGO_IMAGE && \
@@ -98,13 +93,12 @@ RUN conda update jupyterlab && \
 
 USER root
 
-RUN pip install --upgrade pip
-RUN pip install googletrans fuzzywuzzy python-Levenshtein \
+RUN pip install --upgrade pip && \
+    pip install googletrans fuzzywuzzy python-Levenshtein \
         jupyterlab_geojson jupyterlab_widgets altair==2.0.0rc1 bqplot pylantern gtts \
-        jupyterlab-discovery perspective-python qgrid cite2c pivottablejs
-RUN jupyter nbextension enable --py --sys-prefix qgrid && \
-    python3 -m cite2c.install
-
+        jupyterlab-discovery perspective-python qgrid pivottablejs jupyterlab_github && \
+    jupyter nbextension enable --py --sys-prefix qgrid && \
+    jupyter serverextension enable --sys-prefix jupyterlab_github
 
 RUN jupyter labextension install @jupyterlab/hub-extension && \
     jupyter labextension install @jupyterlab/geojson-extension && \
@@ -122,8 +116,5 @@ RUN conda clean -tipsy && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     sed -i 's/ NOPASSWD://g' /etc/sudoers
-    #mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/
-
-#COPY ./drive.jupyterlab-settings /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/google-drive/drive.jupyterlab-settings
 
 USER $NB_USER

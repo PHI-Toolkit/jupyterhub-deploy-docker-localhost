@@ -12,6 +12,9 @@ c.NotebookApp.ip = '*'
 c.NotebookApp.port = 8888
 c.NotebookApp.open_browser = False
 c.NotebookApp.iopub_data_rate_limit=10000000000
+c.GitHubConfig.access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
+c.GitHubConfig.client_id = os.environ.get('GITHUB_CLIENT_ID')
+c.GitHubConfig.client_secret = os.environ.get('GITHUB_CLIENT_SECRET')
 
 # Generate a self-signed certificate
 if 'GEN_CERT' in os.environ:

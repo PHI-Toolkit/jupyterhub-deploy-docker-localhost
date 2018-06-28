@@ -115,6 +115,10 @@ else:
 # this creates temporary users
     c.JupyterHub.authenticator_class = tmpauthenticator.TmpAuthenticator
 
+c.GitHubConfig.access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
+c.GitHubConfig.client_id = os.environ.get('GITHUB_CLIENT_ID')
+c.GitHubConfig.client_secret = os.environ.get('GITHUB_CLIENT_SECRET')
+
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
 

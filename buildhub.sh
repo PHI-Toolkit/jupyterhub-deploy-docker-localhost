@@ -1,13 +1,14 @@
 #!/bin/bash
 # 2018-05-29
 
-docker pull jupyter/datascience-notebook:e1677043235c
-docker pull jupyter/scipy-notebook:e1677043235c
-docker pull jupyter/r-notebook:e1677043235c
-docker pull jupyter/minimal-notebook:e1677043235c
+source .env
+
+docker pull jupyter/datascience-notebook:$IMAGE_TAG
+docker pull jupyter/scipy-notebook:$IMAGE_TAG
+docker pull jupyter/r-notebook:$IMAGE_TAG
+docker pull jupyter/minimal-notebook:$IMAGE_TAG
 
 ./stophub.sh
-source .env
 if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
   echo "JupyterHub image does not exist."
 else
