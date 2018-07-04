@@ -34,10 +34,6 @@ services:
       args:
         JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
         LOGO_IMAGE: ${LOGO_IMAGE}
-    environment:
-      JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION}
-    env_file:
-        - .env
     restart: always
     image: jupyterhub
     container_name: jupyterhub
