@@ -15,7 +15,8 @@ For quick installation on local machine, with self-signed SSL certificate, edit 
 1. Generate password for PostgreSQL
 2. Generate proxy auth token
 3. Run `buildhub.sh`
-4. Go to https://localhost when build script finishes without errors.
+4. Run `starthub.sh`
+5. Go to https://localhost when build script finishes without errors.
 
 # Installation Guide - Detailed
 

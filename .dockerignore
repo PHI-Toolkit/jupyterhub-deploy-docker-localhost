@@ -25,3 +25,4 @@ secrets/drive.jupyterlab-settings
 drive.jupyterlab-settings
 *.tar
 errorlog.txt
+secrets/jupyterhub_host_ip

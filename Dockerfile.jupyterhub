@@ -2,7 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 # Base: https://github.com/jupyterhub/jupyterhub/blob/master/Dockerfile
 # Version 20180115
-ARG JUPYTERHUB_VERSION
+ARG JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION}
 FROM jupyterhub/jupyterhub-onbuild:$JUPYTERHUB_VERSION
 LABEL maintainer='herman.tolentino@gmail.com'
 
