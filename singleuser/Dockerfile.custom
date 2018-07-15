@@ -9,7 +9,8 @@ ARG GITHUB_CLIENT_SECRET
 
 LABEL maintainer='herman.tolentino@gmail.com'
 
-RUN python3 -m pip install --no-cache-dir --upgrade pip
+RUN python3 -m pip install --no-cache-dir --upgrade pip && \
+    conda update conda
     #python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
 
 USER root
@@ -24,7 +25,7 @@ RUN \
     echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     # install jupyterlab, jupyter_client
     conda config --set ssl_verify no && \
-    conda update openssl ca-certificates certifi conda && \
+    conda update openssl ca-certificates certifi && \
     conda config --set ssl_verify yes
 
 # Code below based on https://github.com/jenkinsci/docker/issues/543
@@ -78,7 +79,7 @@ RUN sudo apt-get update && \
     sudo chown -R 1000:1000 /home/jovyan/.conda/
 
 RUN \
-    conda install --quiet --yes \
+    conda install -c conda-forge --quiet --yes \
       # begin stack
       'r-base=3.4.1' \
       'r-irkernel=0.8*' \
@@ -101,8 +102,12 @@ RUN \
       'r-hexbin=1.27*' && \
       # end stack
     conda clean -tipsy && \
-    conda install -c conda-forge -c brown-data-science \
-      -c r -c blaze -c bioconda --yes \
+    conda install -c conda-forge \
+      -c r -c bioconda --yes \
+#    conda install -c conda-forge -c brown-data-science \
+#      -c r -c blaze -c bioconda --yes \
+      'gdal=2.2*' \
+      'libgdal=2.2*' \
       'libspatialite=4.3*' \
       'r-rsqlite' \
       'r-reticulate=1.8*' \
@@ -120,14 +125,18 @@ RUN \
       'r-sf=0.6' \
       'r-rgeos=0.3*' \
       'r-raster=2.6*' \
-      'r-text2vec=0.5*' && \
+      'r-text2vec=0.5*' \
+      'r-viridis=0.5*' \
+      'r-viridislite=0.3*' \
+      'geojsonio=0.0.3*' && \
     conda clean -tipsy && \
     # devtools install 'viridis' and 'cividis' to avoid errors
     R -e "install.packages(c('crayon','jqr'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
-    R -e "devtools::install_github('sjmgarnier/viridis')" && \
-    R -e "devtools::install_github('marcosci/cividis')" && \
+    #R -e "devtools::install_github('sjmgarnier/viridis')" && \
+    #R -e "devtools::install_github('marcosci/cividis')" && \
     #R -e "install.packages(c('raster','rgeos'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
-    R -e "install.packages(c('geojsonio','protolite'),repos='http://cran.rstudio.com')"
+    #R -e "install.packages(c('geojsonio','protolite'),repos='http://cran.rstudio.com')"
+    R -e "install.packages(c('protolite'),repos='http://cran.rstudio.com')"
 
 # Install Python 3 packages
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
@@ -165,11 +174,11 @@ RUN conda install -c conda-forge --yes \
       'protobuf=3.*' \
       'xlrd=1.1*' \
       # end of stack entries
-      'icu' \
+      'icu=58.2' \
       'missingno=0.4*' \
       'blaze=0.11*' \
       'pandas-datareader=0.6*' \
-      'wrapt' \
+      'wrapt=1.10.11' \
       'textblob=0.15*' \
       'jupyter_kernel_gateway=2.0*' && \
       conda remove --quiet --yes --force qt pyqt && \
@@ -180,7 +189,10 @@ RUN \
       'rpy2=2.9*' \
       'pyproj=1.9.5*' \
       'pillow=5.1*' \
-      'fiona=1.7*' \
+      # folium unit
+      'fiona=1.7.11' \
+      'libkml=1.3.0' \
+      # end of folium unit
       'rasterio=0.36*' \
       'geojson=2.3*' \
       'pyshp=1.2*' \
@@ -210,36 +222,38 @@ RUN \
       'vega3=0.13*' \
       'vega_datasets=0.5*' \
       # osmnx and numpy versions that match
-      'osmnx=0.8.1' \
+      'osmnx=0.7.1' \
       'numpy=1.14' \
       # Facebook Prophet packages
       'fbprophet=0.3*' \
       'pystan=2.17*' && \
       conda remove --quiet --yes --force qt pyqt && \
-      conda clean -tipsy
-RUN \
+      conda clean -tipsy && \
+    # insert RUN here if build fails
     pip install --no-cache-dir \
       twisted==17.5.0 \
       Automat==0.3.0 \
-      cufflinks \
-      sklearn-pandas \
-      epipy \
-      googletrans \
-      hyper \
-      fuzzywuzzy \
-      python-Levenshtein \
-      jupyterlab_geojson \
-      jupyterlab-widgets \
-      altair==2.0.0rc1 \
-      bqplot \
-      pylantern \
-      gtts \
+      cufflinks==0.13.0 \
+      sklearn-pandas==1.6.0 \
+      epipy==0.0.2.1 \
+      googletrans==2.3.0 \
+      hyper==0.7.0 \
+      fuzzywuzzy==0.16.0 \
+      python-Levenshtein==0.12.0 \
+      jupyterlab_geojson==0.4.0 \
+      jupyterlab-widgets==0.6.15 \
+      altair==2.1.0 \
+      pylantern==0.0.18 \
+      gtts==2.0.1 \
       jupyter-contrib-core==0.3.3 \
       jupyter-contrib-nbextensions==0.5.0 \
       jupyter-nbextensions-configurator==0.4.0 \
-      jupyterhub==0.8.0 \
+      #jupyterhub==0.8.0 \
+      #tornado==5.0.0 \
+      #pyzmq==17.0.0 \
       tornado==4.5.2 \
-      pyzmq==16.0.2 && \
+      pyzmq==16.0.2 \
+      uritemplate==3.0.0 && \
     jupyter contrib nbextension install --user && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter nbextensions_configurator enable --user && \
@@ -305,14 +319,17 @@ RUN \
     jupyter labextension install @jupyterlab/plotly-extension && \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install jupyterlab_bokeh && \
-    jupyter labextension install pylantern
-
-RUN \
+    jupyter labextension install pylantern && \
     git clone https://github.com/python-visualization/folium.git && \
     pip install -r folium/requirements.txt && \
     pip install ./folium && \
+    rm -fvR ./folium && \
     git clone https://github.com/pallets/jinja.git && \
-    pip install ./jinja
+    pip install ./jinja && \
+    rm -fvR ./jinja && \
+    git clone https://github.com/timkpaine/datacomb_jlab.git && \
+    pip install ./datacomb_jlab && \
+    rm -fvR ./datacomb_jlab
 
 USER root
 
