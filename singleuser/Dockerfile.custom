@@ -248,6 +248,7 @@ RUN \
       jupyter-contrib-core==0.3.3 \
       jupyter-contrib-nbextensions==0.5.0 \
       jupyter-nbextensions-configurator==0.4.0 \
+      wordcloud==1.4.1 \
       #jupyterhub==0.8.0 \
       #tornado==5.0.0 \
       #pyzmq==17.0.0 \
@@ -300,6 +301,7 @@ RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 RUN \
+    pip install --upgrade pip && \
     pip install --no-cache-dir jupyterlab-discovery perspective-python && \
     pip install  --no-cache-dir --upgrade "ipython[all]" && \
     sudo apt-get update && \
