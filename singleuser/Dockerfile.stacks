@@ -9,8 +9,8 @@ ARG GITHUB_CLIENT_SECRET
 
 LABEL maintainer='herman.tolentino@gmail.com'
 
-RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install --no-cache jupyterhub==$JUPYTERHUB_VERSION
+RUN python3 -m pip install --no-cache-dir --upgrade pip && \
+    conda update conda
 
 USER root
 
