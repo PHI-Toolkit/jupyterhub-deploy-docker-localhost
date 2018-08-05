@@ -22,7 +22,6 @@ RUN \
     ln -sf /bin/bash /bin/sh && \
     ln -s /bin/tar /bin/gtar && \
     echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    # install jupyterlab, jupyter_client
     conda config --set ssl_verify no && \
     conda update openssl ca-certificates certifi && \
     conda config --set ssl_verify yes
@@ -34,8 +33,9 @@ COPY 99fixbadproxy /etc/apt/apt.conf.d/
 RUN \
     conda install -c conda-forge --yes \
       jupyterhub=$JUPYTERHUB_VERSION \
-      'jupyterlab' \
-      'jupyter_client' && \
+      'jupyterlab=0.32*' \
+      'jupyter_client=5.2.3' \
+      'jupyter_console=5.2.0' && \
     jupyter serverextension enable --py jupyterlab --sys-prefix && \
     conda clean -tipsy && \
     mkdir -p /etc/apt/apt.conf.d/ && \
@@ -225,8 +225,8 @@ RUN \
       'numpy=1.14' \
       # Facebook Prophet packages
       'fbprophet=0.3*' \
-      'pystan=2.17*' && \
-      conda remove --quiet --yes --force qt pyqt && \
+      'pystan=2.17*' \
+      'beakerx' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
     pip install --no-cache-dir \
@@ -268,7 +268,8 @@ ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 USER $NB_USER
 COPY work .
 
-RUN conda install conda-build && \
+RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \
+    conda install conda-build && \
     conda clean -tipsy && \
     sudo chmod a+x modules/*.sh && \
     sudo mkdir -p /srv/modules && \
@@ -300,15 +301,31 @@ RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 RUN \
+    # set up for:
+    # 1. jupyterlab and extensions envrironment
+    # 2. javascript kernel and javascript data science tools
     pip install --upgrade pip && \
-    pip install --no-cache-dir jupyterlab-discovery perspective-python && \
     pip install  --no-cache-dir --upgrade "ipython[all]" && \
     sudo apt-get update && \
     sudo apt-get install -y nodejs npm build-essential && \
     sudo npm cache clean -f && \
     sudo npm install -g n && \
     sudo n stable && \
+    # javascript kernel package
+    npm install -g ijavascript && \
+    ijsinstall && \
+    npm install dstools && \
+    # end of javascript kernel package
+    pip install --no-cache-dir \
+      jupyterlab-discovery \
+      perspective-python \
+      ujson \
+      websocket \
+      future \
+      pixiedust \
+      pixiedust_node && \
     jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
+    jupyter serverextension enable --py lantern && \
     jupyter labextension install jupyterlab_discovery && \
     jupyter labextension enable jupyterlab_discovery && \
     jupyter labextension install @jupyterlab/hub-extension && \
@@ -337,6 +354,8 @@ USER root
 # restore password for sudo access
 RUN \
     conda clean -tipsy && \
+    # remove qt and pyqt here so all dependent packages are already loaded
+    conda remove --quiet --yes --force qt pyqt && \
     apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
