@@ -40,12 +40,13 @@ RUN \
     conda clean -tipsy && \
     mkdir -p /etc/apt/apt.conf.d/ && \
     apt-get update && \
-    apt-get install -y software-properties-common && \
+    apt-get install -y --no-install-recommends software-properties-common && \
     add-apt-repository -y ppa:opencpu/opencpu-2.0 --yes && \
     add-apt-repository -y ppa:opencpu/jq && \
     add-apt-repository -y ppa:ubuntugis/ubuntugis-experimental && \
     apt-get update && \
-    apt-get install -y gdal-bin libgeos-dev libjq-dev nano \
+    apt-get install -y --no-install-recommends \
+      gdal-bin libgeos-dev libjq-dev nano \
       libffi-dev g++ libssl-dev libfreetype6-dev \
       python-dev libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr \
       flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig \
@@ -104,6 +105,8 @@ USER $NB_USER
 COPY work .
 
 RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \
+    sudo mkdir -p /opt/conda/pkgs/cache/ && \
+    sudo chown -R 1000:100 /opt/conda/pkgs/cache/ && \
     conda install conda-build && \
     conda clean -tipsy && \
     sudo chmod a+x modules/*.sh && \
@@ -142,7 +145,8 @@ RUN \
     pip install --upgrade pip && \
     pip install  --no-cache-dir --upgrade "ipython[all]" && \
     sudo apt-get update && \
-    sudo apt-get install -y nodejs npm build-essential && \
+    sudo apt-get install -y --no-install-recommends \
+      nodejs npm build-essential && \
     sudo npm cache clean -f && \
     sudo npm install -g n && \
     sudo n stable && \
@@ -158,7 +162,8 @@ RUN \
       websocket \
       future \
       pixiedust \
-      pixiedust_node && \
+      pixiedust_node \
+      nbresuse && \
     jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
     jupyter serverextension enable --py lantern && \
     jupyter labextension install jupyterlab_discovery && \
