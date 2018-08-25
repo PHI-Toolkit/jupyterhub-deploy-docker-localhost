@@ -1,6 +1,12 @@
 #!/bin/bash
 # 2018-05-29
 
+# Set up PostGreSQL password
+sed -i -e "s/REPLACE_PG_PASS/`openssl rand -hex 32`/g" .env
+
+# Set up config proxy token
+sed -i -e "s/REPLACE_TOKEN/`openssl rand -hex 32`/g" .env
+
 source .env
 
 docker pull jupyter/datascience-notebook:$IMAGE_TAG
