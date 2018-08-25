@@ -319,8 +319,6 @@ RUN \
     # javascript kernel package
     npm install -g ijavascript && \
     ijsinstall && \
-    npm install dstools \
-    npm install deck.gl --save && \
     # end of javascript kernel package
     pip install --no-cache-dir \
       jupyterlab-discovery \
