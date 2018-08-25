@@ -4,15 +4,14 @@
 if [[ ! -f .env ]]; then
   cp .env-template .env
 fi
+# generate PostGreSQL password and proxy token
+# update .env with values
+./pg_pass.sh
+./proxy_token.sh
+
 if [[ ! -f userlist ]]; then
   cp userlist-template userlist
 fi
-
-# Set up PostGreSQL password
-sed -i -e "s/REPLACE_PG_PASS/`openssl rand -hex 32`/g" .env
-
-# Set up config proxy token
-sed -i -e "s/REPLACE_TOKEN/`openssl rand -hex 32`/g" .env
 
 source .env
 
