@@ -1,6 +1,13 @@
 #!/bin/bash
 # 2018-05-29
 
+if [[ ! -f .env ]]; then
+  cp .env-template .env
+fi
+if [[ ! -f userlist ]]; then
+  cp userlist-template userlist
+fi
+
 # Set up PostGreSQL password
 sed -i -e "s/REPLACE_PG_PASS/`openssl rand -hex 32`/g" .env
 
