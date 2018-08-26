@@ -15,21 +15,22 @@ fi
 
 source .env
 
-# get images for base notebooks for Dockerfile.custom and Dockerfile.stacks
-if [[ "$(docker images -q jupyter/minimal-notebook)" == "" ]]; then
-  docker pull jupyter/datascience-notebook:$IMAGE_TAG
-  docker pull jupyter/scipy-notebook:$IMAGE_TAG
-  docker pull jupyter/r-notebook:$IMAGE_TAG
-  docker pull jupyter/minimal-notebook:$IMAGE_TAG
-fi
-
 ./stophub.sh
 
 if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
   echo "JupyterHub image does not exist."
 else
   echo "Deleting Docker images..."
-  docker rmi $(docker images -q jupyterhub:latest)
+  docker rmi $(docker images -a | grep jupyterhub | awk '{print $3}')
+fi
+
+# get images for base notebooks for Dockerfile.custom and Dockerfile.stacks
+if [[ "$(docker images -q jupyter/minimal-notebook)" == "" ]]; then
+  docker pull jupyter/datascience-notebook:$IMAGE_TAG
+  docker pull jupyter/scipy-notebook:$IMAGE_TAG
+  docker pull jupyter/r-notebook:$IMAGE_TAG
+  docker pull jupyter/minimal-notebook:$IMAGE_TAG
+  docker pull quay.io/letsencrypt/letsencrypt:latest
 fi
 
 echo "Creating network and volumes..."
