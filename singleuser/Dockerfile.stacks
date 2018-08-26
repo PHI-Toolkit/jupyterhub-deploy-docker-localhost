@@ -113,12 +113,10 @@ RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \
     sudo mkdir -p /srv/modules && \
     sudo mv modules/* /srv/modules/. && \
     sudo chmod a+w -R /home/jovyan/work/shared && \
-    sudo chmod a+w -R /home/jovyan/work/geoserver && \
     sudo chmod a+w -R /home/jovyan/work/notebooks && \
     sudo chmod a+w /home/jovyan/work/notebooks/*.ipynb && \
     sudo chown -R jovyan:users /home/jovyan && \
     sudo chown -R jovyan:users /home/jovyan/work/shared && \
-    sudo chown -R jovyan:users /home/jovyan/work/geoserver && \
     sudo chown -R jovyan:users /home/jovyan/work/notebooks && \
     mkdir -p /home/jovyan/.cache && \
     chmod -R a+w /home/jovyan/.cache && \

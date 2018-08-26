@@ -92,7 +92,7 @@ c.JupyterHub.hub_port = 8080
 # TLS config
 # If using GitHub Authenticator, make sure to update .env file:
 # 1. Update the GitHub credentials section
-# 2. Update SSL option: use_ssl_le
+# 2. Update SSL option: use_ssl_le or use_ssl_ss
 c.JupyterHub.port = 443
 c.JupyterHub.ssl_key = os.environ['SSL_KEY']
 c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
