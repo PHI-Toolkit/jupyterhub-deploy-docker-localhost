@@ -15,33 +15,35 @@ fi
 
 source .env
 
-docker pull jupyter/datascience-notebook:$IMAGE_TAG
-docker pull jupyter/scipy-notebook:$IMAGE_TAG
-docker pull jupyter/r-notebook:$IMAGE_TAG
-docker pull jupyter/minimal-notebook:$IMAGE_TAG
+# get images for base notebooks for Dockerfile.custom and Dockerfile.stacks
+if [[ "$(docker images -q jupyter/minimal-notebook)" == "" ]]; then
+  docker pull jupyter/datascience-notebook:$IMAGE_TAG
+  docker pull jupyter/scipy-notebook:$IMAGE_TAG
+  docker pull jupyter/r-notebook:$IMAGE_TAG
+  docker pull jupyter/minimal-notebook:$IMAGE_TAG
+fi
 
 ./stophub.sh
+
 if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
   echo "JupyterHub image does not exist."
 else
   echo "Deleting Docker images..."
   docker rmi $(docker images -q jupyterhub:latest)
 fi
+
 echo "Creating network and volumes..."
 make network volumes
+
 if [ "$JUPYTERHUB_SSL" == "use_ssl_ss" ]; then
   ./create-certs.sh
 else
-  if [ "$JUPYTERHUB_SSL" == "use_ssl_le" ]; then
-    if test `find "./secrets/live/$JH_FQDN/fullchain.pem" -mmin +108000`
-    then
-        echo "Files old enough, running letsencrypt."
-        ./letsencrypt-certs.sh
-    fi
-  else
+  if [ "$JUPYTERHUB_SSL" == "no_ssl" ]; then
     echo "no_ssl is deprecated. "
     echo "Please select SSL option: use_ssl_ss or use_ssl_le in the .env file. Exiting..."
     exit
+  else
+    ./letsencrypt-certs.sh
   fi
 fi
 docker-compose build

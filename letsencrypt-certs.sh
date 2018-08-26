@@ -1,15 +1,46 @@
 #!/bin/bash
 # change the values of the exported variables as needed
+echo 'Running LetsEncrypt routine...'
 source .env
 if [[ ! -d secrets ]]; then
     echo "Creating 'secrets' directory..."
     mkdir -p secrets
 fi
+echo 'Testing exit conditions...'
+if [ "$JUPYTERHUB_SSL" == "use_ssl_le" ]; then
+    echo 'JUPYTERHUB_SSL in .env is set to "use_ssl_le".'
+else
+    echo "JUPYTERHUB_SSL: $JUPYTERHUB_SSL"
+    echo 'JUPYTERHUB_SSL in .env is not set to "use_ssl_le".'
+    exit
+fi
+if [[ "$JH_FQDN" == "" ]]; then
+    echo '$JH_FQDN environment variable not set.'.
+    exit
+fi
+if [[ "$JH_EMAIL" == "" ]]; then
+    echo '$JH_EMAIL environment variable not set.'.
+    exit
+fi
+echo 'Using the following LetsEncrypt parameters:'
 echo "JH_FQDN = $JH_FQDN"
 echo "JH_EMAIL = $JH_EMAIL"
+echo "CERT_SERVER = $CERT_SERVER"
+if [[ -f "secrets/fullchain.pem" ]]; then
+    echo "LetsEncrypt files found. Testing file modification time..."
+    if test `find "./secrets/fullchain.pem" -mtime +100`
+    then
+        echo "LetsEncrypt files old enough (>100 days)to renew."
+    else
+        echo "LetsEncrypt files are relatively new. Exiting LetsEncrypt routine..."
+        exit
+    fi
+fi
+echo 'Testing exit conditions...done.'
+
 export JH_SECRETS="`pwd`/secrets"
 export JH_COMMAND="letsencrypt.sh --domain $JH_FQDN --email $JH_EMAIL --volume $JH_SECRETS"
-export CERT_SERVER="" # set this to "--staging" if testing script settings
+export CERT_SERVER=$CERT_SERVER # set this to "--staging" in .env if testing script settings
 echo $JH_FQDN $JH_EMAIL $JH_SECRETS $CERT_SERVER
 echo "Generating LetsEncrypt certificates..."
 docker run --rm -it \
@@ -47,3 +78,4 @@ docker run --rm -it \
   cp secrets/fullchain.pem secrets/jupyterhub.pem
   cp secrets/jupyterhub.key secrets/default.key
   cp secrets/jupyterhub.pem secrets/default.pem
+echo "LetsEncrypt routine completed..."
