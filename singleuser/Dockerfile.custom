@@ -356,6 +356,8 @@ USER root
 
 # restore password for sudo access
 RUN \
+    rm -fvR modules && \
+    echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd && \
     conda clean -tipsy && \
     # remove qt and pyqt here so all dependent packages are already loaded
     conda remove --quiet --yes --force qt pyqt && \
