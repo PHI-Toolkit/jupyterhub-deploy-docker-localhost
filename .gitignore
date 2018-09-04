@@ -10,6 +10,8 @@ secrets/default.pem
 secrets/jupyterhub.crt
 secrets/jupyterhub.key
 secrets/jupyterhub.pem
+secrets/pg_pass
+secrets/proxy_token
 .DS_Store
 .gitignore
 userlist

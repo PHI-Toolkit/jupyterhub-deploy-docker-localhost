@@ -227,29 +227,29 @@ RUN \
       # Facebook Prophet packages
       'fbprophet=0.3*' \
       'pystan=2.17*' \
-      'graphviz' \
-      'beakerx' && \
+      'graphviz=2.38*' \
+      #'beakerx=1.0*' \
+      'jupyter_contrib_core' \
+      'jupyter_contrib_nbextensions' \
+      'jupyter_nbextensions_configurator' \
+      'wordcloud' \
+      'googletrans' \
+      'hyper' \
+      'twisted' \
+      'cufflinks-py' \
+      'altair' \
+      'Automat' \
+      'fuzzywuzzy' \
+      'python-levenshtein' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
     pip install --no-cache-dir \
-      twisted==17.5.0 \
-      Automat==0.3.0 \
-      cufflinks==0.13.0 \
       sklearn-pandas==1.6.0 \
       epipy==0.0.2.1 \
-      googletrans==2.3.0 \
-      hyper==0.7.0 \
-      fuzzywuzzy==0.16.0 \
-      python-Levenshtein==0.12.0 \
       jupyterlab_geojson==0.4.0 \
       jupyterlab-widgets==0.6.15 \
-      altair==2.1.0 \
       pylantern==0.0.18 \
       gtts==2.0.1 \
-      jupyter-contrib-core==0.3.3 \
-      jupyter-contrib-nbextensions==0.5.0 \
-      jupyter-nbextensions-configurator==0.4.0 \
-      wordcloud==1.4.1 \
       #jupyterhub==0.8.0 \
       #tornado==5.0.0 \
       #pyzmq==17.0.0 \

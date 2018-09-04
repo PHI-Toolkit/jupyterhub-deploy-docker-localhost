@@ -17,6 +17,8 @@ secrets/oauth.env
 secrets/postgres.env
 secrets/default.pem
 secrets/default.key
+secrets/pg_pass
+secrets/proxy_token
 LICENSE.md
 .env
 .env-e
