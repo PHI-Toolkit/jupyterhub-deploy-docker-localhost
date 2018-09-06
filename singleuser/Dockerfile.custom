@@ -233,14 +233,15 @@ RUN \
       'jupyter_contrib_nbextensions' \
       'jupyter_nbextensions_configurator' \
       'wordcloud' \
-      'googletrans' \
-      'hyper' \
+      'googletrans=2.3.0' \
+      'hyper=0.7.0' \
       'twisted' \
       'cufflinks-py' \
       'altair' \
       'Automat' \
       'fuzzywuzzy' \
-      'python-levenshtein' && \
+      'python-levenshtein' \
+      'folium=0.6*' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
     pip install --no-cache-dir \
@@ -341,13 +342,6 @@ RUN \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install jupyterlab_bokeh && \
     jupyter labextension install pylantern && \
-    git clone https://github.com/python-visualization/folium.git && \
-    pip install -r folium/requirements.txt && \
-    pip install ./folium && \
-    rm -fvR ./folium && \
-    git clone https://github.com/pallets/jinja.git && \
-    pip install ./jinja && \
-    rm -fvR ./jinja && \
     git clone https://github.com/timkpaine/datacomb_jlab.git && \
     pip install ./datacomb_jlab && \
     rm -fvR ./datacomb_jlab
