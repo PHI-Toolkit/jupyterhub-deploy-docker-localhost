@@ -35,7 +35,9 @@ RUN \
       jupyterhub=$JUPYTERHUB_VERSION \
       'jupyterlab=0.32*' \
       'jupyter_client=5.2.3' \
-      'jupyter_console=5.2.0' && \
+      'jupyter_console=5.2.0' \
+      'notebook=5.4*' \
+      'libsodium' && \
     jupyter serverextension enable --py jupyterlab --sys-prefix && \
     conda clean -tipsy && \
     mkdir -p /etc/apt/apt.conf.d/ && \
@@ -187,7 +189,8 @@ RUN conda install -c conda-forge --yes \
 RUN \
     conda install -c conda-forge -c ioam -c bioconda -c anaconda -c esri --yes \
       'rpy2=2.9*' \
-      'pyproj=1.9.5*' \
+      'pyproj' \
+      'geos' \
       'pillow=5.1*' \
       # folium unit
       'fiona=1.7.11' \
@@ -255,8 +258,9 @@ RUN \
       #tornado==5.0.0 \
       #pyzmq==17.0.0 \
       tornado==4.5.2 \
-      pyzmq==16.0.2 \
+      pyzmq \
       uritemplate==3.0.0 && \
+    conda update nbconvert && \
     jupyter contrib nbextension install --user && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter nbextensions_configurator enable --user && \
@@ -351,13 +355,14 @@ USER root
 # restore password for sudo access
 RUN \
     rm -fvR modules && \
-    echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd && \
     conda clean -tipsy && \
     # remove qt and pyqt here so all dependent packages are already loaded
     conda remove --quiet --yes --force qt pyqt && \
     apt-get update && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    sed -i 's/ NOPASSWD://g' /etc/sudoers
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN if [ "$NB_USER_PASS" != "" ]; then     echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
+    sed -i 's/ NOPASSWD://g' /etc/sudoers; fi
 
 USER $NB_USER
