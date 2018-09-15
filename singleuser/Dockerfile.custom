@@ -244,7 +244,9 @@ RUN \
       'Automat' \
       'fuzzywuzzy' \
       'python-levenshtein' \
-      'folium=0.6*' && \
+      'folium=0.6*' \
+      'neo4j-python-driver' \
+      'py2neo' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
     pip install --no-cache-dir \
@@ -353,6 +355,7 @@ RUN \
 USER root
 
 # restore password for sudo access
+ENV PROJ_LIB=/usr/share/proj
 RUN \
     rm -fvR modules && \
     conda clean -tipsy && \
