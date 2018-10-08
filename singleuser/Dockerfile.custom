@@ -19,6 +19,8 @@ ENV DEBIAN_FRONTEND noninteractive
 WORKDIR /home/jovyan/work
 
 RUN \
+    # uncomment the line below if necessary
+    #/bin/bash upgrade-distro.sh
     ln -sf /bin/bash /bin/sh && \
     ln -s /bin/tar /bin/gtar && \
     echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
@@ -31,20 +33,26 @@ RUN \
 COPY 99fixbadproxy /etc/apt/apt.conf.d/
 
 RUN \
-    conda install -c conda-forge --yes \
+      conda install -c conda-forge --yes \
       jupyterhub=$JUPYTERHUB_VERSION \
-      'jupyterlab=0.32*' \
-      'jupyter_client=5.2.3' \
-      'jupyter_console=5.2.0' \
-      'notebook=5.4*' \
+      'jupyterlab=0.34.12*' \
+      'jupyter_client' \
+      'jupyter_console' \
+      'notebook=5.7*' \
       'libsodium' && \
+      #'jupyterlab=0.32*' \
+      #'jupyter_client=5.2.3' \
+      #'jupyter_console=5.2.0' \
+      #'notebook=5.4*' \
+      #'libsodium' && \
     jupyter serverextension enable --py jupyterlab --sys-prefix && \
     conda clean -tipsy && \
     mkdir -p /etc/apt/apt.conf.d/ && \
     apt-get update && \
-    apt-get install -y --no-install-recommends software-properties-common && \
-    add-apt-repository -y ppa:opencpu/opencpu-2.0 --yes && \
-    add-apt-repository -y ppa:opencpu/jq && \
+    apt-get install -y --no-install-recommends software-properties-common apt-utils && \
+    ln -sf /usr/share/zoneinfo/EST /etc/localtime && \
+    #add-apt-repository -y ppa:opencpu/opencpu-2.0 --yes && \
+    #add-apt-repository -y ppa:opencpu/jq && \
     add-apt-repository -y ppa:ubuntugis/ubuntugis-experimental && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -187,7 +195,7 @@ RUN conda install -c conda-forge --yes \
       conda clean -tipsy
 
 RUN \
-    conda install -c conda-forge -c ioam -c bioconda -c anaconda -c esri --yes \
+    conda install -c conda-forge -c ioam -c bioconda -c anaconda -c esri -c etetoolkit --yes \
       'rpy2=2.9*' \
       'pyproj' \
       'geos' \
@@ -225,7 +233,8 @@ RUN \
       'vega3=0.13*' \
       'vega_datasets=0.5*' \
       # osmnx and numpy versions that match
-      'osmnx=0.7.1' \
+      #'osmnx=0.7.1' \
+      'osmnx=0.8*' \
       'numpy=1.14' \
       # Facebook Prophet packages
       'fbprophet=0.3*' \
@@ -245,9 +254,15 @@ RUN \
       'fuzzywuzzy' \
       'python-levenshtein' \
       'folium=0.6*' \
+      'gmaps' \
       'neo4j-python-driver' \
       'py2neo' \
-      'rise' && \
+      'rise' \
+      'ete3' \
+      'ete_toolchain' \
+      'keras' \
+      'tensorflow' \
+      'tabulate' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
     pip install --no-cache-dir \
@@ -324,34 +339,41 @@ RUN \
     sudo n stable && \
     # javascript kernel package
     npm install -g ijavascript && \
-    ijsinstall && \
+    ijsinstall
     # end of javascript kernel package
+RUN \
     pip install --no-cache-dir \
       jupyterlab-discovery \
       perspective-python \
+      lineup_widget \
       ujson \
       websocket \
       future \
       pixiedust \
       pixiedust_node \
       nbresuse && \
-    jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
-    jupyter serverextension enable --py lantern && \
-    jupyter labextension install jupyterlab_discovery && \
-    jupyter labextension enable jupyterlab_discovery && \
+      jupyter nbextension enable --py --sys-prefix lineup_widget && \
+      jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
+      jupyter serverextension enable --py lantern
+RUN \
+    #jupyter labextension install jupyterlab_discovery && \
+    #jupyter labextension enable jupyterlab_discovery && \
     jupyter labextension install @jupyterlab/hub-extension && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
-    jupyter labextension install qgrid && \
+    jupyter labextension install qgrid
+RUN \
     jupyter labextension install @jupyterlab/geojson-extension && \
     jupyter labextension install @pyviz/jupyterlab_pyviz && \
     jupyter labextension install @mflevine/jupyterlab_html && \
-    jupyter labextension install @jupyterlab/plotly-extension && \
+    jupyter labextension install @jupyterlab/plotly-extension
+RUN \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install jupyterlab_bokeh && \
     jupyter labextension install pylantern && \
-    git clone https://github.com/timkpaine/datacomb_jlab.git && \
-    pip install ./datacomb_jlab && \
-    rm -fvR ./datacomb_jlab
+    jupyter labextension install lineup_widget
+    #git clone https://github.com/timkpaine/datacomb_jlab.git && \
+    #pip install ./datacomb_jlab && \
+    #rm -fvR ./datacomb_jlab
 
 USER root
 
@@ -361,14 +383,14 @@ RUN \
     rm -fvR modules && \
     conda clean -tipsy && \
     # remove qt and pyqt here so all dependent packages are already loaded
-    conda remove --quiet --yes --force qt pyqt && \
+    #conda remove --quiet --yes --force qt pyqt && \
     apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     mkdir -p /opt/conda/pkgs/cache && \
     chmod -R a+w /opt/conda/pkgs/cache/
 
-RUN if [ "$NB_USER_PASS" != "" ]; then     echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
+RUN if [ "$NB_USER_PASS" != "" ]; then echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
     sed -i 's/ NOPASSWD://g' /etc/sudoers; fi
 
 USER $NB_USER

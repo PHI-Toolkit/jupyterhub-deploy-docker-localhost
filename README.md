@@ -37,12 +37,16 @@ To enable GitHub autentication:
 6. Run the `starthub.sh` script
 7. Go to https://example.com. You will be redirected to the GitHub site to allow `hermantolentino` to autenticate you and to fill in your GitHub user ID and password. You will be redirected back to the Jupyter Notebook server after that.
 
-# Installation Guide - Detailed
+# Installation Guide - Some Details for Remote Servers
 
-## Install Docker and Docker Compose on your remote VM
+## Prepare Jupyter Notebook server files
+Git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
+
+## Install Docker and Docker Compose on your remote Virtual Machine (VM)
 
 1. Run the `install-docker-bionic.sh` to install Docker and Docker Compose on a VM running Ubuntu Bionic.
-2. Make sure to exit the VM and log back in for changes to take effect.
+2. If the VM is not running Bionic Beaver, run the `upgrade-distro.sh` script. Be sure to replace the source and destination OS in the `sed` statement.
+3. Make sure to exit the VM and log back in for changes to take effect.
 
 *References*
 * Install Docker: https://docs.docker.com/install/
@@ -87,11 +91,20 @@ If you will be using GitHub Oauth to authenticate users to JupyterHub, you need 
 
 If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i.e., "https://localhost/hub/oauth_callback").
 
+## Upgrading JupyterHub to a newer version
+
+Upon runnng `starthub.sh`, you will likely see an error message saying you need to run `jupyterhub upgrade-db`. You can do this by:
+
+1. Running the `upgrade-jupyterhub-db.sh` script against a running container
+
+2. Commenting lines 71-72 of the `docker-compose.yml`, and uncommenting lines 73-74 (runs `jupyterhub upgrade-db`), then running `docker-compose build`. After running the database upgrade, run `stophub.sh` again, uncomment lines 71-72, comment out lines 73-74, and then running `docker-compose build` again. Then run `starthub.sh`. (based on https://jupyterhub.readthedocs.io/en/stable/reference/upgrading.html)
+
 ## Using custom Dockerfile or Docker Jupyter Stacks for your User Notebook Server
 
 1. If using custom Dockerfile:<br/>
     a. DOCKER_NOTEBOOK_IMAGE=jupyter/minimal-notebook:e1677043235c<br/>
     b. DOCKERFILE=Dockerfile.custom
+    
 2. If using Docker Jupyter Stacks (https://github.com/jupyter/docker-stacks)<br/>
     a. DOCKER_NOTEBOOK_IMAGE can be any of the following:
       `jupyter/scipy-notebook:e1677043235c`, `jupyter/r-notebook:e1677043235c`, or `jupyter/datascience-notebook:e1677043235c`<br/>
@@ -112,12 +125,17 @@ Delete the old `jupyterhub_cookie_secret` file:
 
 # Changes
 
-## stacks-0.1
+## stacks-0.2
 
 * **IMAGE_TAG variable**: See the `.env` file. Sets the Jupyter Stacks minimal image version to use in case of Dockerfile.custom or the stacks version in case of Dockerfile.stacks. For example, the Docker image for the singleuser-notebook that uses image tag `5811dcb711ba` is based on Ubuntu Bionic. The tags can be found here: https://hub.docker.com/r/jupyter/base-notebook/tags/.
 
 * **GITHUB_ACCESS_TOKEN**: See `.env` file. Obtain your personal GitHub access token from https://github.com/settings/tokens.
 
+## master
+
+* based on docker stacks tag `459e68c2f8b7`.
+* `jupyterHub=0.9.4`
+* `notebook=5.7.0`
 
 # JupyterHub Logs / Launch Issues
 
