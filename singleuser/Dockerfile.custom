@@ -160,7 +160,7 @@ RUN conda install -c conda-forge --yes \
       'nomkl=2.0*' \
       # begin stack entries
       'conda-forge::blas=*=openblas' \
-      'ipywidgets=7.2*' \
+      'ipywidgets=7.4*' \
       'pandas=0.23*' \
       'numexpr=2.6*' \
       'matplotlib=2.2*' \
@@ -244,6 +244,7 @@ RUN \
       'jupyter_contrib_core' \
       'jupyter_contrib_nbextensions' \
       'jupyter_nbextensions_configurator' \
+      'widgetsnbextension' \
       'wordcloud' \
       'googletrans=2.3.0' \
       'hyper=0.7.0' \
@@ -256,7 +257,7 @@ RUN \
       'folium=0.6*' \
       'gmaps' \
       'neo4j-python-driver' \
-      'py2neo' \
+      'py2neo=4.0*' \
       'rise' \
       'ete3' \
       'ete_toolchain' \
@@ -319,13 +320,12 @@ RUN echo $LOGO_IMAGE && \
     mkdir -p /home/jovyan/.jupyter/custom
 ADD css/custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
-RUN sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
-    cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup
-
 # Address iopub data error message with custom config
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 RUN \
+    sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
+    cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup && \
     # set up for:
     # 1. jupyterlab and extensions envrironment
     # 2. javascript kernel and javascript data science tools
@@ -339,9 +339,8 @@ RUN \
     sudo n stable && \
     # javascript kernel package
     npm install -g ijavascript && \
-    ijsinstall
+    ijsinstall && \
     # end of javascript kernel package
-RUN \
     pip install --no-cache-dir \
       jupyterlab-discovery \
       perspective-python \
@@ -352,28 +351,29 @@ RUN \
       pixiedust \
       pixiedust_node \
       nbresuse && \
-      jupyter nbextension enable --py --sys-prefix lineup_widget && \
-      jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
-      jupyter serverextension enable --py lantern
-RUN \
-    #jupyter labextension install jupyterlab_discovery && \
-    #jupyter labextension enable jupyterlab_discovery && \
+    jupyter nbextension enable --py --sys-prefix lineup_widget && \
+    jupyter nbextension install --py widgetsnbextension --sys-prefix && \
+    jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
+    jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
+    jupyter serverextension enable --py lantern && \
     jupyter labextension install @jupyterlab/hub-extension && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
-    jupyter labextension install qgrid
-RUN \
+    jupyter labextension install qgrid && \
     jupyter labextension install @jupyterlab/geojson-extension && \
     jupyter labextension install @pyviz/jupyterlab_pyviz && \
     jupyter labextension install @mflevine/jupyterlab_html && \
-    jupyter labextension install @jupyterlab/plotly-extension
-RUN \
+    jupyter labextension install @jupyterlab/plotly-extension && \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install jupyterlab_bokeh && \
     jupyter labextension install pylantern && \
     jupyter labextension install lineup_widget
-    #git clone https://github.com/timkpaine/datacomb_jlab.git && \
-    #pip install ./datacomb_jlab && \
-    #rm -fvR ./datacomb_jlab
+RUN \
+    pip uninstall -y googletrans && \
+    git clone https://github.com/BoseCorp/py-googletrans.git && \
+    cd ./py-googletrans && \
+    python setup.py install && \
+    cd $WORKDIR && \
+    rm -fvR py-googletrans
 
 USER root
 
@@ -388,9 +388,8 @@ RUN \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     mkdir -p /opt/conda/pkgs/cache && \
-    chmod -R a+w /opt/conda/pkgs/cache/
-
-RUN if [ "$NB_USER_PASS" != "" ]; then echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
-    sed -i 's/ NOPASSWD://g' /etc/sudoers; fi
+    chmod -R a+w /opt/conda/pkgs/cache/ && \
+    if [ "$NB_USER_PASS" != "" ]; then echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
+      sed -i 's/ NOPASSWD://g' /etc/sudoers; fi
 
 USER $NB_USER
