@@ -261,8 +261,8 @@ RUN \
       'rise' \
       'ete3' \
       'ete_toolchain' \
-      'keras' \
-      'tensorflow' \
+      #'keras' \
+      #'tensorflow' \
       'tabulate' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
@@ -367,13 +367,16 @@ RUN \
     jupyter labextension install jupyterlab_bokeh && \
     jupyter labextension install pylantern && \
     jupyter labextension install lineup_widget
+# This RUN segment sets up a temporary install of googletrans
+#   and also installs the Intel Python package.
 RUN \
     pip uninstall -y googletrans && \
     git clone https://github.com/BoseCorp/py-googletrans.git && \
     cd ./py-googletrans && \
     python setup.py install && \
     cd $WORKDIR && \
-    rm -fvR py-googletrans
+    rm -fvR py-googletrans && \
+    conda install -c intel intelpython3_core numpy sympy
 
 USER root
 
@@ -386,6 +389,7 @@ RUN \
     #conda remove --quiet --yes --force qt pyqt && \
     apt-get update && \
     apt-get clean && \
+    apt-get autoremove && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     mkdir -p /opt/conda/pkgs/cache && \
     chmod -R a+w /opt/conda/pkgs/cache/ && \
