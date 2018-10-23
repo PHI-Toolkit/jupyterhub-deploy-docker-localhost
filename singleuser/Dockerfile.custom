@@ -261,8 +261,6 @@ RUN \
       'rise' \
       'ete3' \
       'ete_toolchain' \
-      #'keras' \
-      #'tensorflow' \
       'tabulate' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
