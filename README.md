@@ -101,13 +101,13 @@ Upon runnng `starthub.sh`, you will likely see an error message saying you need 
 
 ## Using custom Dockerfile or Docker Jupyter Stacks for your User Notebook Server
 
-1. If using custom Dockerfile:<br/>
-    a. DOCKER_NOTEBOOK_IMAGE=jupyter/minimal-notebook:e1677043235c<br/>
+1. If using custom Dockerfile, use the following values:<br/>
+    a. DOCKER_NOTEBOOK_IMAGE=jupyter/minimal-notebook:459e68c2f8b7<br/>
     b. DOCKERFILE=Dockerfile.custom
-    
-2. If using Docker Jupyter Stacks (https://github.com/jupyter/docker-stacks)<br/>
+
+2. If using Docker Jupyter Stacks (https://github.com/jupyter/docker-stacks), use the following values:<br/>
     a. DOCKER_NOTEBOOK_IMAGE can be any of the following:
-      `jupyter/scipy-notebook:e1677043235c`, `jupyter/r-notebook:e1677043235c`, or `jupyter/datascience-notebook:e1677043235c`<br/>
+      `jupyter/scipy-notebook:459e68c2f8b7`, `jupyter/r-notebook:459e68c2f8b7`, or `jupyter/datascience-notebook:459e68c2f8b7`<br/>
     b. DOCKERFILE=Dockerfile.stacks
 
 # Notes for Windows users
@@ -133,7 +133,7 @@ Delete the old `jupyterhub_cookie_secret` file:
 
 ## master
 
-* based on docker stacks tag `459e68c2f8b7`.
+* based on docker stacks tag `459e68c2f8b7`
 * `jupyterHub=0.9.4`
 * `notebook=5.7.0`
 
