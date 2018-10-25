@@ -195,7 +195,7 @@ RUN conda install -c conda-forge --yes \
       conda clean -tipsy
 
 RUN \
-    conda install -c conda-forge -c ioam -c bioconda -c anaconda -c esri -c etetoolkit --yes \
+    conda install -c conda-forge -c etetoolkit --yes \
       'rpy2=2.9*' \
       'pyproj' \
       'geos' \
@@ -271,10 +271,7 @@ RUN \
       jupyterlab-widgets==0.6.15 \
       pylantern==0.0.18 \
       gtts==2.0.1 \
-      #jupyterhub==0.8.0 \
-      #tornado==5.0.0 \
-      #pyzmq==17.0.0 \
-      tornado==4.5.2 \
+      tornado \
       pyzmq \
       uritemplate==3.0.0 && \
     conda update nbconvert && \
