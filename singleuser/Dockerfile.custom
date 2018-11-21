@@ -261,7 +261,8 @@ RUN \
       'rise' \
       'ete3' \
       'ete_toolchain' \
-      'tabulate' && \
+      'tabulate' \
+      'deepgraph' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
     pip install --no-cache-dir \
