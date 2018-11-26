@@ -33,18 +33,14 @@ RUN \
 COPY 99fixbadproxy /etc/apt/apt.conf.d/
 
 RUN \
-      conda install -c conda-forge --yes \
+    conda install -c conda-forge --yes \
       jupyterhub=$JUPYTERHUB_VERSION \
-      'jupyterlab=0.34.12*' \
+      #'jupyterlab=0.34.12*' \
+      'jupyterlab=0.35*' \
       'jupyter_client' \
       'jupyter_console' \
       'notebook=5.7*' \
       'libsodium' && \
-      #'jupyterlab=0.32*' \
-      #'jupyter_client=5.2.3' \
-      #'jupyter_console=5.2.0' \
-      #'notebook=5.4*' \
-      #'libsodium' && \
     jupyter serverextension enable --py jupyterlab --sys-prefix && \
     conda clean -tipsy && \
     mkdir -p /etc/apt/apt.conf.d/ && \
@@ -114,8 +110,6 @@ RUN \
     conda clean -tipsy && \
     conda install -c conda-forge \
       -c r -c bioconda --yes \
-#    conda install -c conda-forge -c brown-data-science \
-#      -c r -c blaze -c bioconda --yes \
       'gdal=2.2*' \
       'libgdal=2.2*' \
       'libspatialite=4.3*' \
@@ -138,15 +132,12 @@ RUN \
       'r-text2vec=0.5*' \
       'r-viridis=0.5*' \
       'r-viridislite=0.3*' \
-      'geojsonio=0.0.3*' && \
+      'geojsonio=0.0.3*' \
+      'crayon' && \
     conda clean -tipsy && \
-    # devtools install 'viridis' and 'cividis' to avoid errors
-    R -e "install.packages(c('crayon','jqr'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
-    #R -e "devtools::install_github('sjmgarnier/viridis')" && \
-    #R -e "devtools::install_github('marcosci/cividis')" && \
-    #R -e "install.packages(c('raster','rgeos'), dependencies=TRUE, repos='http://cran.rstudio.com/')" && \
-    #R -e "install.packages(c('geojsonio','protolite'),repos='http://cran.rstudio.com')"
-    R -e "install.packages(c('protolite'),repos='http://cran.rstudio.com')"
+    conda install -c quasiben r-protolite && \
+    R -e "install.packages(c('jqr'), dependencies=TRUE, repos='http://cran.rstudio.com/')"
+    #R -e "install.packages(c('protolite'),repos='http://cran.rstudio.com')"
 
 # Install Python 3 packages
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
@@ -175,7 +166,7 @@ RUN conda install -c conda-forge --yes \
       'cloudpickle=0.5*' \
       'dill=0.2*' \
       'numba=0.38*' \
-      'bokeh=0.12*' \
+      'bokeh=0.13*' \
       'sqlalchemy=1.2*' \
       'hdf5=1.10*' \
       'h5py=2.7*' \
@@ -191,6 +182,8 @@ RUN conda install -c conda-forge --yes \
       'wrapt=1.10.11' \
       'textblob=0.15*' \
       'jupyter_kernel_gateway=2.0*' && \
+      # Install the Intel Python package
+      conda install -c intel intelpython3_core numpy sympy certifi && \
       conda remove --quiet --yes --force qt pyqt && \
       conda clean -tipsy
 
@@ -246,7 +239,7 @@ RUN \
       'jupyter_nbextensions_configurator' \
       'widgetsnbextension' \
       'wordcloud' \
-      'googletrans=2.3.0' \
+      #'googletrans=2.3.0' \
       'hyper=0.7.0' \
       'twisted' \
       'cufflinks-py' \
@@ -254,13 +247,13 @@ RUN \
       'Automat' \
       'fuzzywuzzy' \
       'python-levenshtein' \
-      'folium=0.6*' \
-      'gmaps' \
+      'folium=0.7*' \
+      #'gmaps' \
       'neo4j-python-driver' \
       'py2neo=4.0*' \
       'rise' \
-      'ete3' \
-      'ete_toolchain' \
+      #'ete3' \
+      #'ete_toolchain' \
       'tabulate' \
       'deepgraph' && \
       conda clean -tipsy && \
@@ -278,9 +271,9 @@ RUN \
     conda update nbconvert && \
     jupyter contrib nbextension install --user && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
-    jupyter nbextensions_configurator enable --user && \
-    jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
-    jupyter nbextension enable nbTranslate/main
+    jupyter nbextensions_configurator enable --user
+    #jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
+    #jupyter nbextension enable nbTranslate/main
 
 # Activate ipywidgets extension in the environment that runs the notebook server\
 USER root
@@ -338,7 +331,7 @@ RUN \
     ijsinstall && \
     # end of javascript kernel package
     pip install --no-cache-dir \
-      jupyterlab-discovery \
+      #jupyterlab-discovery \
       perspective-python \
       lineup_widget \
       ujson \
@@ -350,7 +343,7 @@ RUN \
     jupyter nbextension enable --py --sys-prefix lineup_widget && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
-    jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
+    #jupyter serverextension enable --sys-prefix jupyterlab_discovery && \
     jupyter serverextension enable --py lantern && \
     jupyter labextension install @jupyterlab/hub-extension && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
@@ -363,17 +356,16 @@ RUN \
     jupyter labextension install jupyterlab_bokeh && \
     jupyter labextension install pylantern && \
     jupyter labextension install lineup_widget
+
+USER root
+
 # This RUN segment sets up a temporary install of googletrans
-#   and also installs the Intel Python package.
 RUN \
-    pip uninstall -y googletrans && \
+    #pip uninstall -y googletrans && \
     git clone https://github.com/BoseCorp/py-googletrans.git && \
     cd ./py-googletrans && \
     python setup.py install && \
-    rm -fvR /home/jovyan/work/py-googletrans && \
-    conda install -c intel intelpython3_core numpy sympy
-
-USER root
+    rm -fvR /home/jovyan/work/py-googletrans
 
 # restore password for sudo access
 ENV PROJ_LIB=/usr/share/proj
