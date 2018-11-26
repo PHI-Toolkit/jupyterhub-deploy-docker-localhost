@@ -36,7 +36,9 @@ fi
 echo "Creating network and volumes..."
 make network volumes
 
+echo "Creating SSL certificate..."
 if [ "$JUPYTERHUB_SSL" == "use_ssl_ss" ]; then
+  echo "Creating self-signed SSL certificate..."
   ./create-certs.sh
 else
   if [ "$JUPYTERHUB_SSL" == "no_ssl" ]; then
@@ -44,9 +46,11 @@ else
     echo "Please select SSL option: use_ssl_ss or use_ssl_le in the .env file. Exiting..."
     exit
   else
+    echo "Creating LetsEncrypt SSL certificate..."
     ./letsencrypt-certs.sh
   fi
 fi
+echo "Building Docker images..."
 docker-compose build
 # Get jupyterhub host IP address
 echo "Obtaining JupyterHub host ip address..."
@@ -80,8 +84,10 @@ fi
 if [ ! -f userlist ]; then
     cp userlist-template userlist
 fi
-echo "Rebuilding images..."
+echo "Rebuilding Docker images..."
 docker-compose build
+
+echo "Building notebook image..."
 make notebook_image
 rc=$?
 if [[ $rc -ne 0 ]]; then
