@@ -78,7 +78,7 @@ docker rm $(docker ps -a | grep jupyter- | awk '{print $1}')
 docker rmi $(docker images -q jupyterhub:latest)
 docker rmi $(docker images -q postgres-hub:latest)
 #docker rmi -f $(docker images -q jupyterhub-user:latest)
-if [ ! -f singleuser/drive.jupyterlab-settings ]; then
+if [ ! -f 'singleuser/drive.jupyterlab-settings' ]; then
     cp singleuser/drive.jupyterlab-settings-template singleuser/drive.jupyterlab-settings
 fi
 if [ ! -f userlist ]; then

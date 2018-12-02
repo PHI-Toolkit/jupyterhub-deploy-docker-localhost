@@ -59,7 +59,7 @@ RUN \
       aptitude libmariadb-client-lgpl-dev fonts-dejavu gfortran gcc \
       libcairo2 mesa-common-dev libglu1-mesa-dev libudunits2-dev libgdal-dev \
       libv8-3.14-dev libprotobuf-dev protobuf-compiler libproj-dev \
-          libgeos++-dev zip unzip && \
+          libgeos++-dev libzmq3-dev zip unzip && \
     export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib && \
     aptitude install -y libmagick++-dev && \
     apt-get clean && \
@@ -133,7 +133,7 @@ RUN \
       'r-viridis=0.5*' \
       'r-viridislite=0.3*' \
       'geojsonio=0.0.3*' \
-      'crayon' && \
+      'r-crayon' && \
     conda clean -tipsy && \
     conda install -c quasiben r-protolite && \
     R -e "install.packages(c('jqr'), dependencies=TRUE, repos='http://cran.rstudio.com/')"
