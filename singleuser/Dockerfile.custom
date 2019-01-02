@@ -10,7 +10,7 @@ ARG GITHUB_CLIENT_SECRET
 LABEL maintainer='herman.tolentino@gmail.com'
 
 RUN python3 -m pip install --no-cache-dir --upgrade pip && \
-    conda update conda
+    conda update -n base conda
 
 USER root
 
@@ -137,7 +137,6 @@ RUN \
     conda clean -tipsy && \
     conda install -c quasiben r-protolite && \
     R -e "install.packages(c('jqr'), dependencies=TRUE, repos='http://cran.rstudio.com/')"
-    #R -e "install.packages(c('protolite'),repos='http://cran.rstudio.com')"
 
 # Install Python 3 packages
 # Remove pyqt and qt pulled in for matplotlib since we're only ever going to
@@ -166,7 +165,8 @@ RUN conda install -c conda-forge --yes \
       'cloudpickle=0.5*' \
       'dill=0.2*' \
       'numba=0.38*' \
-      'bokeh=0.13*' \
+      #'bokeh=0.13*' \
+      'bokeh=1.0*' \
       'sqlalchemy=1.2*' \
       'hdf5=1.10*' \
       'h5py=2.7*' \
@@ -178,12 +178,10 @@ RUN conda install -c conda-forge --yes \
       'icu=58.2' \
       'missingno=0.4*' \
       'blaze=0.11*' \
-      'pandas-datareader=0.6*' \
+      'pandas-datareader=0.7*' \
       'wrapt=1.10.11' \
       'textblob=0.15*' \
       'jupyter_kernel_gateway=2.0*' && \
-      # Install the Intel Python package
-      conda install -c intel intelpython3_core numpy sympy certifi && \
       conda remove --quiet --yes --force qt pyqt && \
       conda clean -tipsy
 
@@ -223,8 +221,9 @@ RUN \
       'openpyxl=2.5*' \
       'bqplot=0.10*' \
       'qgrid=1.0.5' \
-      'vega3=0.13*' \
-      'vega_datasets=0.5*' \
+      #'vega3=0.13*' \
+      'vega=1.4*' \
+      'vega_datasets=0.7*' \
       # osmnx and numpy versions that match
       #'osmnx=0.7.1' \
       'osmnx=0.8*' \
@@ -255,7 +254,8 @@ RUN \
       #'ete3' \
       #'ete_toolchain' \
       'tabulate' \
-      'deepgraph' && \
+      'deepgraph' \
+      'geoplot' && \
       conda clean -tipsy && \
     # insert RUN here if build fails
     pip install --no-cache-dir \
@@ -330,7 +330,7 @@ RUN \
     npm install -g ijavascript && \
     ijsinstall && \
     # end of javascript kernel package
-    pip install --no-cache-dir \
+    pip install --no-cache-dir --upgrade \
       #jupyterlab-discovery \
       perspective-python \
       lineup_widget \
@@ -339,7 +339,12 @@ RUN \
       future \
       pixiedust \
       pixiedust_node \
-      nbresuse && \
+      nbresuse \
+      dedupe \
+      yellowbrick \
+      nx_altair \
+      Dora \
+      quilt && \
     jupyter nbextension enable --py --sys-prefix lineup_widget && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
@@ -355,7 +360,10 @@ RUN \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install jupyterlab_bokeh && \
     jupyter labextension install pylantern && \
-    jupyter labextension install lineup_widget
+    jupyter labextension install lineup_widget && \
+    jupyter labextension install bqplot && \
+    # Install the Intel Python package
+    conda install -c intel intelpython3_core numpy sympy certifi
 
 USER root
 
@@ -366,6 +374,11 @@ RUN \
     cd ./py-googletrans && \
     python setup.py install && \
     rm -fvR /home/jovyan/work/py-googletrans
+#RUN \
+#    git clone https://github.com/neilpanchal/spinzero-jupyter-theme.git && \
+#    cp -r spinzero-jupyter-theme/*  /home/jovyan/.jupyter/custom/. && \
+#    rm -fvR spinzero-jupyter-theme
+
 
 # restore password for sudo access
 ENV PROJ_LIB=/usr/share/proj

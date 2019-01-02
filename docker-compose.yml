@@ -70,8 +70,8 @@ services:
       - .env
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py
-#    command: >
-#      jupyterhub upgrade-db
+    #command: >
+    #  jupyterhub upgrade-db
 
 volumes:
   data:
