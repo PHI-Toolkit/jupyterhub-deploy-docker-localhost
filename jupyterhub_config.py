@@ -104,12 +104,17 @@ if os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'dummy_authenticator':
 # 1. Dummy Authenticator  do not use this for production!
     c.JupyterHub.authenticator_class = 'dummyauthenticator.DummyAuthenticator'
     c.DummyAuthenticator.password = "geeks@localhost"
-elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'github_authenticator':
+elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'hash_authenticator':
 # 2. Authenticate users with GitHub OAuth
+    c.JupyterHub.authenticator_class = 'hashauthenticator.HashAuthenticator'
+    c.HashAuthenticator.secret_key = 'geeks'          # Defaults to ''
+    c.HashAuthenticator.password_length = 10          # Defaults to 6
+    c.HashAuthenticator.show_logins = True            # Optional, defaults to Falseelif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'github_authenticator':
+# 3. Authenticate users with GitHub OAuth
     c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
     c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 else:
-# 3. JupyterHub tmpauthenticator
+# 4. JupyterHub tmpauthenticator
 # this creates temporary users
     c.JupyterHub.authenticator_class = tmpauthenticator.TmpAuthenticator
 
