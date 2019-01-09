@@ -344,7 +344,9 @@ RUN \
       yellowbrick \
       nx_altair \
       Dora \
-      quilt && \
+      quilt \
+      plotnine \
+      apiclient && \
     jupyter nbextension enable --py --sys-prefix lineup_widget && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
