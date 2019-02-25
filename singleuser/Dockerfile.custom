@@ -1,7 +1,9 @@
-# Version: 20180601
+# Version: 20190203
 ARG DOCKER_NOTEBOOK_IMAGE
 FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
+ARG JUPYTERLAB_VERSION
+ARG NOTEBOOK_VERSION
 ARG NB_USER_PASS
 ARG GITHUB_ACCESS_TOKEN
 ARG GITHUB_CLIENT_ID
@@ -35,11 +37,10 @@ COPY 99fixbadproxy /etc/apt/apt.conf.d/
 RUN \
     conda install -c conda-forge --yes \
       jupyterhub=$JUPYTERHUB_VERSION \
-      #'jupyterlab=0.34.12*' \
-      'jupyterlab=0.35*' \
+      "jupyterlab=$JUPYTERLAB_VERSION" \
       'jupyter_client' \
       'jupyter_console' \
-      'notebook=5.7*' \
+      "notebook=$NOTEBOOK_VERSION" \
       'libsodium' && \
     jupyter serverextension enable --py jupyterlab --sys-prefix && \
     conda clean -tipsy && \
@@ -52,14 +53,16 @@ RUN \
     add-apt-repository -y ppa:ubuntugis/ubuntugis-experimental && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-      gdal-bin libgeos-dev libjq-dev nano \
+      #gdal-bin \
+      libgeos-dev libjq-dev nano \
       libffi-dev g++ libssl-dev libfreetype6-dev \
       python-dev libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr \
       flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig \
       aptitude libmariadb-client-lgpl-dev fonts-dejavu gfortran gcc \
-      libcairo2 mesa-common-dev libglu1-mesa-dev libudunits2-dev libgdal-dev \
+      libcairo2 mesa-common-dev libglu1-mesa-dev libudunits2-dev \
+      #libgdal-dev \
       libv8-3.14-dev libprotobuf-dev protobuf-compiler libproj-dev \
-          libgeos++-dev libzmq3-dev zip unzip && \
+          libgeos++-dev libzmq3-dev zip unzip file && \
     export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib && \
     aptitude install -y libmagick++-dev && \
     apt-get clean && \
@@ -68,7 +71,7 @@ RUN \
     chown -R root:users /opt/conda && \
     chmod g+s /opt/conda
 
-USER $NB_USER
+#USER $NB_USER
 
 # R packages
 # install R libraries and pre-requisites
@@ -104,14 +107,14 @@ RUN \
       'r-randomforest=4.6*' \
       'r-htmltools=0.3*' \
       'r-sparklyr=0.7*' \
-      'r-htmlwidgets=1.0*' \
+      'r-htmlwidgets' \
       'r-hexbin=1.27*' && \
       # end stack
     conda clean -tipsy && \
-    conda install -c conda-forge \
-      -c r -c bioconda --yes \
-      'gdal=2.2*' \
-      'libgdal=2.2*' \
+    conda install --yes -c conda-forge --force  \
+      'gdal=2.4.0' \
+      'libgdal=2.4.0' && \
+    conda install -c conda-forge -c r --yes \
       'libspatialite=4.3*' \
       'r-rsqlite' \
       'r-reticulate=1.8*' \
@@ -126,7 +129,7 @@ RUN \
       'r-igraph =1.2*' \
       'r-leaflet=2.0*' \
       'r-tm=0.7*' \
-      'r-sf=0.6' \
+      'r-sf=0.4*' \
       'r-rgeos=0.3*' \
       'r-raster=2.6*' \
       'r-text2vec=0.5*' \
@@ -144,19 +147,19 @@ RUN \
 # Unversion 'hdf5' and 'h5py' for 'rgdal' compatibility
 # Unversion 'matplotlib' for 'libkml', 'rgdal' and 'r-sf' compatibility
 # Specify pyqt version to avoid two choices
-USER $NB_USER
+#USER $NB_USER
 
 RUN conda install -c conda-forge --yes \
       'nomkl=2.0*' \
       # begin stack entries
       'conda-forge::blas=*=openblas' \
       'ipywidgets=7.4*' \
-      'pandas=0.23*' \
+      'pandas=0.24*' \
       'numexpr=2.6*' \
-      'matplotlib=2.2*' \
+      'matplotlib=3.0.2' \
       'scipy=1.1*' \
-      'seaborn=0.8*' \
-      'scikit-learn=0.19*' \
+      'seaborn=0.9*' \
+      'scikit-learn=0.20*' \
       'scikit-image=0.14*' \
       'sympy=1.1*' \
       'cython=0.28*' \
@@ -165,11 +168,9 @@ RUN conda install -c conda-forge --yes \
       'cloudpickle=0.5*' \
       'dill=0.2*' \
       'numba=0.38*' \
-      #'bokeh=0.13*' \
-      'bokeh=1.0*' \
       'sqlalchemy=1.2*' \
       'hdf5=1.10*' \
-      'h5py=2.7*' \
+      'h5py=2.9*' \
       'vincent=0.4.*' \
       'beautifulsoup4=4.6.*' \
       'protobuf=3.*' \
@@ -186,25 +187,27 @@ RUN conda install -c conda-forge --yes \
       conda clean -tipsy
 
 RUN \
-    conda install -c conda-forge -c etetoolkit --yes \
-      'rpy2=2.9*' \
-      'pyproj' \
-      'geos' \
+    conda install -c conda-forge --yes \
+      'rpy2=2.9.4' \
+      'pyproj=1.9.6' \
+      'geos=3.7*' \
       'pillow=5.1*' \
       # folium unit
-      'fiona=1.7.11' \
-      'libkml=1.3.0' \
+      'fiona=1.8.4' \
+      'libkml=1.3*' \
+      'kealib=1.4.10' \
       # end of folium unit
-      'rasterio=0.36*' \
+      'bokeh=1.0.4' \
+      'rasterio=1.0.18' \
       'geojson=2.3*' \
       'pyshp=1.2*' \
-      'shapely=1.6*' \
+      'shapely=1.6.4' \
       'obspy=1.1*' \
-      'geopandas=0.3*' \
+      'geopandas=0.4.0' \
       'mplleaflet=0.0.5' \
       'plotly=2.7*' \
       'holoviews=1.10*' \
-      'geoviews=1.5*' \
+      #'geoviews=1.5.0' \
       'xarray=0.10*' \
       'dask=0.18*' \
       'pyke=1.1*' \
@@ -212,71 +215,61 @@ RUN \
       'cf_units' \
       'setuptools=39.2*' \
       'bkcharts=0.2*' \
-      'basemap=1.1*' \
-      'basemap-data-hires=1.1*' \
+      'basemap=1.2.0' \
+      'basemap-data-hires=1.2.0' \
       'networkx=2.1*' \
-      'cartopy=0.16*' \
-      'proj4=4.9.3*' \
+      'cartopy=0.17*' \
+      'proj4=5.2.0' \
       'datashader=0.6*' \
       'openpyxl=2.5*' \
       'bqplot=0.10*' \
       'qgrid=1.0.5' \
-      #'vega3=0.13*' \
       'vega=1.4*' \
       'vega_datasets=0.7*' \
-      # osmnx and numpy versions that match
-      #'osmnx=0.7.1' \
-      'osmnx=0.8*' \
-      'numpy=1.14' \
-      # Facebook Prophet packages
-      'fbprophet=0.3*' \
-      'pystan=2.17*' \
+      'osmnx=0.9*' \
+      'numpy=1.15*' \
       'graphviz=2.38*' \
-      #'beakerx=1.0*' \
-      'jupyter_contrib_core' \
-      'jupyter_contrib_nbextensions' \
+      'jupyter_contrib_core=0.3*' \
+      'jupyter_contrib_nbextensions=0.5*' \
       'jupyter_nbextensions_configurator' \
-      'widgetsnbextension' \
-      'wordcloud' \
-      #'googletrans=2.3.0' \
+      'widgetsnbextension=3.4*' \
+      'wordcloud=1.5*' \
       'hyper=0.7.0' \
-      'twisted' \
-      'cufflinks-py' \
-      'altair' \
-      'Automat' \
+      'twisted=17.5*' \
+      'cufflinks-py=0.13*' \
+      'altair=2.3.0' \
+      'Automat=0.7.0' \
       'fuzzywuzzy' \
-      'python-levenshtein' \
-      'folium=0.7*' \
-      #'gmaps' \
-      'neo4j-python-driver' \
+      'python-levenshtein=0.12*' \
+      'folium=0.7.0' \
+      'neo4j-python-driver=1.1*' \
       'py2neo=4.0*' \
-      'rise' \
-      #'ete3' \
-      #'ete_toolchain' \
-      'tabulate' \
-      'deepgraph' \
-      'geoplot' && \
-      conda clean -tipsy && \
+      'rise=5.4.1' \
+      'tabulate=0.8.3' \
+      'deepgraph=0.2.0' \
+      'geoplot=0.2.3' \
+      'iris=2.2.0' \
+      'nodejs=11.9*' \
+      'tweepy' && \
+    conda install -c pyviz -y 'geoviews=1.6*' && \
+    conda update nbconvert && \
+    conda clean -tipsy && \
     # insert RUN here if build fails
     pip install --no-cache-dir \
-      sklearn-pandas==1.6.0 \
-      epipy==0.0.2.1 \
-      jupyterlab_geojson==0.4.0 \
-      jupyterlab-widgets==0.6.15 \
-      pylantern==0.0.18 \
-      gtts==2.0.1 \
-      tornado \
-      pyzmq \
-      uritemplate==3.0.0 && \
-    conda update nbconvert && \
+      'sklearn-pandas==1.6.0' \
+      'jupyterlab_geojson==0.4.0' \
+      'jupyterlab-widgets==0.6.15' \
+      'pylantern==0.0.18' \
+      'gtts==2.0.1' \
+      'tornado' \
+      'pyzmq' \
+      'uritemplate==3.0.0' && \
     jupyter contrib nbextension install --user && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter nbextensions_configurator enable --user
-    #jupyter nbextension install https://rawgit.com/jfbercher/jupyter_nbTranslate/master/nbTranslate.zip --user && \
-    #jupyter nbextension enable nbTranslate/main
 
 # Activate ipywidgets extension in the environment that runs the notebook server\
-USER root
+#USER root
 
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 
@@ -286,8 +279,6 @@ COPY work .
 RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \
     sudo mkdir -p /opt/conda/pkgs/cache/ && \
     sudo chown -R 1000:100 /opt/conda/pkgs/cache/ && \
-    conda install conda-build && \
-    conda clean -tipsy && \
     sudo chmod a+x modules/*.sh && \
     sudo mkdir -p /srv/modules && \
     sudo mv modules/* /srv/modules/. && \
@@ -299,14 +290,17 @@ RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \
     sudo chown -R jovyan:users /home/jovyan/work/notebooks && \
     mkdir -p /home/jovyan/.cache && \
     chmod -R a+w /home/jovyan/.cache && \
-    chown -R jovyan:users /home/jovyan/.cache
+    chown -R jovyan:users /home/jovyan/.cache && \
+    conda install conda-build && \
+    conda clean -tipsy
 
 WORKDIR /home/jovyan/work
 
 # Custom logo, create backup CSS file to enable restore if jupyter-themes overwrites it and the GEEKS logo
 ARG LOGO_IMAGE
 RUN echo $LOGO_IMAGE && \
-    mkdir -p /home/jovyan/.jupyter/custom
+    mkdir -p /home/jovyan/.jupyter/custom && \
+    chown -R $NB_USER /home/jovyan/.jupyter
 ADD css/custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
 # Address iopub data error message with custom config
@@ -314,39 +308,29 @@ ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
 RUN \
     sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
+    sudo chown -R jovyan:users /opt/ && \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup && \
-    # set up for:
-    # 1. jupyterlab and extensions envrironment
-    # 2. javascript kernel and javascript data science tools
     pip install --upgrade pip && \
     pip install  --no-cache-dir --upgrade "ipython[all]" && \
     sudo apt-get update && \
-    sudo apt-get install -y --no-install-recommends \
-      nodejs npm build-essential && \
-    sudo npm cache clean -f && \
-    sudo npm install -g n && \
-    sudo n stable && \
-    # javascript kernel package
-    npm install -g ijavascript && \
-    ijsinstall && \
     # end of javascript kernel package
     pip install --no-cache-dir --upgrade \
       #jupyterlab-discovery \
-      perspective-python \
-      lineup_widget \
-      ujson \
-      websocket \
-      future \
-      pixiedust \
-      pixiedust_node \
-      nbresuse \
-      dedupe \
-      yellowbrick \
-      nx_altair \
-      Dora \
-      quilt \
-      plotnine \
-      apiclient && \
+      'perspective-python' \
+      'lineup_widget' \
+      'ujson' \
+      'websocket' \
+      'future' \
+      'pixiedust' \
+      'pixiedust_node' \
+      'nbresuse' \
+      'dedupe' \
+      'yellowbrick' \
+      'nx_altair' \
+      'Dora' \
+      'quilt' \
+      'apiclient' \
+      'jupyter_disqus' && \
     jupyter nbextension enable --py --sys-prefix lineup_widget && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
@@ -364,8 +348,13 @@ RUN \
     jupyter labextension install pylantern && \
     jupyter labextension install lineup_widget && \
     jupyter labextension install bqplot && \
-    # Install the Intel Python package
-    conda install -c intel intelpython3_core numpy sympy certifi
+    conda clean -tipsy
+
+#RUN \
+#    conda config --add channels intel && \
+#    conda install intelpython3_core && \
+#    conda remove --quiet --yes --force qt pyqt && \
+#    conda clean -tipsy
 
 USER root
 
@@ -386,7 +375,9 @@ RUN \
 ENV PROJ_LIB=/usr/share/proj
 RUN \
     rm -fvR modules && \
+    apt-get autoremove -y && \
     conda clean -tipsy && \
+    rm -fvR /opt/conda/pkgs/* && \
     # remove qt and pyqt here so all dependent packages are already loaded
     #conda remove --quiet --yes --force qt pyqt && \
     apt-get update && \

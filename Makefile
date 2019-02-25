@@ -56,6 +56,8 @@ notebook_image: #pull singleuser/Dockerfile
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
 		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
+		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
 		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
