@@ -202,7 +202,6 @@ RUN \
       'geojson=2.3*' \
       'pyshp=1.2*' \
       'shapely=1.6.4' \
-      'obspy=1.1*' \
       'geopandas=0.4.0' \
       'mplleaflet=0.0.5' \
       'plotly=2.7*' \
@@ -241,7 +240,7 @@ RUN \
       'Automat=0.7.0' \
       'fuzzywuzzy' \
       'python-levenshtein=0.12*' \
-      'folium=0.7.0' \
+      'folium=0.8*' \
       'neo4j-python-driver=1.1*' \
       'py2neo=4.0*' \
       'rise=5.4.1' \
@@ -330,6 +329,9 @@ RUN \
       'Dora' \
       'quilt' \
       'apiclient' \
+      'kafka-python' \
+      'confluent-kafka' \
+      'confluent-kafka[avro]' \
       'jupyter_disqus' && \
     jupyter nbextension enable --py --sys-prefix lineup_widget && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
