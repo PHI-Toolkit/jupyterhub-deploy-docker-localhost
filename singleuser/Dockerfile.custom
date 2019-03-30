@@ -320,14 +320,10 @@ RUN \
       'ujson' \
       'websocket' \
       'future' \
-      'pixiedust' \
-      'pixiedust_node' \
       'nbresuse' \
       'dedupe' \
-      'yellowbrick' \
       'nx_altair' \
       'Dora' \
-      'quilt' \
       'apiclient' \
       'kafka-python' \
       'confluent-kafka' \

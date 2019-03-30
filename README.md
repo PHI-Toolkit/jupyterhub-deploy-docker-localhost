@@ -9,14 +9,20 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 # Installation Guide - Quick
 
 
-## Prepare Jupyter Notebook server files
+## Prepare Jupyter Notebook server
 Git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
 
+On Ubuntu Linux 18.04 (Bionic), you might have to (Linux terminal commands):
+1. Install git - `sudo apt install git`
+2. Install Docker, Docker Compose, make - `sudo install-docker-bionic.sh`
+
+The next steps entail three rounds of modification levels (**1=no modification (default settings)**, **2=LetsEncrypt certificates**, **3=GitHub OAuth authentication**).
+
 ## Round 1: Run `buildhub.sh` script unmodified
-This enables you to run on `localhost` or an IP address (if you set it up on a remote VM, i.e., Digital Ocean, Lightsail or Linode), an unmodified Jupyter Notebook that has a self-signed certificate, and `jovyan` as the user.
+This enables you to run on `localhost` or an IP address (if you set it up on a remote VM, i.e., Digital Ocean, Lightsail, Linode, Contabo), an unmodified Jupyter Notebook that has a self-signed certificate, and `jovyan` as the user.
 1. Run `buildhub.sh`
 2. When the script finishes, run the `starthub.sh` script
-3. Go to https://localhost on your Chrome browser to view the JupyterHub log in page. The default login name and password are set in the `.env` file.
+3. Go to https://localhost on your Chrome browser to view the JupyterHub log in page. The default login name is "jovyan" and password is set in the `.env` file.
 
 ## Round 2: Run `buildhub.sh` script with LetsEncrypt certificate
 Modify `.env` file LetsEncrypt section:
@@ -123,20 +129,6 @@ https://docs.microsoft.com/en-us/windows/wsl/install-win10
 Delete the old `jupyterhub_cookie_secret` file:
 > `$ sudo rm /var/lib/docker/volumes/jupyterhub-data/_data/jupyterhub_cookie_secret`
 
-# Changes
-
-## stacks-0.2
-
-* **IMAGE_TAG variable**: See the `.env` file. Sets the Jupyter Stacks minimal image version to use in case of Dockerfile.custom or the stacks version in case of Dockerfile.stacks. For example, the Docker image for the singleuser-notebook that uses image tag `5811dcb711ba` is based on Ubuntu Bionic. The tags can be found here: https://hub.docker.com/r/jupyter/base-notebook/tags/.
-
-* **GITHUB_ACCESS_TOKEN**: See `.env` file. Obtain your personal GitHub access token from https://github.com/settings/tokens.
-
-## master
-
-* based on docker stacks tag `459e68c2f8b7`
-* `jupyterHub=0.9.4`
-* `notebook=5.7.0`
-
 # JupyterHub Logs / Launch Issues
 
 ## Logs: Old base64 cookie-secret detected in /data/jupyterhub_cookie_secret.
@@ -152,3 +144,11 @@ Delete the old `jupyterhub_cookie_secret` file:
 
 ## Windows user
 * There may be slight differences in how Chrome or Firefox behaves compared to installations on Linux or Mac (YMMV).
+
+## HTTP Error
+If you get the error:
+> An HTTP error occurred when trying to retrieve this URL.
+HTTP errors are often intermittent, and a simple retry will get you on your way.
+ConnectionError(ReadTimeoutError("HTTPSConnectionPool(host='conda.anaconda.org', port=443): Read timed out.",),)
+
+...and the `buildhub.sh` script is building the user container image (running Dockerfile.custom), just run `make notebook_image` to resume rebuilding the Jupyter Notebook user container image.
