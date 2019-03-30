@@ -12,9 +12,9 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 ## Prepare Jupyter Notebook server
 Git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
 
-On Ubuntu Linux 18.04 (Bionic), you might have to (Linux terminal commands):
+On Ubuntu Linux 18.04 (Bionic), you might have to execute the following (Linux terminal commands):
 1. Install git - `sudo apt install git`
-2. Install Docker, Docker Compose, make - `sudo install-docker-bionic.sh`
+2. Install Docker, Docker Compose, make - `sudo install-docker-bionic.sh` (see more below, **"Install Docker, Docker Compose and make on your remote Virtual Machine (VM)"**)
 
 The next steps entail three rounds of modification levels (**1=no modification (default settings)**, **2=LetsEncrypt certificates**, **3=GitHub OAuth authentication**).
 
@@ -22,7 +22,7 @@ The next steps entail three rounds of modification levels (**1=no modification (
 This enables you to run on `localhost` or an IP address (if you set it up on a remote VM, i.e., Digital Ocean, Lightsail, Linode, Contabo), an unmodified Jupyter Notebook that has a self-signed certificate, and `jovyan` as the user.
 1. Run `buildhub.sh`
 2. When the script finishes, run the `starthub.sh` script
-3. Go to https://localhost on your Chrome browser to view the JupyterHub log in page. The default login name is "jovyan" and password is set in the `.env` file.
+3. Go to https://localhost on your Chrome browser to view the JupyterHub log in page. The default login name is "jovyan" and password is set in the `.env` file. If on a remote virtual machine, replace "localhost" with the machine's IP address.
 
 ## Round 2: Run `buildhub.sh` script with LetsEncrypt certificate
 Modify `.env` file LetsEncrypt section:
@@ -48,11 +48,11 @@ To enable GitHub autentication:
 ## Prepare Jupyter Notebook server files
 Git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
 
-## Install Docker and Docker Compose on your remote Virtual Machine (VM)
+## Install Docker, Docker Compose and make on your remote Virtual Machine (VM)
 
 1. Run the `install-docker-bionic.sh` to install Docker and Docker Compose on a VM running Ubuntu Bionic.
 2. If the VM is not running Bionic Beaver, run the `upgrade-distro.sh` script. Be sure to replace the source and destination OS in the `sed` statement.
-3. Make sure to exit the VM and log back in for changes to take effect.
+3. Make sure to exit the VM and log back in for changes to take effect. Run `docker images` to check if you have access to docker without sudo. If running `docker images` generates an error, run `sudo usermod -aG docker [replace-with-your-username]`.
 
 *References*
 * Install Docker: https://docs.docker.com/install/
@@ -124,10 +124,6 @@ https://docs.microsoft.com/en-us/windows/wsl/install-win10
 2. Use "Edge Channel" Docker version for Windows 10: https://download.docker.com/win/edge/Docker%20for%20Windows%20Installer.exe
 3. Check "Expose daemon on tcp://localhost:2375 without TLS as follows:
 ![Windows 10 without TLS](./docs/25342.LINE.jpg)
-
-# Upgrading from JupyterHub 0.7* to 0.8*
-Delete the old `jupyterhub_cookie_secret` file:
-> `$ sudo rm /var/lib/docker/volumes/jupyterhub-data/_data/jupyterhub_cookie_secret`
 
 # JupyterHub Logs / Launch Issues
 
