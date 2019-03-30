@@ -113,7 +113,8 @@ RUN \
     conda clean -tipsy && \
     conda install --yes -c conda-forge --force  \
       'gdal=2.4.0' \
-      'libgdal=2.4.0' && \
+      'libgdal=2.4.0' \
+      'r-rgdal=1.3*' && \
     conda install -c conda-forge -c r --yes \
       'libspatialite=4.3*' \
       'r-rsqlite' \
@@ -226,7 +227,7 @@ RUN \
       'vega=1.4*' \
       'vega_datasets=0.7*' \
       'osmnx=0.9*' \
-      'numpy=1.15*' \
+      'numpy=1.16*' \
       'graphviz=2.38*' \
       'jupyter_contrib_core=0.3*' \
       'jupyter_contrib_nbextensions=0.5*' \
@@ -245,8 +246,7 @@ RUN \
       'py2neo=4.0*' \
       'rise=5.4.1' \
       'tabulate=0.8.3' \
-      'deepgraph=0.2.0' \
-      'geoplot=0.2.3' \
+      'geoplot=0.2*' \
       'iris=2.2.0' \
       'nodejs=11.9*' \
       'tweepy' && \

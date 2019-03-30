@@ -33,6 +33,8 @@ class DemoFormSpawner(DockerSpawner):
         self.container_image = container_image
         return options
 
+c.JupyterHub.logo_file = '/opt/conda/share/jupyter/hub/static/images/jupyter.png'
+
 #c.JupyterHub.spawner_class = DemoFormSpawner
 # We rely on environment variables to configure JupyterHub so that we
 # avoid having to rebuild the JupyterHub container every time we change a
