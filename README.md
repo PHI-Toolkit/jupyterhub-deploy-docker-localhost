@@ -19,29 +19,38 @@ On Ubuntu Linux 18.04 (Bionic), you might have to execute the following (Linux t
 The next steps entail three rounds of modification levels (**1=no modification (default settings)**, **2=LetsEncrypt certificates**, **3=GitHub OAuth authentication**).
 
 ## Round 1: Run `buildhub.sh` script unmodified
-This enables you to run on `localhost` or an IP address (if you set it up on a remote VM, i.e., Digital Ocean, Lightsail, Linode, Contabo), an unmodified Jupyter Notebook that has a self-signed certificate, and `jovyan` as the user.
-1. Run `buildhub.sh`
+
+This first round build enables you to run as `localhost` on your laptop with a self-signed certificate (`https://localhost`). If you set it up on a remote VM, i.e., Digital Ocean, Lightsail, Linode, Contabo, you can use the VM IP address instead of `localhost`.
+
+To run the first build with no modifications:
+1. Run `time buildhub.sh` (The `time` before `buildhub.sh` gives you total script run time. This script takes approximately an hour, aside from seeing commands being executed on screen, you may want to grab some cofee and do other things.)
 2. When the script finishes, run the `starthub.sh` script
-3. Go to https://localhost on your Chrome browser to view the JupyterHub log in page. The default login name is "jovyan" and password is set in the `.env` file. If on a remote virtual machine, replace "localhost" with the machine's IP address.
+3. Go to https://localhost on your Chrome browser to view the JupyterHub log in page. The default login name is "jovyan" and password is set in the `.env` file. If on a remote virtual machine, replace "localhost" with the machine's IP address. If you have mapped the VM IP address to a domain name, you can replace the IP address with the domain name. You should see a similar GitHub sign in page as below.
+![Default Dummy Authenticator Sign in page](./docs/Dummy-Signin.png)
 
-## Round 2: Run `buildhub.sh` script with LetsEncrypt certificate
-Modify `.env` file LetsEncrypt section:
-1. Get a domain name (e.g., example.com) from a domain registrar. Make the necessary changes so the DNS of the domain registrar points to the remote VM hosting the Jupyter Notebook server. Propagation of the domain name throughout the Internet may take a few hours.
-2. Fill up `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file.
-3. Run the `stophub.sh` script if the Jupyter Notebook server is still running.
-4. Run `buildhub.sh` script
-5. Go to https://example.com/ (just an example of domain name) and authenticate as in Round 1.
+## Round 2: Run `buildhub.sh` with GitHub Authentication
 
-## Round 3: Run `buildhub.sh` with GitHub Authentication
 To enable GitHub autentication:
-1. Edit the `.env` file and change the `JUPYTERHUB_AUTHENTICATOR` value to `github_authenticator`
-2. Go to GitHub and obtain OAuth credentials (see below for details). Register if needed and obtain your GitHub user ID.
+1. Edit the `.env` file and change the `JUPYTERHUB_AUTHENTICATOR` the default value `dummy_authenticator` to `github_authenticator`
+2. Go to GitHub and obtain OAuth credentials (see below for details, **"Obtain your GitHub Account Credentials"**). Register for a GitHub account if needed, and obtain your GitHub username.
 3. Plug in the values for `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `OAUTH_CALLBACK_URL` in the corresponding variables in the `.env` file.
-4. Edit the `userlist` file and add your GitHub user ID to the line below `jovyan` and add `admin` after your user ID. This enables you to use your GitHub user ID to authenticate via GitHub.
-4. Run the `stophub.sh` script if the Jupyter Notebook server is still running.
-5. Run the `buildhub.sh` script.
+4. **IMPORTANT:** Edit the `userlist` file and add your GitHub user ID to the line below `jovyan` and add `admin` after your user ID. This enables you to use your GitHub user ID to authenticate via GitHub. If you missed this, you may get the Browser 403 error (see below).
+4. Run the `stophub.sh` script if the Jupyter Notebook server is still running. You can check if the hub and single user containers are running with `docker ps`.
+5. Run the `time buildhub.sh` script.
 6. Run the `starthub.sh` script
-7. Go to https://example.com. You will be redirected to the GitHub site to allow `hermantolentino` to autenticate you and to fill in your GitHub user ID and password. You will be redirected back to the Jupyter Notebook server after that.
+7. Go to https://example.com. You will be redirected to the GitHub site to allow `hermantolentino` to autenticate you and to fill in your GitHub user ID and password. You will be redirected back to the Jupyter Notebook server after that. You should see a similar GitHub sign in page as below.
+![GitHub Sign in page](./docs/GitHub-Signin.png)
+
+## Round 3: Run `buildhub.sh` script with LetsEncrypt certificate
+
+Modify `.env` file LetsEncrypt section:
+1. Get a domain name (e.g., example.com) from a domain registrar. Make the necessary changes so the DNS of the domain registrar points to the remote VM hosting the Jupyter Notebook server. **IMPORTANT:** Propagation of the domain name throughout the Internet may take a few hours, so if you intend to use a domain name (needed for LetsEncrypt set up) it is highly recommended to get it set up early, perhaps before beginning Round 1.
+2. Fill up `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file. Leave `CERT_SERVER` blank.
+3. In the `.env` file, change the value of `JUPYTERHUB_SSL=use_ssl_ss` (default) to `JUPYTERHUB_SSL=use_ssl_le` to use LetsEncrypt to generate SSL certificates.
+4. Run the `stophub.sh` script if the Jupyter Hub server is still running.
+5. Run `sudo time buildhub.sh` script. You need `sudo` to run the `letsencrypt-certs.sh` with admin privileges.
+6. Go to https://example.com/ (just an example of domain name) and authenticate as in Round 1. You should see a valid LE https certificate in the URL as below.
+![GitHub Sign in page](./docs/Hub-LE-https.png)
 
 # Installation Guide - Some Details for Remote Servers
 
@@ -96,6 +105,9 @@ If you will be using GitHub Oauth to authenticate users to JupyterHub, you need 
 > `OAUTH_CALLBACK_URL=https://mydomain.com/hub/oauth_callback`
 
 If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i.e., "https://localhost/hub/oauth_callback").
+
+## Renewing LetsEncrypt certificates
+Run `sudo time buildhub.sh`.
 
 ## Upgrading JupyterHub to a newer version
 
