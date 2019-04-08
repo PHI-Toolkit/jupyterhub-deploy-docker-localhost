@@ -249,6 +249,7 @@ RUN \
       'geoplot=0.2*' \
       'iris=2.2.0' \
       'nodejs=11.9*' \
+      'pysal=1.14*' \
       'tweepy' && \
     conda install -c pyviz -y 'geoviews=1.6*' && \
     conda update nbconvert && \
