@@ -160,3 +160,6 @@ HTTP errors are often intermittent, and a simple retry will get you on your way.
 ConnectionError(ReadTimeoutError("HTTPSConnectionPool(host='conda.anaconda.org', port=443): Read timed out.",),)
 
 ...and the `buildhub.sh` script is building the user container image (running Dockerfile.custom), just run `make notebook_image` to resume rebuilding the Jupyter Notebook user container image.
+
+## [Errno 111] Connection Refused
+This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after restarting Docker server (after server reboot). To address this error, run the script `get_service_host_ip.sh` at the command line, which will provide you with the new JUPYTERHUB_SERVICE_HOST_IP value. Replace the old value in the `.env` file with this new IP address. Run `restarthub.sh`. 
