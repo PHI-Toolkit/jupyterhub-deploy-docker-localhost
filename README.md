@@ -144,6 +144,7 @@ https://docs.microsoft.com/en-us/windows/wsl/install-win10
 > `$ docker exec -it jupyterhub /bin/bash`
 * This brings you to the jupyterhub bash prompt. Type the following command to regenerate a new cookie secret:
 > `# openssl rand -hex 32 > "/data/jupyterhub_cookie_secret"`
+
 ## Browser: 403 : Forbidden
 * Add your GitHub username to the `userlist` file as described above.
 
@@ -162,4 +163,4 @@ ConnectionError(ReadTimeoutError("HTTPSConnectionPool(host='conda.anaconda.org',
 ...and the `buildhub.sh` script is building the user container image (running Dockerfile.custom), just run `make notebook_image` to resume rebuilding the Jupyter Notebook user container image.
 
 ## [Errno 111] Connection Refused
-This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after restarting Docker server (after server reboot). To address this error, run the script `get_service_host_ip.sh` at the command line, which will provide you with the new JUPYTERHUB_SERVICE_HOST_IP value. Replace the old value in the `.env` file with this new IP address. Run `restarthub.sh`. 
+This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after restarting Docker server (after server reboot). To address this error, run the script `get_service_host_ip.sh` at the command line, which will provide you with the new JUPYTERHUB_SERVICE_HOST_IP value. Replace the old value in the `.env` file with this new IP address. Run `restarthub.sh`.
