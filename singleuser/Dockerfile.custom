@@ -326,7 +326,10 @@ RUN \
       'nx_altair' \
       'Dora' \
       'apiclient' \
-      'jupyter_disqus' && \
+      'jupyter_disqus' \
+      'jupyterlab_latex' \
+      'sidecar' \
+      'pixiedust' && \
     jupyter nbextension enable --py --sys-prefix lineup_widget && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
@@ -344,6 +347,9 @@ RUN \
     jupyter labextension install pylantern && \
     jupyter labextension install lineup_widget && \
     jupyter labextension install bqplot && \
+    jupyter labextension install @jupyterlab/latex && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
+    jupyter labextension install @jupyterlab/google-drive && \
     conda clean -tipsy
 
 #RUN \
