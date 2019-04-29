@@ -329,7 +329,9 @@ RUN \
       'jupyter_disqus' \
       'jupyterlab_latex' \
       'sidecar' \
-      'pixiedust' && \
+      'pixiedust' \
+      'rosie' \
+      'pixiedust_rosie' && \
     jupyter nbextension enable --py --sys-prefix lineup_widget && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
