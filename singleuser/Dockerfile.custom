@@ -36,7 +36,7 @@ COPY 99fixbadproxy /etc/apt/apt.conf.d/
 
 RUN \
     conda install -c conda-forge --yes \
-      jupyterhub=$JUPYTERHUB_VERSION \
+      "jupyterhub=$JUPYTERHUB_VERSION" \
       "jupyterlab=$JUPYTERLAB_VERSION" \
       'jupyter_client' \
       'jupyter_console' \
@@ -48,19 +48,15 @@ RUN \
     apt-get update && \
     apt-get install -y --no-install-recommends software-properties-common apt-utils && \
     ln -sf /usr/share/zoneinfo/EST /etc/localtime && \
-    #add-apt-repository -y ppa:opencpu/opencpu-2.0 --yes && \
-    #add-apt-repository -y ppa:opencpu/jq && \
     add-apt-repository -y ppa:ubuntugis/ubuntugis-experimental && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-      #gdal-bin \
       libgeos-dev libjq-dev nano \
       libffi-dev g++ libssl-dev libfreetype6-dev \
       python-dev libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr \
       flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig \
       aptitude libmariadb-client-lgpl-dev fonts-dejavu gfortran gcc \
       libcairo2 mesa-common-dev libglu1-mesa-dev libudunits2-dev \
-      #libgdal-dev \
       libv8-3.14-dev libprotobuf-dev protobuf-compiler libproj-dev \
           libgeos++-dev libzmq3-dev zip unzip file && \
     export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib && \
@@ -207,7 +203,6 @@ RUN \
       'mplleaflet=0.0.5' \
       'plotly=2.7*' \
       'holoviews=1.10*' \
-      #'geoviews=1.5.0' \
       'xarray=0.10*' \
       'dask=0.18*' \
       'pyke=1.1*' \
@@ -369,8 +364,15 @@ RUN \
     cd ./py-googletrans && \
     python setup.py install && \
     rm -fvR /home/jovyan/work/py-googletrans
-#RUN \
-#    git clone https://github.com/neilpanchal/spinzero-jupyter-theme.git && \
+ENV LD_LIBRARY_PATH /lib:/usr/lib:/usr/local/lib
+RUN \
+    apt-get update && \
+    apt-get install -y libbsd-dev libreadline-dev && \
+    git clone https://gitlab.com/rosie-pattern-language/rosie.git --recurse-submodules && \
+    cd rosie && \
+    make && \
+    make install && \
+    rm -fvR /home/jovyan/work/rosie
 #    cp -r spinzero-jupyter-theme/*  /home/jovyan/.jupyter/custom/. && \
 #    rm -fvR spinzero-jupyter-theme
 
@@ -392,5 +394,5 @@ RUN \
     chmod -R a+w /opt/conda/pkgs/cache/ && \
     if [ "$NB_USER_PASS" != "" ]; then echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
       sed -i 's/ NOPASSWD://g' /etc/sudoers; fi
-
+WORKDIR /home/jovyan/work
 USER $NB_USER
