@@ -201,7 +201,7 @@ RUN \
       'shapely=1.6.4' \
       'geopandas=0.4.0' \
       'mplleaflet=0.0.5' \
-      'plotly=2.7*' \
+      'plotly=3.9*' \
       'holoviews=1.10*' \
       'xarray=0.10*' \
       'dask=0.18*' \
@@ -247,6 +247,7 @@ RUN \
       'pysal=1.14*' \
       'tweepy' && \
     conda install -c pyviz -y 'geoviews=1.6*' && \
+    conda install -c plotly -y 'plotly_express=0.1*' && \
     conda update nbconvert && \
     conda clean -tipsy && \
     # insert RUN here if build fails
@@ -347,6 +348,7 @@ RUN \
     jupyter labextension install @jupyterlab/latex && \
     jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
     jupyter labextension install @jupyterlab/google-drive && \
+    jupyter labextension install jupyterlab-chart-editor && \
     conda clean -tipsy
 
 #RUN \
