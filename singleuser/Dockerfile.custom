@@ -153,7 +153,7 @@ RUN conda install -c conda-forge --yes \
       'ipywidgets=7.4*' \
       'pandas=0.24*' \
       'numexpr=2.6*' \
-      'matplotlib=3.0.2' \
+      'matplotlib=3.0.3' \
       'scipy=1.1*' \
       'seaborn=0.9*' \
       'scikit-learn=0.20*' \
@@ -199,7 +199,7 @@ RUN \
       'geojson=2.3*' \
       'pyshp=1.2*' \
       'shapely=1.6.4' \
-      'geopandas=0.4.0' \
+      'geopandas=0.5*' \
       'mplleaflet=0.0.5' \
       'plotly=3.9*' \
       'holoviews=1.10*' \
@@ -212,7 +212,7 @@ RUN \
       'bkcharts=0.2*' \
       'basemap=1.2.0' \
       #'basemap-data-hires=1.2.0' \
-      'networkx=2.1*' \
+      'networkx=2.3*' \
       'cartopy=0.17*' \
       'proj4=5.2.0' \
       'datashader=0.6*' \
@@ -221,7 +221,7 @@ RUN \
       'qgrid=1.0.5' \
       'vega=1.4*' \
       'vega_datasets=0.7*' \
-      'osmnx=0.9*' \
+      'osmnx=0.1*' \
       'numpy=1.16*' \
       'graphviz=2.38*' \
       'jupyter_contrib_core=0.3*' \
