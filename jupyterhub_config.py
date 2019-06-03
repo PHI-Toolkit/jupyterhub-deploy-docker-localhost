@@ -6,6 +6,7 @@
 # Configuration file for JupyterHub
 #
 import os
+import sys
 import tmpauthenticator
 
 c = get_config()
@@ -42,6 +43,7 @@ c.JupyterHub.logo_file = '/opt/conda/share/jupyter/hub/static/images/jupyter.png
 
 # Spawn single-user servers as Docker containers
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+
 # Spawn containers from this image
 c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 # JupyterHub requires a single-user instance of the Notebook server, so we
@@ -49,12 +51,12 @@ c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 # jupyter/docker-stacks *-notebook images as the Docker run command when
 # spawning containers.  Optionally, you can override the Docker run command
 # using the DOCKER_SPAWN_CMD environment variable.
-if os.environ['JUPYTER_UI'] == 'notebook':
+if os.environ['JUPYTER_UI'] == '/lab':
+    c.Spawner.cmd = ['jupyter-labhub']
+    c.Spawner.default_url = '/lab'
+else:
     spawn_cmd = os.environ.get('DOCKER_SPAWN_CMD', "start-singleuser.sh")
     c.DockerSpawner.extra_create_kwargs.update({ 'command': spawn_cmd })
-else:
-    c.Spawner.default_url = '/lab'
-    c.Spawner.cmd = ['jupyter-labhub']
 
 # Connect containers to this Docker network
 network_name = os.environ['DOCKER_NETWORK_NAME']
@@ -131,13 +133,15 @@ data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
 c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
     'jupyterhub_cookie_secret')
 
-c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
-    host=os.environ['POSTGRES_HOST'],
-    password=os.environ['POSTGRES_PASSWORD'],
-    db=os.environ['POSTGRES_DB'],
-)
+c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
+#c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
+#    host=os.environ['POSTGRES_HOST'],
+#    password=os.environ['POSTGRES_PASSWORD'],
+#    db=os.environ['POSTGRES_DB'],
+#)
 
 # services
+c.JupyterHub.template_paths = ['/srv/jupyterhub/templates']
 c.JupyterHub.services = [
     {
         'name': 'cull-idle',
@@ -146,6 +150,11 @@ c.JupyterHub.services = [
             server_timeout_seconds=os.environ['SERVER_TIMEOUT_SECONDS']
             ).split(),
 
+    },
+    {
+        'name': 'announcement',
+        'url': 'http://127.0.0.1:8888',
+        'command': [sys.executable, "-m", "announcement"],
     }
 ]
 # Do not comment out this line below!
