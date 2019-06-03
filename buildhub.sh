@@ -89,6 +89,7 @@ docker-compose build
 
 echo "Building notebook image..."
 make notebook_base
+make notebook_body
 make notebook_image
 rc=$?
 if [[ $rc -ne 0 ]]; then
