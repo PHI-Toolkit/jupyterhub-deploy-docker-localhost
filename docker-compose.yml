@@ -6,33 +6,34 @@ version: "3"
 
 services:
 
-  hub-db:
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres
-      args:
-        JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
-    image: postgres-hub
-    container_name: jupyterhub-db
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      PGDATA: ${DB_VOLUME_CONTAINER}
-      JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
-      POSTGRES_PASSWORD: ${JPY_PSQL_PASSWORD}
-    env_file:
-      - .env
-    volumes:
-      - "db:${DB_VOLUME_CONTAINER}"
+  #hub-db:
+  #  build:
+  #    context: .
+  #    dockerfile: Dockerfile.postgres
+  #    args:
+  #      JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
+  #  image: postgres-hub
+  #  container_name: jupyterhub-db
+  #  restart: always
+  #  environment:
+  #    POSTGRES_DB: ${POSTGRES_DB}
+  #    PGDATA: ${DB_VOLUME_CONTAINER}
+  #    JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
+  #    POSTGRES_PASSWORD: ${JPY_PSQL_PASSWORD}
+  #  env_file:
+  #    - .env
+  #  volumes:
+  #    - "db:${DB_VOLUME_CONTAINER}"
 
   hub:
-    depends_on:
-      - hub-db
+    #depends_on:
+    #  - hub-db
     build:
       context: .
       dockerfile: Dockerfile.jupyterhub
       args:
         JUPYTERHUB_VERSION: ${JUPYTERHUB_VERSION}
+        JUPYTER_UI: ${JUPYTER_UI}
         LOGO_IMAGE: ${LOGO_IMAGE}
     restart: always
     image: jupyterhub
@@ -47,8 +48,8 @@ services:
     ports:
       - "443:443"
       #- "8000:8000"
-    links:
-      - hub-db
+    #links:
+    #  - hub-db
     environment:
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
@@ -62,16 +63,17 @@ services:
       # Server time out
       SERVER_TIMEOUT_SECONDS: ${SERVER_TIMEOUT_SECONDS}
       # Postgres db info
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_HOST: hub-db
+      #POSTGRES_DB: ${POSTGRES_DB}
+      #POSTGRES_HOST: hub-db
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       VIRTUAL_PORT: ${VIRTUAL_PORT}
     env_file:
       - .env
     command: >
-      jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py
+      jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py --log-level=${JUPYTERHUB_LOG_LEVEL}
     #command: >
     #  jupyterhub upgrade-db
+    #command: "${DOCKER_COMPOSE_COMMAND}"
 
 volumes:
   data:
