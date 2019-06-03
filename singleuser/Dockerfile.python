@@ -1,0 +1,176 @@
+# Version: 20190524
+FROM phitoolkit/notebook-base:latest
+ARG JUPYTERHUB_VERSION
+ARG JUPYTERLAB_VERSION
+ARG NOTEBOOK_VERSION
+ARG NB_USER_PASS
+ARG GITHUB_ACCESS_TOKEN
+ARG GITHUB_CLIENT_ID
+ARG GITHUB_CLIENT_SECRET
+
+RUN \
+    conda install -c conda-forge --yes \
+      'nomkl=2.0*' \
+      # begin stack entries
+      'conda-forge::blas=*=openblas' \
+      'ipywidgets=7.4*' \
+      'pandas=0.24*' \
+      'numexpr=2.6*' \
+      'matplotlib=3.0*' \
+      'scipy=1.2*' \
+      'seaborn=0.9*' \
+      'scikit-learn=0.20*' \
+      'scikit-image=0.14*' \
+      'sympy=1.3*' \
+      'cython=0.29*' \
+      'patsy=0.5*' \
+      'statsmodels=0.9*' \
+      'cloudpickle=0.8*' \
+      'dill=0.2*' \
+      'dask=1.1.*' \
+      'numba=0.42*' \
+      'bokeh=1.0*' \
+      'sqlalchemy=1.3*' \
+      'hdf5=1.10*' \
+      'h5py=2.9*' \
+      'vincent=0.4.*' \
+      'beautifulsoup4=4.7.*' \
+      'protobuf=3.7.*' \
+      'xlrd' \
+      # end of stack entries
+      'icu=58.2' \
+      'missingno' \
+      'wrapt=1.10.11' \
+      'textblob' \
+      'jupyter_kernel_gateway=2.0*' && \
+      #conda remove --quiet --yes --force qt pyqt && \
+      conda build purge-all && \
+      conda clean --all -f -y
+
+RUN \
+    conda install -c conda-forge --yes \
+      'gdal' \
+      'libgdal' \
+      'proj4' \
+      #'blaze' \
+      'geos' \
+      'osmnx' \
+      'pyproj=1.9.6' \
+      'pillow' \
+      # folium unit
+      'fiona' \
+      'libkml=1.3*' \
+      'kealib=1.4.10' \
+      # end of folium unit
+      'bokeh=1.0.4' \
+      'rasterio=1.0.18' \
+      'geojson=2.3*' \
+      'pyshp=1.2*' \
+      'shapely=1.6.4' \
+      'geopandas=0.5*' \
+      'mplleaflet=0.0.5' \
+      'xarray=0.10*' \
+      'dask=0.18*' \
+      'pyke=1.1*' \
+      'netcdf4=1.4*' \
+      'cf_units' \
+      'setuptools' \
+      #'bkcharts' \
+      'basemap' \
+      'basemap-data-hires' \
+      'networkx=2.3*' \
+      'cartopy' \
+      'datashader=0.6*' \
+      #'openpyxl' \
+      'bqplot' \
+      'qgrid' \
+      'vega=1.4*' \
+      'vega_datasets=0.7*' \
+      'numpy=1.16*' \
+      'jupyter_contrib_core=0.3*' \
+      'jupyter_contrib_nbextensions=0.5*' \
+      'jupyter_nbextensions_configurator' \
+      'widgetsnbextension=3.4*' \
+      'wordcloud=1.5*' \
+      'cufflinks-py=0.13*' \
+      'altair=2.3.0' \
+      'Automat=0.7.0' \
+      'fuzzywuzzy' \
+      'python-levenshtein=0.12*' \
+      'folium=0.9*' \
+      'neo4j-python-driver' \
+      'py2neo' \
+      'rise=5.4.1' \
+      'tabulate=0.8.3' \
+      'geoplot=0.2*' \
+      'iris=2.2.0' \
+      'plotly=3.9*' \
+      'nodejs' && \
+      #'tweepy' && \
+    conda install -c plotly --yes \
+      'plotly_express=0.1*' && \
+    conda update nbconvert && \
+    conda build purge-all && \
+    conda clean --all -f -y && \
+    conda remove --quiet --yes --force qt pyqt
+
+# insert RUN here if build fails
+RUN \
+    pip install --upgrade pip && \
+    pip install  --no-cache-dir --upgrade "ipython[all]" && \
+    pip install --no-cache-dir --upgrade \
+      'pandas-datareader' \
+      'twisted' \
+      'hyper' \
+      'h2' \
+      'perspective-python' \
+      'lineup_widget' \
+      'ujson' \
+      'websocket' \
+      'future' \
+      'nbresuse' \
+      'dedupe' \
+      'nx_altair' \
+      'Dora' \
+      'apiclient' \
+      'jupyter_disqus' \
+      'jupyterlab_latex' \
+      'sidecar' \
+      'sklearn-pandas==1.6.0' \
+      'jupyterlab_geojson==0.4.0' \
+      'jupyterlab-widgets==0.6.15' \
+      'pylantern==0.0.18' \
+      'gtts==2.0.1' \
+      'tornado' \
+      'pyzmq' \
+      'uritemplate==3.0.0' \
+      'pysal' \
+      'pygeoj' \
+      'blaze' \
+      'pytess' \
+      'geovoronoi[plotting]' && \
+    jupyter contrib nbextension install --user && \
+    jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
+    jupyter nbextensions_configurator enable --user
+
+RUN \
+    jupyter labextension install @jupyterlab/hub-extension && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
+    # python modules
+    jupyter nbextension enable --py --sys-prefix lineup_widget && \
+    jupyter nbextension install --py widgetsnbextension --sys-prefix && \
+    jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
+    jupyter serverextension enable --py lantern && \
+    jupyter serverextension enable --py nbresuse && \
+    jupyter labextension install qgrid && \
+    jupyter labextension install @jupyterlab/geojson-extension && \
+    jupyter labextension install @pyviz/jupyterlab_pyviz && \
+    jupyter labextension install @mflevine/jupyterlab_html && \
+    jupyter labextension install @jupyterlab/plotly-extension && \
+    jupyter labextension install @jupyterlab/vega3-extension && \
+    jupyter labextension install jupyterlab_bokeh && \
+    jupyter labextension install pylantern && \
+    jupyter labextension install lineup_widget && \
+    jupyter labextension install bqplot && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
+    jupyter labextension install @lckr/jupyterlab_variableinspector
