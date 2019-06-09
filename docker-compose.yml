@@ -69,11 +69,12 @@ services:
       VIRTUAL_PORT: ${VIRTUAL_PORT}
     env_file:
       - .env
+    # option 1: default command
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py --log-level=${JUPYTERHUB_LOG_LEVEL}
+    # option 2: to upgrade jupyterhub db (if postgres)
     #command: >
     #  jupyterhub upgrade-db
-    #command: "${DOCKER_COMPOSE_COMMAND}"
 
 volumes:
   data:
