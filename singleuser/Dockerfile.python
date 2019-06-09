@@ -105,11 +105,14 @@ RUN \
       'geoplot=0.2*' \
       'iris=2.2.0' \
       'plotly=3.9*' \
-      'nodejs' && \
+      'nodejs' \
+      'nbconvert' \
+      'psycopg2' \
+      'holoviews' \
+      'geoviews' && \
       #'tweepy' && \
     conda install -c plotly --yes \
       'plotly_express=0.1*' && \
-    conda update nbconvert && \
     conda build purge-all && \
     conda clean --all -f -y && \
     conda remove --quiet --yes --force qt pyqt
