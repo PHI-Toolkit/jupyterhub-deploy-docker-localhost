@@ -107,15 +107,18 @@ If you will be using GitHub Oauth to authenticate users to JupyterHub, you need 
 If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i.e., "https://localhost/hub/oauth_callback").
 
 ## Renewing LetsEncrypt certificates
-Run `sudo time buildhub.sh`.
+Run `sudo time letsencrypt-certs.sh`.
 
 ## Upgrading JupyterHub to a newer version
 
-Upon runnng `starthub.sh`, you will likely see an error message saying you need to run `jupyterhub upgrade-db`. You can do this by:
+Upon runnng `starthub.sh`, if you see an error message saying you need to run `jupyterhub upgrade-db`, you can do the following:
+1. Run `stophub.sh`.
+2. Comment option 1 of the `command:` section of the `docker-compose.yml`, and uncommenting option 2 lines (this runs `jupyterhub upgrade-db`)
+3. Run `docker-compose build`.
+5. After running the database upgrade, run `stophub.sh` again, uncomment comment out option 2 lines, uncomment option 1 lines and then run `docker-compose build` again.
+5. Run `starthub.sh`.
 
-1. Running the `upgrade-jupyterhub-db.sh` script against a running container
-
-2. Commenting lines 71-72 of the `docker-compose.yml`, and uncommenting lines 73-74 (runs `jupyterhub upgrade-db`), then running `docker-compose build`. After running the database upgrade, run `stophub.sh` again, uncomment lines 71-72, comment out lines 73-74, and then running `docker-compose build` again. Then run `starthub.sh`. (based on https://jupyterhub.readthedocs.io/en/stable/reference/upgrading.html)
+(This is based on https://jupyterhub.readthedocs.io/en/stable/reference/upgrading.html)
 
 ## Using custom Dockerfile or Docker Jupyter Stacks for your User Notebook Server
 
