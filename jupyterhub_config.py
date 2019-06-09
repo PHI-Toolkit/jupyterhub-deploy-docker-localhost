@@ -113,7 +113,7 @@ elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'hash_authenticator':
     c.JupyterHub.authenticator_class = 'hashauthenticator.HashAuthenticator'
     c.HashAuthenticator.secret_key = 'geeks'          # Defaults to ''
     c.HashAuthenticator.password_length = 10          # Defaults to 6
-    c.HashAuthenticator.show_logins = True            # Optional, defaults to Falseelif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'github_authenticator':
+    c.HashAuthenticator.show_logins = True            # Optional, defaults to False
 elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'github_authenticator':
 # 3. Authenticate users with GitHub OAuth
     c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
