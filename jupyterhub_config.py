@@ -6,6 +6,7 @@
 # Configuration file for JupyterHub
 #
 import os
+import sys
 import tmpauthenticator
 
 c = get_config()
@@ -42,6 +43,7 @@ c.JupyterHub.logo_file = '/opt/conda/share/jupyter/hub/static/images/jupyter.png
 
 # Spawn single-user servers as Docker containers
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+
 # Spawn containers from this image
 c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 # JupyterHub requires a single-user instance of the Notebook server, so we
@@ -49,12 +51,12 @@ c.DockerSpawner.image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 # jupyter/docker-stacks *-notebook images as the Docker run command when
 # spawning containers.  Optionally, you can override the Docker run command
 # using the DOCKER_SPAWN_CMD environment variable.
-if os.environ['JUPYTER_UI'] == 'notebook':
+if os.environ['JUPYTER_UI'] == '/lab':
+    c.Spawner.cmd = ['jupyter-labhub']
+    c.Spawner.default_url = '/lab'
+else:
     spawn_cmd = os.environ.get('DOCKER_SPAWN_CMD', "start-singleuser.sh")
     c.DockerSpawner.extra_create_kwargs.update({ 'command': spawn_cmd })
-else:
-    c.Spawner.default_url = '/lab'
-    c.Spawner.cmd = ['jupyter-labhub']
 
 # Connect containers to this Docker network
 network_name = os.environ['DOCKER_NETWORK_NAME']
@@ -90,6 +92,8 @@ c.JupyterHub.hub_ip = '0.0.0.0'
 c.JupyterHub.hub_connect_ip = os.environ['JUPYTERHUB_SERVICE_HOST_IP']
 #c.JupyterHub.hub_connect_ip = '172.19.0.3'
 c.JupyterHub.hub_port = 8080
+#c.JupyterHub.generate_certs = True
+#c.JupyterHub.internal_ssl = True
 
 # TLS config
 # If using GitHub Authenticator, make sure to update .env file:
@@ -98,6 +102,7 @@ c.JupyterHub.hub_port = 8080
 c.JupyterHub.port = 443
 c.JupyterHub.ssl_key = os.environ['SSL_KEY']
 c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
+#c.JupyterHub.internal_certs_location = 'internal-ssl'
 
 # Authenticators: pick one from 1, 2 or 3 below and comment out the others
 # DEFAULT is dummy_authenticator
@@ -116,8 +121,23 @@ elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'github_authenticator':
 # 3. Authenticate users with GitHub OAuth
     c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
     c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
+elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'native_authenticator':
+# 4. Authenticate users with Native Authenticator
+    c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'
+    if os.environ['NATIVEAUTH_SIGNUP'] == 'open_signup':
+        c.NativeAuthenticator.open_signup = True
+    else:
+        c.NativeAuthenticator.open_signup = False
+    c.NativeAuthenticator.minimum_password_length = 10
+    c.NativeAuthenticator.check_common_password = True
+    if os.environ['NATIVEAUTH_EMAIL'] == 'yes':
+        c.Authenticator.ask_email_on_signup = True
+    else:
+        c.Authenticator.ask_email_on_signup = False
+    c.Authenticator.allowed_failed_logins = 3
+    c.Authenticator.seconds_before_next_try = 1200
 else:
-# 4. JupyterHub tmpauthenticator
+# 5. JupyterHub tmpauthenticator
 # this creates temporary users
     c.JupyterHub.authenticator_class = tmpauthenticator.TmpAuthenticator
 
@@ -131,13 +151,15 @@ data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
 c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
     'jupyterhub_cookie_secret')
 
-c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
-    host=os.environ['POSTGRES_HOST'],
-    password=os.environ['POSTGRES_PASSWORD'],
-    db=os.environ['POSTGRES_DB'],
-)
+c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
+#c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
+#    host=os.environ['POSTGRES_HOST'],
+#    password=os.environ['POSTGRES_PASSWORD'],
+#    db=os.environ['POSTGRES_DB'],
+#)
 
 # services
+c.JupyterHub.template_paths = ['/srv/jupyterhub/templates']
 c.JupyterHub.services = [
     {
         'name': 'cull-idle',
@@ -147,15 +169,22 @@ c.JupyterHub.services = [
             ).split(),
 
     }
+    #{
+    #    'name': 'announcement',
+    #    'url': 'http://127.0.0.1:8888',
+    #    'command': [sys.executable, "-m", "announcement"],
+    #}
 ]
 # Do not comment out this line below!
 c.ConfigurableHTTPProxy.auth_token = open('/etc/proxy_token','r').read().replace('\n','')
 
-# Whitlelist users and admins
-c.Authenticator.whitelist = whitelist = set()
-c.Authenticator.admin_users = admin = set()
-c.JupyterHub.admin_access = True
+if os.environ['ALLOW_NAMED_SERVERS'] == 'yes':
+    c.JupyterHub.allow_named_servers = True
+    c.JupyterHub.named_server_limit_per_user = 2
+
 pwd = os.path.dirname(__file__)
+whitelist = set()
+admin = set()
 with open(os.path.join(pwd, 'userlist')) as f:
     for line in f:
         if not line:
@@ -165,3 +194,8 @@ with open(os.path.join(pwd, 'userlist')) as f:
         whitelist.add(name)
         if len(parts) > 1 and parts[1] == 'admin':
             admin.add(name)
+
+# Whitlelist users and admins
+c.Authenticator.whitelist = whitelist
+c.Authenticator.admin_users = admin
+c.JupyterHub.admin_access = True

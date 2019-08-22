@@ -1,5 +1,10 @@
 #!/bin/bash
-# change the values of the exported variables as needed
+# letsencrypt-certs.sh: renew LetsEncrypt certificates
+# updated 7/27/2019
+# maintainer: herman.tolentino@gmail.com
+#
+# change the default values of the exported variables as needed in .env
+#
 echo 'Running LetsEncrypt routine...'
 source .env
 if [[ ! -d secrets ]]; then
@@ -22,21 +27,23 @@ if [[ "$JH_EMAIL" == "" ]]; then
     echo '$JH_EMAIL environment variable not set.'.
     exit
 fi
+echo 'Testing exit conditions...done.'
 echo 'Using the following LetsEncrypt parameters:'
 echo "JH_FQDN = $JH_FQDN"
 echo "JH_EMAIL = $JH_EMAIL"
 echo "CERT_SERVER = $CERT_SERVER"
 if [[ -f "secrets/fullchain.pem" ]]; then
     echo "LetsEncrypt files found. Testing file modification time..."
-    if test `find "./secrets/fullchain.pem" -mtime +100`
-    then
-        echo "LetsEncrypt files old enough (>100 days)to renew."
+    if test `find "./secrets/fullchain.pem" -mtime +80`; then
+    #if [[ test `find "./secrets/live/$JH_FQDN" -mindepth 1 -mtime +80`]]; then
+        echo "LetsEncrypt files old enough (>80 days)to renew."
+        rm ./secrets/*.pem
+        rm ./secrets/*.key
     else
         echo "LetsEncrypt files are relatively new. Exiting LetsEncrypt routine..."
         exit
     fi
 fi
-echo 'Testing exit conditions...done.'
 
 export JH_SECRETS="`pwd`/secrets"
 export JH_COMMAND="letsencrypt.sh --domain $JH_FQDN --email $JH_EMAIL --volume $JH_SECRETS"
@@ -69,6 +76,7 @@ docker run --rm -it \
       ln -s /etc/letsencrypt/live/$JH_FQDN/* /etc/letsencrypt/ && \
       find /etc/letsencrypt -type d -exec chmod 755 {} +"
   rm secrets/*.pem
+  rm secrets/*.key
   rm secrets/README
   cp secrets/live/$JH_FQDN/fullchain.pem secrets/fullchain.pem
   cp secrets/live/$JH_FQDN/privkey.pem secrets/privkey.pem

@@ -52,8 +52,8 @@ check-files: userlist $(cert_files) .env
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
-notebook_image: #pull singleuser/Dockerfile
-	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
+notebook_base:
+	docker build -t $(LOCAL_NOTEBOOK_BASE) \
 		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
@@ -63,7 +63,30 @@ notebook_image: #pull singleuser/Dockerfile
 		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
 		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
 		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
+		--file=$(DOCKERFILE_BASE) singleuser
+
+notebook_body:
+	docker build -t $(LOCAL_NOTEBOOK_BODY) \
+		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
+		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
+		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
+		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
+		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
+		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
 		--file=singleuser/$(DOCKERFILE) singleuser
+
+notebook_image: #pull singleuser/Dockerfile
+	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
+		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
+		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
+		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
+		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
+		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
+		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
+		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
+		--file=singleuser/$(DOCKERFILE_TAIL) singleuser
 
 build: check-files network volumes
 	docker-compose build
