@@ -67,11 +67,9 @@ notebook_base:
 
 notebook_body:
 	docker build -t $(LOCAL_NOTEBOOK_BODY) \
-		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
-		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
 		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
 		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
@@ -84,7 +82,6 @@ notebook_image: #pull singleuser/Dockerfile
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
-		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
 		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
 		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
