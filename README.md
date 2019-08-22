@@ -71,25 +71,22 @@ Git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost. Cha
 
 This build of JupyterHub has three options for Authentication. Go to about Line 18 of the `.env` file and set the environment variable `JUPYTERHUB_AUTHENTICATOR` to the selected option.
 * tmp_authenticator
-* dummy_authenticator (default)
+* dummy_authenticator (default, see `.env-template` for details)
 * github_authenticator (thru OAuth, requires obtaining GitHub credentials, see below)
+* hash_authenticator
+* native_authenticator (new)
 
-Possible scenarios for GitHub authentication (if you choose 'github_authenticator'):
-1. Default GitHub settings in .env - no need to change or update any .env settings
-2. Set up your own GitHub account and OAuth:
+There is no need to change or update any .env settings for initial one-user (you) launch and testing. The default setting `dummy_authenticator` uses the default user `jovyan` whose password you can set in the `.env` file.
 
-   2.1 Set up GitHub account
-
-   2.2 Set up OAuth application (see below "Obtain GitHub Credentials")
-
-## Obtain your GitHub Account Credentials
+### GitHub authentication
+#### Obtain your GitHub Account Credentials
 If you will be using GitHub Oauth to authenticate users to JupyterHub, you need to sign up for a GitHub Account:
 1. Go to https://www.github.com and create an account if you do not have one yet.
 2. Remember your GitHub user name. You will use this for #3 below.
 3. Open the file `userlist` with your text editor and add your GitHub user name below "jovyan admin" as below:
 > `<github user name> admin`
 
-## Obtain GitHub OAuth Credentials
+#### Obtain GitHub OAuth Credentials
 * Log in to GitHub
 * Go to Developer Settings (https://github.com/settings/developers) - create new Oauth App
 * Record the following information:
@@ -105,6 +102,17 @@ If you will be using GitHub Oauth to authenticate users to JupyterHub, you need 
 > `OAUTH_CALLBACK_URL=https://mydomain.com/hub/oauth_callback`
 
 If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i.e., "https://localhost/hub/oauth_callback").
+
+### Native Authentication
+
+#### Quick Start
+1. `jovyan` is the default admin user. You can change this setting in the `.env` file.
+2. On first launch, do not sign in with `jovyan` and default password. This only works for `dummy_authenticator`. Instead, go to https://localhost/hub/signup (change `localhost` to your fully qualified domain name) to sign up as a user.
+3. `jovyan` is the default admin user in `userlist` and, after sign up, will be authorized  by default after log in. Be sure to change the  admin user in production. Admin user also needs to sign up.
+4. To authorize non-admin users, go to https://localhost/hub/authorize (change `localhost` to your fully qualified domain name)
+
+#### Reference for more information
+For more information, go to the native authentication [documentation](https://native-authenticator.readthedocs.io/en/latest/).
 
 ## Renewing LetsEncrypt certificates
 Run `sudo time letsencrypt-certs.sh`.
@@ -165,5 +173,5 @@ ConnectionError(ReadTimeoutError("HTTPSConnectionPool(host='conda.anaconda.org',
 
 ...and the `buildhub.sh` script is building the user container image (running Dockerfile.custom), just run `make notebook_image` to resume rebuilding the Jupyter Notebook user container image.
 
-## `[Errno 111] Connection Refused` or in the JupyterHub logs after running `starthub.sh` you see the error message `error: [ConfigProxy] Proxy error:  Error: connect EHOSTUNREACH 172.18.0.3:8080`
-This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after restarting Docker server (after server reboot). To address this error, run the script `get_service_host_ip.sh` at the command line, which will provide you with the new JUPYTERHUB_SERVICE_HOST_IP value. Replace the old value in the `.env` file with this new IP address. Run `restarthub.sh`.
+## `[Errno 111] Connection Refused` or in the JupyterHub logs after running `starthub.sh` you see the error message `error: [ConfigProxy] Proxy error:  Error: connect EHOSTUNREACH 172.18.0.3:8080` or `tornado.curl_httpclient.CurlError: HTTP 599: Failed to connect to 172.18.0.X port 8080: Connection refused`
+This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after restarting Docker server (after server reboot). To address this error, run the script `get_service_host_ip.sh` at the command line, which will provide you with the new JUPYTERHUB_SERVICE_HOST_IP value. This script automatically replaces the old value in the `.env` file with this new IP address. Run `restarthub.sh`.
