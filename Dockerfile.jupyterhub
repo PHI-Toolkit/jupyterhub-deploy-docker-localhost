@@ -1,7 +1,8 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 # Base: https://github.com/jupyterhub/jupyterhub/blob/master/Dockerfile
-# Version 20180115
+# Version 20190818
+# 
 ARG JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION}
 ARG JUPYTER_UI
 FROM jupyterhub/jupyterhub-onbuild:$JUPYTERHUB_VERSION
@@ -9,18 +10,21 @@ LABEL maintainer='herman.tolentino@gmail.com'
 
 ENV JUPYTER_UI ${JUPYTER_UI}
 # Install dockerspawner, oauth, postgres
-RUN /opt/conda/bin/conda install -yq psycopg2=2.7 && \
-    /opt/conda/bin/conda clean -tipsy && \
+RUN /opt/conda/bin/conda update conda && \
+    /opt/conda/bin/conda install -yq psycopg2=2.7 conda-build && \
+    #/opt/conda/bin/conda clean -tipsy && \
     /opt/conda/bin/pip install --no-cache-dir --upgrade pip && \
     /opt/conda/bin/pip install --no-cache-dir \
-    'oauthenticator==0.8.2' \
-    'dockerspawner==0.11.1'
+    'oauthenticator' \
+    'dockerspawner' && \
+    conda build purge-all
+    #conda clean --all -y
 
-# pick one authenticator in the .env file
 RUN pip install --no-cache-dir \
     'jupyterhub-tmpauthenticator==0.6' \
     'jupyterhub-dummyauthenticator==0.3.1' \
-    'jupyterhub-hashauthenticator==0.4.0'
+    'jupyterhub-hashauthenticator==0.4.0' \
+    'jupyterhub-nativeauthenticator'
 
 RUN mkdir -p /srv/jupyterhub/secrets/
 
