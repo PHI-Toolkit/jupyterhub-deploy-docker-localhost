@@ -46,67 +46,81 @@ RUN \
     sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
     sudo chown -R jovyan:users /opt/ && \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup && \
+    # JupyterLab related packages
     pip install --no-cache-dir \
+        'plotly==4.0.0' \
         'jupyterlab-git' \
-        'ipywebrtc' \
-        'nbgitpuller' \
-        'DeckGLWidget' \
-        'jupyterlab_sql' \
-        'fhirclient' \
-        'contextily' \
-        'jupyterlab_iframe' && \
+        'nbgitpuller' && \
+    # Extensions
     jupyter serverextension enable --py jupyterlab_git && \
     jupyter serverextension enable --py nbgitpuller --sys-prefix && \
+    jupyter serverextension enable voila --sys-prefix && \
+    jupyter nbextension install --py widgetsnbextension --sys-prefix && \
+    jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
+    jupyter serverextension enable --py nbresuse && \
+    jupyter labextension install @jupyterlab/toc && \
     jupyter labextension install jupyter-webrtc && \
-    jupyter labextension install @jupyterlab/hub-extension && \
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
     jupyter labextension install @jupyterlab/git && \
     jupyter labextension install @jupyterlab/latex && \
     jupyter labextension install @jupyterlab/google-drive && \
     jupyter labextension install jupyterlab-chart-editor && \
-    jupyter labextension install @jupyterlab/toc && \
     jupyter labextension install jupyterlab-topbar-extension && \
     jupyter labextension install jupyterlab-system-monitor && \
     jupyter labextension install jupyterlab-topbar-text && \
     jupyter labextension install jupyterlab_filetree && \
     jupyter labextension install jupyterlab-logout && \
-    jupyter labextension install @jupyterlab/statusbar && \
-    conda build purge-all && \
-    conda clean --all -f -y
+    jupyter labextension install qgrid && \
+    jupyter labextension install @jupyterlab/geojson-extension && \
+    jupyter labextension install @pyviz/jupyterlab_pyviz && \
+    jupyter labextension install @mflevine/jupyterlab_html && \
+    jupyter labextension install @jupyterlab/vega3-extension && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
+    jupyter labextension install @lckr/jupyterlab_variableinspector && \
+    jupyter labextension install @jupyter-voila/jupyterlab-preview && \
+    npm cache clean --force
 
 RUN \
-    jupyter labextension install jupyterlab_iframe && \
-    jupyter serverextension enable --py jupyterlab_iframe && \
-    jupyter nbextension enable --py --sys-prefix --user DeckGLWidget && \
-    jupyter labextension install @enlznep/runall-extension && \
-    jupyter labextension install @hkjinlee/jupyterlab_gz && \
-    jupyter serverextension enable jupyterlab_sql --py --sys-prefix && \
-    jupyter lab build && \
-    conda build purge-all && \
-    conda clean --all -f -y
-
+    pip install --no-cache-dir \
+        'ipywebrtc' \
+        'fhirclient' \
+        'contextily' \
+        #'datatable' \
+        'streamz' \
+        's3fs' \
+        'notebook_autorun' \
+        'smopy' \
+        'alphashape' \
+        'pyepsg' \
+        # Tensor Flow
+        # If with GPU  select tensorflow with GPU, comment out the other
+        'tensorflow==2.0.0-beta1' \
+        #'tensorflow-gpu==2.0.0-beta1' \
+        'tensorflow_hub' \
+        'tensorflow_datasets' \
+        # End of Tensor Flow
+        'voila' \
+        'voila-gridstack' \
+        'nteract_on_jupyter'
 
 USER root
-
 
 ENV LD_LIBRARY_PATH /lib:/usr/lib:/usr/local/lib
 ENV PROJ_LIB=/usr/share/proj
 
 # This RUN segment sets up a temporary install of googletrans
 RUN \
-    #pip uninstall -y googletrans && \
     rm -fvR /home/jovyan/work/modules && \
     git clone https://github.com/BoseCorp/py-googletrans.git && \
     cd /home/jovyan/work/py-googletrans && \
     python setup.py install && \
     cd /home/jovyan/work && \
     rm -fvR /home/jovyan/work/py-googletrans && \
-    apt-get autoremove -y && \
+    conda list > /home/jovyan/work/condalist.txt && \
     conda build purge-all && \
     conda clean --all -f -y && \
     rm -fvR /opt/conda/pkgs/* && \
-    apt-get clean && \
-    apt-get autoremove && \
+    apt-get clean -y && \
+    apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     mkdir -p /opt/conda/pkgs/cache && \
     chmod -R a+w /opt/conda/pkgs/cache/ && \
