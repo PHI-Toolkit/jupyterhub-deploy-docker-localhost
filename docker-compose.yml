@@ -24,6 +24,17 @@ services:
   #    - .env
   #  volumes:
   #    - "db:${DB_VOLUME_CONTAINER}"
+  nginx-proxy:
+    build:
+      context: nginx-proxy/
+      dockerfile: Dockerfile.alpine
+    image: nginxproxy
+    ports:
+      - "80:80"
+    container_name: nginxproxy
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "./secrets:/etc/nginx/certs"
 
   hub:
     #depends_on:
