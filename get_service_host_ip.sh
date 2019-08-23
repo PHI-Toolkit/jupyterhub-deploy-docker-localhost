@@ -23,3 +23,4 @@ echo $REPLACE_LINE
 sed "s#.*JUPYTERHUB_SERVICE_HOST_IP.*#$REPLACE_LINE#g" .env > secrets/file
 cat secrets/file > .env
 rm secrets/file
+./starthub.sh
