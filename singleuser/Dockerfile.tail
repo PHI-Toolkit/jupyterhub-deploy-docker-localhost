@@ -100,7 +100,12 @@ RUN \
         # End of Tensor Flow
         'voila' \
         'voila-gridstack' \
-        'nteract_on_jupyter'
+        'nteract_on_jupyter' \
+        'datatable' \
+        'scrapy' \
+        'kafka-python'
+RUN \
+    pip install --no-cache-dir git+https://github.com/jupyterhub/binderhub
 
 USER root
 

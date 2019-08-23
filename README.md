@@ -10,11 +10,14 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 
 
 ## Prepare Jupyter Notebook server
-Git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
 
 On Ubuntu Linux 18.04 (Bionic), you might have to execute the following (Linux terminal commands):
 1. Install git - `sudo apt install git`
-2. Install Docker, Docker Compose, make - `sudo install-docker-bionic.sh` (see more below, **"Install Docker, Docker Compose and make on your remote Virtual Machine (VM)"**)
+2. `git clone` https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost.
+3. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
+4. **IMPORTANT**: Open `.env-template` with a text editor and update `INSTALL_USER` with your Linux or MacOSX login name. Save file.
+5. Install Docker, Docker Compose, make using the `sudo install-docker-bionic.sh` script (see more below, **"Install Docker, Docker Compose and make on your remote Virtual Machine (VM)"**)
+6. Proceed to steps below.
 
 The next steps entail three rounds of modification levels (**1=no modification (default settings)**, **2=LetsEncrypt certificates**, **3=GitHub OAuth authentication**).
 

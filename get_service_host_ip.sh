@@ -23,3 +23,9 @@ echo $REPLACE_LINE
 sed "s#.*JUPYTERHUB_SERVICE_HOST_IP.*#$REPLACE_LINE#g" .env > secrets/file
 cat secrets/file > .env
 rm secrets/file
+echo "Starting up JupyterHub"
+echo "..."
+docker-compose up -d
+echo "Starting up log tracking (Press ctrl-C to stop tracking, JupyterHub will continue running.)"
+echo "..."
+docker-compose logs --tail='all' -f -t
