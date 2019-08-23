@@ -102,7 +102,8 @@ RUN \
         'voila-gridstack' \
         'nteract_on_jupyter' \
         'datatable' \
-        'scrapy'
+        'scrapy' \
+        'kafka-python'
 RUN \
     pip install --no-cache-dir git+https://github.com/jupyterhub/binderhub
 
