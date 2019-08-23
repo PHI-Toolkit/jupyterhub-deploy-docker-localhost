@@ -101,7 +101,8 @@ RUN \
         'voila' \
         'voila-gridstack' \
         'nteract_on_jupyter' \
-        'datatable'
+        'datatable' \
+        'scrapy'
 RUN \
     pip install --no-cache-dir git+https://github.com/jupyterhub/binderhub
 
