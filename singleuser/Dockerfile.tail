@@ -103,7 +103,8 @@ RUN \
         'nteract_on_jupyter' \
         'datatable' \
         'scrapy' \
-        'kafka-python'
+        'kafka-python' \
+        'what3words'
 RUN \
     pip install --no-cache-dir git+https://github.com/jupyterhub/binderhub
 
