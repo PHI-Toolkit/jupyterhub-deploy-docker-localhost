@@ -1,3 +1,5 @@
+secrets/*.pem
+secrets/*.key
 secrets/accounts
 secrets/archive
 secrets/csr
@@ -13,10 +15,8 @@ secrets/jupyterhub.pem
 secrets/pg_pass
 secrets/proxy_token
 .DS_Store
-.gitignore
 userlist
 .ftpconfig
-.dockerignore
 .env
 .env-e
 secrets/drive.jupyterlab-settings
@@ -25,3 +25,5 @@ drive.jupyterlab-settings
 errorlog.txt
 secrets/jupyterhub_host_ip
 _config.yml
+proxy_token
+pg_pass

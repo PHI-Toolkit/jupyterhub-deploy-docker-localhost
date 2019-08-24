@@ -1,9 +1,10 @@
 .git
-.gitignore
 .ftpconfig
 examples/
 internal/
 docs/
+secrets/*.pem
+secrets/*.key
 secrets/accounts
 secrets/archive
 secrets/csr
@@ -22,7 +23,6 @@ secrets/proxy_token
 LICENSE.md
 .env
 .env-e
-.gitignore
 secrets/drive.jupyterlab-settings
 drive.jupyterlab-settings
 *.tar
