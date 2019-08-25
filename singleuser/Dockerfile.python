@@ -9,39 +9,41 @@ ARG GITHUB_CLIENT_ID
 ARG GITHUB_CLIENT_SECRET
 
 RUN \
-    conda install -c conda-forge --yes \
+    conda install -c conda-forge --yes --verbose \
       # uncomment nomkl as necessary
       #'nomkl=2.0*' \
       # begin stack entries
       'conda-forge::blas=*=openblas' \
       'ipywidgets=7.5*' \
-      'pandas=0.24*' \
+      'pandas=0.25*' \
       'numexpr=2.6*' \
       'matplotlib=3.0*' \
-      'scipy=1.2*' \
+      'scipy=1.3*' \
       'seaborn=0.9*' \
-      'scikit-learn=0.20*' \
-      'scikit-image=0.14*' \
-      'sympy=1.3*' \
+      'scikit-learn=0.21*' \
+      'scikit-image=0.15*' \
+      'sympy=1.4*' \
       'cython=0.29*' \
       'patsy=0.5*' \
-      'statsmodels=0.9*' \
-      'cloudpickle=0.8*' \
-      'dill=0.2*' \
-      'dask=1.1.*' \
-      'numba=0.42*' \
-      'bokeh=1.0*' \
+      'statsmodels=0.10*' \
+      'cloudpickle=1.2*' \
+      'dill=0.3*' \
+      'dask=2.2.*' \
+      'numba=0.45*' \
+      'bokeh=1.3*' \
       'sqlalchemy=1.3*' \
       'hdf5=1.10*' \
       'h5py=2.9*' \
       'vincent=0.4.*' \
       'beautifulsoup4' \
-      'protobuf=3.7.*' \
+      'protobuf=3.9.*' \
       'xlrd' \
       # end of stack entries
-      'icu=58.2' \
+      'icu' \
       'wrapt' \
       'textblob' && \
+      #'hyper' \
+      #'h2' && \
       #conda remove --quiet --yes --force qt pyqt && \
       conda build purge-all && \
       conda clean --all -f -y
@@ -49,17 +51,24 @@ RUN \
 
 RUN \
     conda install -c conda-forge --yes \
-      'gdal=2.4*' \
-      'libgdal=2.4*' \
-      'proj4=5.2.0' \
+      #'gdal=2.4*' \
+      #'libgdal=2.4*' \
+      #'proj4=5.2.0' \
+      'gdal' \
+      'libgdal' \
+      'proj4' \
+      'pyproj' \
       #'blaze' \
       'geos' \
       'osmnx' \
       'pillow' \
       # folium unit
-      'fiona=1.8*' \
-      'libkml=1.3*' \
-      'kealib=1.4*' \
+      #'fiona=1.8*' \
+      #'libkml=1.3*' \
+      #'kealib=1.4*' \
+      'fiona' \
+      'libkml' \
+      'kealib' \
       # end of folium unit
       'rasterio' \
       'geojson' \
@@ -68,7 +77,6 @@ RUN \
       'geopandas' \
       'mplleaflet' \
       'xarray' \
-      'dask' \
       'pyke' \
       'netcdf4' \
       'cf_units' \
@@ -89,29 +97,34 @@ RUN \
       'jupyter_contrib_nbextensions' \
       'jupyter_nbextensions_configurator' \
       'widgetsnbextension' \
-      'wordcloud=1.5*' \
+      'wordcloud' \
       'altair' \
       'Automat' \
       'fuzzywuzzy' \
       'python-levenshtein' \
-      'folium=0.10*' \
+      #'folium=0.10*' \
+      'folium' \
       'neo4j-python-driver' \
       'py2neo' \
-      'rise=5.4.1' \
-      'tabulate=0.8.3' \
+      'rise' \
+      'tabulate' \
       'nodejs' \
       'nbconvert' \
       'psycopg2' \
-      'holoviews=1.11*' \
+      #'holoviews=1.11*' \
+      'holoviews' \
       'geoviews' \
       'python-snappy' \
       'graphviz' \
       'python-graphviz' \
       'selenium' \
       'phantomjs' \
-      'missingno=0.4*' \
-      'camelot-py' && \
-    conda install -c pyviz pyviz && \
+      'missingno' \
+      'camelot-py' \
+      'spacy' \
+      'uritemplate' \
+      'blaze' \
+      'pysal' && \
     conda build purge-all && \
     conda clean --all -f -y
     #conda remove --quiet --yes --force qt pyqt
@@ -122,8 +135,8 @@ RUN \
     pip install --no-cache-dir --upgrade \
       'pandas-datareader' \
       'twisted' \
-      'hyper' \
-      'h2' \
+      #'hyper' \
+      #'h2' \
       'perspective-python' \
       'ujson' \
       'websocket' \
@@ -139,21 +152,16 @@ RUN \
       'sklearn-pandas' \
       'jupyterlab_geojson' \
       'jupyterlab-widgets' \
-      'gtts==2.0.1' \
+      'gtts==2.0.3' \
       'tornado' \
       'pyzmq' \
-      'uritemplate==3.0.0' \
-      'pysal' \
+      #'uritemplate==3.0.0' \
+      #'pysal' \
       'pygeoj' \
-      'blaze' \
-      'pytess' \
-      'geovoronoi[plotting]' \
+      #'blaze' \
       'geonamescache' \
       'hvplot' \
-      'intake' \
       #'pyproj==1.9.6' \
-      'pyproj==1.9.6' \
-      'intake-parquet' \
       'recordlinkage' \
       'opencv-python' \
       'opencv-contrib-python' && \
@@ -165,7 +173,7 @@ RUN \
     # Also activate ipywidgets extension for JupyterLab
     # Check this URL for most recent compatibilities
     # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.0.0 && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.0 && \
     jupyter labextension install jupyterlab_bokeh@1.0.0 && \
     npm cache clean --force && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \

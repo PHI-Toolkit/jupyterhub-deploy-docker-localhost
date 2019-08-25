@@ -41,6 +41,7 @@ ADD css/custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
 # Address iopub data error message with custom config
 ADD jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
+ADD git/.gitconfig /home/jovyan/.gitconfig
 
 RUN \
     sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
@@ -48,7 +49,9 @@ RUN \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup && \
     # JupyterLab related packages
     pip install --no-cache-dir \
-        'plotly==4.0.0' \
+        'plotly==4.1.0' \
+        'dash==1.1.1' \
+        'dash-daq==0.1.0' \
         'jupyterlab-git' \
         'nbgitpuller' && \
     # Extensions
@@ -84,29 +87,21 @@ RUN \
         'ipywebrtc' \
         'fhirclient' \
         'contextily' \
-        #'datatable' \
         'streamz' \
         's3fs' \
         'notebook_autorun' \
-        'smopy' \
         'alphashape' \
         'pyepsg' \
         # Tensor Flow
         # If with GPU  select tensorflow with GPU, comment out the other
+        'keras' \
         'tensorflow==2.0.0-beta1' \
         #'tensorflow-gpu==2.0.0-beta1' \
         'tensorflow_hub' \
         'tensorflow_datasets' \
         # End of Tensor Flow
         'voila' \
-        'voila-gridstack' \
-        'nteract_on_jupyter' \
-        'datatable' \
-        'scrapy' \
-        'kafka-python' \
-        'what3words'
-RUN \
-    pip install --no-cache-dir git+https://github.com/jupyterhub/binderhub
+        'voila-gridstack'
 
 USER root
 
