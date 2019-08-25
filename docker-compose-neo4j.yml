@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  neo4j:
+    restart: always
+    container_name: neo4j
+    image: neo4j:latest
+    env_file:
+      - .env
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+      - "7473:7473"
+    environment:
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_dbms_shell_enabled: "true"
+      NEO4J_dbms_memory_pagecache_size: "1G"
+    volumes:
+      - ./neo4j/plugins:/plugins
+      - ./neo4j/data:/data
+      - ./neo4j/import:/import
+      - ./neo4j/logs:/logs
+      - ./secrets:/ssl
+
+networks:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
