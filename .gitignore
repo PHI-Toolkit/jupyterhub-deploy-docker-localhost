@@ -14,6 +14,7 @@ secrets/jupyterhub.key
 secrets/jupyterhub.pem
 secrets/pg_pass
 secrets/proxy_token
+secrets/neo4j.cert
 .DS_Store
 userlist
 .ftpconfig
@@ -27,3 +28,6 @@ secrets/jupyterhub_host_ip
 _config.yml
 proxy_token
 pg_pass
+neo4j/data
+neo4j/import
+neo4j/plugins

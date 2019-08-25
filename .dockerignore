@@ -20,6 +20,7 @@ secrets/default.pem
 secrets/default.key
 secrets/pg_pass
 secrets/proxy_token
+secrets/neo4j.cert
 LICENSE.md
 .env
 .env-e
@@ -29,3 +30,6 @@ drive.jupyterlab-settings
 errorlog.txt
 secrets/jupyterhub_host_ip
 _config.yml
+neo4j/data
+neo4j/import
+neo4j/plugins
