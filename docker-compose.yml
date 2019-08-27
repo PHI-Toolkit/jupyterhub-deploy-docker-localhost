@@ -3,9 +3,7 @@
 
 # JupyterHub docker-compose configuration file
 version: "3"
-
 services:
-
   #hub-db:
   #  build:
   #    context: .
@@ -35,7 +33,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
       - "./secrets:/etc/nginx/certs"
-
+      
   hub:
     #depends_on:
     #  - hub-db
