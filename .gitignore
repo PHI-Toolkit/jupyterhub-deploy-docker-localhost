@@ -31,3 +31,5 @@ pg_pass
 neo4j/data
 neo4j/import
 neo4j/plugins
+mongodb/config
+mongodb/data
