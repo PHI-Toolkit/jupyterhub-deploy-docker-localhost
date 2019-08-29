@@ -55,6 +55,11 @@ RUN \
         'jupyterlab-git' \
         'nbgitpuller' && \
     # Extensions
+    # Check this URL for most recent compatibilities
+    # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
+    echo "Building JupyterLab extensions..." && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.0.2 && \
+    jupyter labextension install jupyterlab_bokeh@1.0.0 && \
     jupyter serverextension enable --py jupyterlab_git && \
     jupyter serverextension enable --py nbgitpuller --sys-prefix && \
     jupyter serverextension enable voila --sys-prefix && \
@@ -74,7 +79,6 @@ RUN \
     jupyter labextension install jupyterlab-logout && \
     jupyter labextension install qgrid && \
     jupyter labextension install @jupyterlab/geojson-extension && \
-    jupyter labextension install @pyviz/jupyterlab_pyviz && \
     jupyter labextension install @mflevine/jupyterlab_html && \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
@@ -106,8 +110,9 @@ RUN \
         'pygithub' \
         'google-api-python-client' \
         'scholarly' \
-        'pymed'
-
+        'pymed' \
+        'goose3' \
+        'sputnik'
 
 USER root
 
