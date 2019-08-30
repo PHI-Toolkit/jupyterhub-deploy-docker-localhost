@@ -111,8 +111,7 @@ RUN \
         'google-api-python-client' \
         'scholarly' \
         'pymed' \
-        'goose3' \
-        'sputnik'
+        'goose3'
 
 USER root
 
