@@ -1,6 +1,17 @@
 #!/bin/bash
+source .env
 if [[ "$(docker ps -a | grep jupyter- | awk '{print $1}')" != "" ]]; then
     docker stop $(docker ps -a | grep jupyter- | awk '{print $1}')
     docker rm $(docker ps -a | grep jupyter- | awk '{print $1}')
 fi
-docker-compose down
+
+case $JUPYTERHUB_SSL in
+    use_ssl_ss)
+        echo "Shutting down JupyterHub..."
+        docker-compose -f docker-compose.yml down
+        ;;
+    use_ssl_le)
+        echo "Shutting down JupyterHub-LetsEncrypt..."
+        docker-compose -f docker-compose-letsencrypt.yml down
+        ;;
+esac
