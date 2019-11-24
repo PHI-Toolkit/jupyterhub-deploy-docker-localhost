@@ -2,62 +2,73 @@
 This code base to deploy Jupyter Notebooks using JupyterHub is based on the open source reference implementation from https://github.com/jupyterhub/jupyterhub-deploy-docker.
 
 It also uses Docker (https://www.docker.com/) containers to manage the three pieces of software needed to run this set up:
-1. JupyterHub - takes care of authentication and notebook spawning
-2. Jupyter Notebooks - notebook environment Python, R and Javascript kernels, plus BeakerX kernels (includes Scala and Java)
-3. PostgreSQL - database backend to store notebook user data
+1. JupyterHub - takes care of authentication and spawning of single-user notebook servers (containers)
+2. Jupyter Notebooks - notebook environment with Python 3.6 kernel
+3. PostgreSQL or SQLite database backend to store notebook user data
 
 # Installation Guide - Quick
 
+## First install on localhost machine
+1. Install `Docker`, `docker-compose`, `git`. (...or run  `sudo install-docker-bionic.sh`.)
+2. Open terminal app and cd to preferred workspace directory
+3. `git clone` this repository: `git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost.git`
+4. `cd jupyterhub-deploy-docker-localhost`, locate buildhub.sh, make sure it is executable and run this script on command line.
+5. Wait for the `buildhub.sh` script to finish, then locate `starthub.sh`, make sure it is executable, then run `./starthub.sh` on a terminal. To check:
+    5.1 Built Docker contaiiners: run `docker images` on the terminal.
+    5.2 Running containers (after running `./starthub.sh`: run `docker ps` on the terminal.
+6. Open Chrome or Firefox browser and proceed to https://localhost. (Look up default login credentials on .env file.)
 
-## Prepare Jupyter Notebook server
+## First install on remote server
 
-On Ubuntu Linux 18.04 (Bionic), you might have to execute the following (Linux terminal commands):
-1. Install git - `sudo apt install git`
-2. `git clone` https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost.
-3. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
-4. **IMPORTANT**: Open `.env-template` with a text editor and update `INSTALL_USER` with your Linux or MacOSX login name. Save file.
-5. Install Docker, Docker Compose, make using the `sudo install-docker-bionic.sh` script (see more below, **"Install Docker, Docker Compose and make on your remote Virtual Machine (VM)"**)
-6. Proceed to steps below.
+Follow steps 1-6 above and replace localhost with IP address of remote server.
 
-The next steps entail three rounds of modification levels (**1=no modification (default settings)**, **2=LetsEncrypt certificates**, **3=GitHub OAuth authentication**).
+## Starting and Stopping Containers
+1. `cd` to the folder where you did `git clone` of the GitHub repository. (This is important to do before running any of the shell scripts below.)
+2. To start containers, run `./starthub.sh`. Running this script also displays the logs for the running containers as they boot up and/or encounter any launch errors.
+3. To stop containers, press `ctrl-C` if you see log file display on your terminal. When you see the terminal prompt, run `./stophub.sh`.
+4. You can also use `./restarthub.sh` for stopping and restarting containers.
 
-## Round 1: Run `buildhub.sh` script unmodified
+### Modifying the `.env` and `userlist` files
 
-This first round build enables you to run as `localhost` on your laptop with a self-signed certificate (`https://localhost`). If you set it up on a remote VM, i.e., Digital Ocean, Lightsail, Linode, Contabo, you can use the VM IP address instead of `localhost`.
+The `.env` is automatically created adter the first run of the `buildhub.sh` file. It contains all configurable parameters for this application:
+1. Authentication - includes `dummy_authenticator` (default), `github_authenticator`
+2. SSL Certificate - self-signed (default) or LetsEncrypt
+3. Database for user data - SQLite or PostGreSQL
+4. Custom logo (filename pointer to image)
+5. Jupyter Notebook UI or JupyterLab
+6. Versions of JupyterHub, JupyterLab and Jupyter Notebook
+7. OAuth, Notebook and Hub, PostGreSQL Authentication Credentials
+8. Single-user Notebook server timeout (when idle servers are culled)
 
-To run the first build with no modifications:
-1. Run `time buildhub.sh` (The `time` before `buildhub.sh` gives you total script run time. This script takes approximately an hour, aside from seeing commands being executed on screen, you may want to grab some cofee and do other things.)
-2. When the script finishes, run the `starthub.sh` script
-3. Go to https://localhost on your Chrome browser to view the JupyterHub log in page. The default login name is "jovyan" and password is set in the `.env` file. If on a remote virtual machine, replace "localhost" with the machine's IP address. If you have mapped the VM IP address to a domain name, you can replace the IP address with the domain name. You should see a similar GitHub sign in page as below.
+The `userlist` file is automatically created from `userlist-template` after the first run of `buildhub.sh`. For GitHub autentication, follow the template entry for recording GitHub username in the `userlist` file and assigning `admin` status. This can also be done through the `Admin` interface of JupyterHub.
+
+### Recommended four steps for remote server install (unmodified `.env` file to full LetsEncrypt SSL certificate)
+
+#### Step 1 ####
+Follow steps for first install (step 1-6, unmodified `.env` file after `git clone`) then test if the JupyterHub server can be accessed at `https://<server IP address>` using a Chrome or Firefox browser. First install uses default settings - dummy_authenticator, self-signed SSL certificates for running on `localhost` machine. The `localhost` IP address can be replaced with the server IP address.
+
+**Figure 1**. JupyterHub signin page using `dummy_authenticator` and self-signed SSL certificate
 ![Default Dummy Authenticator Sign in page](./docs/Dummy-Signin.png)
 
-## Round 2: Run `buildhub.sh` with GitHub Authentication
+#### Step 2####
+Get a domain name and assign it to the JupyterHub server. Test if the JupyterHub server can be accessed through the fully qualified domain name using `https`.
 
-To enable GitHub autentication:
-1. Edit the `.env` file and change the `JUPYTERHUB_AUTHENTICATOR` the default value `dummy_authenticator` to `github_authenticator`
-2. Go to GitHub and obtain OAuth credentials (see below for details, **"Obtain your GitHub Account Credentials"**). Register for a GitHub account if needed, and obtain your GitHub username.
-3. Plug in the values for `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and `OAUTH_CALLBACK_URL` in the corresponding variables in the `.env` file.
-4. **IMPORTANT:** Edit the `userlist` file and add your GitHub user ID to the line below `jovyan` and add `admin` after your user ID. This enables you to use your GitHub user ID to authenticate via GitHub. If you missed this, you may get the Browser 403 error (see below).
-4. Run the `stophub.sh` script if the Jupyter Notebook server is still running. You can check if the hub and single user containers are running with `docker ps`.
-5. Run the `time buildhub.sh` script.
-6. Run the `starthub.sh` script
-7. Go to https://example.com. You will be redirected to the GitHub site to allow `hermantolentino` to autenticate you and to fill in your GitHub user ID and password. You will be redirected back to the Jupyter Notebook server after that. You should see a similar GitHub sign in page as below.
+#### Step 3####
+Get GitHub OAuth credentials and record these in the `.env` file (around line 67), replacinf the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_CALLBACK_URL` with the correct entries from GitHub. In the `.env` file (around line 37) make sure you replace `JUPYTERHUB_AUTHENTICATOR=dummy_authenticator` with this entry, `JUPYTERHUB_AUTHENTICATOR=github_authenticator`. For high volume access, make sure you also obtain an access token from `https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/` and record the access token using the `.env` file `GITHUB_ACCESS_TOKEN` environment variable (around line 73). Test GitHub OAuth by restarting the containers using `./restarthub.sh`
+
+**Figure 1**. JupyterHub sign in page after launching containers.
 ![GitHub Sign in page](./docs/GitHub-Signin.png)
 
-## Round 3: Run `buildhub.sh` script with LetsEncrypt certificate
 
-Modify `.env` file LetsEncrypt section:
-1. Get a domain name (e.g., example.com) from a domain registrar. Make the necessary changes so the DNS of the domain registrar points to the remote VM hosting the Jupyter Notebook server. **IMPORTANT:** Propagation of the domain name throughout the Internet may take a few hours, so if you intend to use a domain name (needed for LetsEncrypt set up) it is highly recommended to get it set up early, perhaps before beginning Round 1.
-2. Fill up `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file. Leave `CERT_SERVER` blank.
-3. In the `.env` file, change the value of `JUPYTERHUB_SSL=use_ssl_ss` (default) to `JUPYTERHUB_SSL=use_ssl_le` to use LetsEncrypt to generate SSL certificates.
-4. Run the `stophub.sh` script if the Jupyter Hub server is still running.
-5. Run `sudo time buildhub.sh` script. You need `sudo` to run the `letsencrypt-certs.sh` with admin privileges.
-6. Go to https://example.com/ (just an example of domain name) and authenticate as in Round 1. You should see a valid LE https certificate in the URL as below.
+#### Step 4####
+To replace the self-signed SSL certificate with LetsEncrypt certificates, replace the `.env` file entry `JUPYTERHUB_SSL=use_ssl_ss` with `JUPYTERHUB_SSL=use_ssl_le` (around line 86), as well as the `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file (around line 92). Leave `CERT_SERVER` blank. Then run `./restarthub.sh` on a terminal.
+
+**Figure 2**. JupyterHub sign in page with LetsEncrypt SSL certificate installed.
 ![GitHub Sign in page](./docs/Hub-LE-https.png)
 
 # Installation Guide - Some Details for Remote Servers
 
-## Prepare Jupyter Notebook server files
+## Prepare Jupyter Notebook server
 Git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
 
 ## Install Docker, Docker Compose and make on your remote Virtual Machine (VM)
@@ -118,29 +129,18 @@ If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i
 For more information, go to the native authentication [documentation](https://native-authenticator.readthedocs.io/en/latest/).
 
 ## Renewing LetsEncrypt certificates
-Run `sudo time letsencrypt-certs.sh`.
+The `letsencrypt` container automatically checks if the LetsEncrypt certificate is about to expire (at 60 days old) and automatically downloads a new certificate as needed. 
 
 ## Upgrading JupyterHub to a newer version
 
 Upon runnng `starthub.sh`, if you see an error message saying you need to run `jupyterhub upgrade-db`, you can do the following:
 1. Run `stophub.sh`.
-2. Comment option 1 of the `command:` section of the `docker-compose.yml`, and uncommenting option 2 lines (this runs `jupyterhub upgrade-db`)
+2. Comment option 1 of the `command:` section of the `docker-compose.yml` (if running without LetsEncrypt) or `docker-compose-letsencrypt.yml` (if running with LetsEncrypt), and uncommenting option 2 lines (this runs `jupyterhub upgrade-db`)
 3. Run `docker-compose build`.
 5. After running the database upgrade, run `stophub.sh` again, uncomment comment out option 2 lines, uncomment option 1 lines and then run `docker-compose build` again.
 5. Run `starthub.sh`.
 
 (This is based on https://jupyterhub.readthedocs.io/en/stable/reference/upgrading.html)
-
-## Using custom Dockerfile or Docker Jupyter Stacks for your User Notebook Server
-
-1. If using custom Dockerfile, use the following values:<br/>
-    a. DOCKER_NOTEBOOK_IMAGE=jupyter/minimal-notebook:459e68c2f8b7<br/>
-    b. DOCKERFILE=Dockerfile.custom
-
-2. If using Docker Jupyter Stacks (https://github.com/jupyter/docker-stacks), use the following values:<br/>
-    a. DOCKER_NOTEBOOK_IMAGE can be any of the following:
-      `jupyter/scipy-notebook:459e68c2f8b7`, `jupyter/r-notebook:459e68c2f8b7`, or `jupyter/datascience-notebook:459e68c2f8b7`<br/>
-    b. DOCKERFILE=Dockerfile.stacks
 
 # Notes for Windows users
 
@@ -174,7 +174,7 @@ If you get the error:
 HTTP errors are often intermittent, and a simple retry will get you on your way.
 ConnectionError(ReadTimeoutError("HTTPSConnectionPool(host='conda.anaconda.org', port=443): Read timed out.",),)
 
-...and the `buildhub.sh` script is building the user container image (running Dockerfile.custom), just run `make notebook_image` to resume rebuilding the Jupyter Notebook user container image.
+...and the `buildhub.sh` script is building the user container image (running Dockerfile.custom), just run `make notebook_base`, then `make notebook_body`, and lastly `make notebook_image` to resume rebuilding the Jupyter Notebook singleuser container image (shows up as `jupyterhub-user` if you run `docker images` on the terminal).
 
 ## `[Errno 111] Connection Refused` or in the JupyterHub logs after running `starthub.sh` you see the error message `error: [ConfigProxy] Proxy error:  Error: connect EHOSTUNREACH 172.18.0.3:8080` or `tornado.curl_httpclient.CurlError: HTTP 599: Failed to connect to 172.18.0.X port 8080: Connection refused`
-This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after restarting Docker server (after server reboot). To address this error, run the script `get_service_host_ip.sh` at the command line, which will provide you with the new JUPYTERHUB_SERVICE_HOST_IP value. This script automatically replaces the old value in the `.env` file with this new IP address. Run `restarthub.sh`.
+This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after restarting Docker server (after server reboot). To address this error, run the script `get_service_host_ip.sh` at the command line, which will provide you with the new JUPYTERHUB_SERVICE_HOST_IP value. This script automatically replaces the old value in the `.env` file with this new IP address.
