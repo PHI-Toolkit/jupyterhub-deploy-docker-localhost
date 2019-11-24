@@ -30,10 +30,10 @@ services:
     build:
       context: nginx-proxy/
       dockerfile: Dockerfile.alpine
-    image: nginx_proxy
+    image: nginxproxy
     ports:
       - "80:80"
-    container_name: nginx_proxy
+    container_name: nginxproxy
     restart: always
     volumes:
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
@@ -45,6 +45,24 @@ services:
     #    options:
     #      syslog-address: "udp://192.168.50.128:514"
     #      tag: docker/nginx-proxy
+  letsencrypt:
+    depends_on:
+      - nginx-proxy
+    build:
+      context: server_apps/letsencrypt
+      dockerfile: Dockerfile
+    restart: always
+    image: letsencrypt
+    container_name: letsencrypt
+    environment:
+      DEFAULT_EMAIL: herman.tolentino@gmail.com
+      NGINX_PROXY_CONTAINER: nginxproxy
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./secrets:/etc/nginx/certs:rw"
+      - "nginx_vhostd:/etc/nginx/vhost.d:rw"
+      - "nginx_html:/usr/share/nginx/html:rw"
+
   hub:
     #depends_on:
     #  - hub-db
@@ -95,7 +113,7 @@ services:
     # option 1: default command
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py --log-level=${JUPYTERHUB_LOG_LEVEL}
-    # option 2: to upgrade jupyterhub db (if postgres)
+    # option 2: to upgrade jupyterhub db (if postgres), uncomment 2 lines below
     #command: >
     #  jupyterhub upgrade-db
 
