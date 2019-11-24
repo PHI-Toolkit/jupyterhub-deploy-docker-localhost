@@ -86,6 +86,7 @@ notebook_image: #pull singleuser/Dockerfile
 		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
 		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
 		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
+		--build-arg GEN_CERT=$(GEN_CERT) \
 		--file=singleuser/$(DOCKERFILE_TAIL) singleuser
 
 build: check-files network volumes
