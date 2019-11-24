@@ -22,15 +22,9 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 
 Follow steps 1-6 above and replace localhost with IP address of remote server.
 
-## Starting and Stopping Containers
-1. `cd` to the folder where you did `git clone` of the GitHub repository. (This is important to do before running any of the shell scripts below.)
-2. To start containers, run `./starthub.sh`. Running this script also displays the logs for the running containers as they boot up and/or encounter any launch errors.
-3. To stop containers, press `ctrl-C` if you see log file display on your terminal. When you see the terminal prompt, run `./stophub.sh`.
-4. You can also use `./restarthub.sh` for stopping and restarting containers.
+## Modifying the `.env` and `userlist` files
 
-### Modifying the `.env` and `userlist` files
-
-The `.env` is automatically created adter the first run of the `buildhub.sh` file. It contains all configurable parameters for this application:
+The `.env` is automatically created after the first run of the `buildhub.sh` script. It contains all configurable parameters for this application:
 1. Authentication - includes `dummy_authenticator` (default), `github_authenticator`
 2. SSL Certificate - self-signed (default) or LetsEncrypt
 3. Database for user data - SQLite or PostGreSQL
@@ -40,27 +34,32 @@ The `.env` is automatically created adter the first run of the `buildhub.sh` fil
 7. OAuth, Notebook and Hub, PostGreSQL Authentication Credentials
 8. Single-user Notebook server timeout (when idle servers are culled)
 
-The `userlist` file is automatically created from `userlist-template` after the first run of `buildhub.sh`. For GitHub autentication, follow the template entry for recording GitHub username in the `userlist` file and assigning `admin` status. This can also be done through the `Admin` interface of JupyterHub.
+The `userlist` file is automatically created from `userlist-template` after the first run of the `buildhub.sh` script. For GitHub autentication, follow the template entry for recording GitHub username in the `userlist` file and assigning `admin` status. This can also be done through the `Admin` interface of JupyterHub.
 
-### Recommended four steps for remote server install (unmodified `.env` file to full LetsEncrypt SSL certificate)
+## Starting and Stopping Containers
+1. `cd` to the folder where you did `git clone` of the GitHub repository. (This is important to do before running any of the shell scripts below.)
+2. To start containers, run `./starthub.sh`. Running this script also displays the logs for the running containers as they boot up and/or encounter any launch errors.
+3. To stop containers, press `ctrl-C` if you see log file display on your terminal. When you see the terminal prompt, run `./stophub.sh`.
+4. You can also use `./restarthub.sh` for stopping and restarting containers.
 
-#### Step 1 ####
+## Recommended four steps for remote server install (unmodified `.env` file to full LetsEncrypt SSL certificate)
+
+### Step 1
 Follow steps for first install (step 1-6, unmodified `.env` file after `git clone`) then test if the JupyterHub server can be accessed at `https://<server IP address>` using a Chrome or Firefox browser. First install uses default settings - dummy_authenticator, self-signed SSL certificates for running on `localhost` machine. The `localhost` IP address can be replaced with the server IP address.
 
 **Figure 1**. JupyterHub signin page using `dummy_authenticator` and self-signed SSL certificate
 ![Default Dummy Authenticator Sign in page](./docs/Dummy-Signin.png)
 
-#### Step 2####
+### Step 2
 Get a domain name and assign it to the JupyterHub server. Test if the JupyterHub server can be accessed through the fully qualified domain name using `https`.
 
-#### Step 3####
+### Step 3
 Get GitHub OAuth credentials and record these in the `.env` file (around line 67), replacinf the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_CALLBACK_URL` with the correct entries from GitHub. In the `.env` file (around line 37) make sure you replace `JUPYTERHUB_AUTHENTICATOR=dummy_authenticator` with this entry, `JUPYTERHUB_AUTHENTICATOR=github_authenticator`. For high volume access, make sure you also obtain an access token from `https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/` and record the access token using the `.env` file `GITHUB_ACCESS_TOKEN` environment variable (around line 73). Test GitHub OAuth by restarting the containers using `./restarthub.sh`
 
 **Figure 1**. JupyterHub sign in page after launching containers.
 ![GitHub Sign in page](./docs/GitHub-Signin.png)
 
-
-#### Step 4####
+### Step 4
 To replace the self-signed SSL certificate with LetsEncrypt certificates, replace the `.env` file entry `JUPYTERHUB_SSL=use_ssl_ss` with `JUPYTERHUB_SSL=use_ssl_le` (around line 86), as well as the `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file (around line 92). Leave `CERT_SERVER` blank. Then run `./restarthub.sh` on a terminal.
 
 **Figure 2**. JupyterHub sign in page with LetsEncrypt SSL certificate installed.
@@ -129,7 +128,7 @@ If using localhost, replace "mydomain.com" in OAUTH_CALLBACK with "localhost" (i
 For more information, go to the native authentication [documentation](https://native-authenticator.readthedocs.io/en/latest/).
 
 ## Renewing LetsEncrypt certificates
-The `letsencrypt` container automatically checks if the LetsEncrypt certificate is about to expire (at 60 days old) and automatically downloads a new certificate as needed. 
+The `letsencrypt` container automatically checks if the LetsEncrypt certificate is about to expire (at 60 days old) and automatically downloads a new certificate as needed.
 
 ## Upgrading JupyterHub to a newer version
 
