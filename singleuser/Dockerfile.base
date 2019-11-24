@@ -17,8 +17,8 @@ RUN \
     #mv /opt/conda/conda-meta/pinned /opt/conda/conda-meta/pinned.bak
 
 RUN \
-    conda update 'conda' && \
-    conda install -c conda-forge -y 'conda=4.7.11' 'conda-build=3.18*' && \
+    conda update conda && \
+    conda install -c conda-forge -y 'conda-build=3.18*' && \
     conda config --prepend channels conda-forge && \
     #conda config --set channel_priority strict && \
     conda config --describe channel_priority && \
@@ -52,11 +52,14 @@ RUN \
     conda install -c conda-forge --yes \
       "jupyterhub=$JUPYTERHUB_VERSION" \
       "jupyterlab=$JUPYTERLAB_VERSION" \
-      'jupyter_client' \
+      'jupyter_client=5.3.3' \
       'jupyter_console' \
       "notebook=$NOTEBOOK_VERSION" \
       'libsodium' && \
-      conda clean --all -f -y
+    conda install -c anaconda -y 'libspatialite' && \
+    conda build purge-all && \
+    conda clean --all -f -y
+
 RUN \
     jupyter serverextension enable --py jupyterlab --sys-prefix && \
     conda build purge-all && \
@@ -64,8 +67,9 @@ RUN \
     apt-get update && \
     apt-get install -y --no-install-recommends \
       software-properties-common apt-utils ffmpeg \
-      libssl1.0.0 libssl-dev \
-      zip unzip file fonts-dejavu tzdata nano && \
+      libssl1.0.0 libssl-dev libxtst6 xvfb xdotool wmctrl \
+      zip unzip file fonts-dejavu tzdata nano graphviz graphviz-dev \
+      libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev libpng-dev python-dev && \
     add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable && \
     apt-get update && \
     ln -sf /usr/share/zoneinfo/EST /etc/localtime && \
