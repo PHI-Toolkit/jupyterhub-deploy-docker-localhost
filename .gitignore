@@ -10,3 +10,5 @@ errorlog.txt
 _config.yml
 proxy_token
 pg_pass
+server_apps/neo4j/data/databases
+server_apps/neo4j/data/dbms

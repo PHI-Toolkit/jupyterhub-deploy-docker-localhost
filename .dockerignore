@@ -11,3 +11,5 @@ drive.jupyterlab-settings
 *.tar
 errorlog.txt
 _config.yml
+server_apps/neo4j/data/databases
+server_apps/neo4j/data/dbms
