@@ -12,6 +12,7 @@ import tmpauthenticator
 c = get_config()
 
 from dockerspawner import DockerSpawner
+from jupyter_client.localinterfaces import public_ips
 
 class DemoFormSpawner(DockerSpawner):
     def _options_form_default(self):
@@ -89,20 +90,29 @@ c.DockerSpawner.debug = True
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = '0.0.0.0'
+c.JupyterHub.ip = '0.0.0.0'
 c.JupyterHub.hub_connect_ip = os.environ['JUPYTERHUB_SERVICE_HOST_IP']
-#c.JupyterHub.hub_connect_ip = '172.19.0.3'
 c.JupyterHub.hub_port = 8080
 #c.JupyterHub.generate_certs = True
 #c.JupyterHub.internal_ssl = True
+
+ipaddress = public_ips()[0]
+
+c.JupyterHub.bind_url = 'http://0.0.0.0:8000'
+c.JupyterHub.hub_bind_url = 'http://0.0.0.0:8081'
+c.JupyterHub.hub_connect_url = f"http://{ipaddress}:8081"
 
 # TLS config
 # If using GitHub Authenticator, make sure to update .env file:
 # 1. Update the GitHub credentials section
 # 2. Update SSL option: use_ssl_le or use_ssl_ss
-c.JupyterHub.port = 443
-c.JupyterHub.ssl_key = os.environ['SSL_KEY']
-c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
-#c.JupyterHub.internal_certs_location = 'internal-ssl'
+if os.environ['JUPYTERHUB_SSL'] =='no_ssl':
+    c.JupyterHub.port = 8000
+    #c.JupyterHub.internal_certs_location = 'internal-ssl'
+else:
+    c.JupyterHub.port = 443
+    c.JupyterHub.ssl_key = os.environ['SSL_KEY']
+    c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
 # Authenticators: pick one from 1, 2 or 3 below and comment out the others
 # DEFAULT is dummy_authenticator
@@ -151,12 +161,13 @@ data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
 c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
     'jupyterhub_cookie_secret')
 
-c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite'
-#c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
-#    host=os.environ['POSTGRES_HOST'],
-#    password=os.environ['POSTGRES_PASSWORD'],
-#    db=os.environ['POSTGRES_DB'],
-#)
+if os.environ.get('HUB_DB_URL') == 'sqlite':
+    c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite' #default
+else:
+    c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
+        host=os.environ['POSTGRES_HOST'],
+        password=os.environ['POSTGRES_PASSWORD'],
+        db=os.environ['POSTGRES_DB'],)
 
 # services
 c.JupyterHub.template_paths = ['/srv/jupyterhub/templates']
@@ -168,12 +179,12 @@ c.JupyterHub.services = [
             server_timeout_seconds=os.environ['SERVER_TIMEOUT_SECONDS']
             ).split(),
 
+    },
+    {
+        'name': 'announcement',
+        'url': 'http://127.0.0.1:8888',
+        'command': [sys.executable, "-m", "announcement"],
     }
-    #{
-    #    'name': 'announcement',
-    #    'url': 'http://127.0.0.1:8888',
-    #    'command': [sys.executable, "-m", "announcement"],
-    #}
 ]
 # Do not comment out this line below!
 c.ConfigurableHTTPProxy.auth_token = open('/etc/proxy_token','r').read().replace('\n','')
