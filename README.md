@@ -20,7 +20,7 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 
 ## First install on remote server
 
-Follow steps 1-6 above and replace localhost with IP address of remote server.
+Follow steps 1-6 above and replace localhost with IP address of remote server. See also **Four Steps** below. If you get a `NET::ERR_CERT_INVALID` error on Chrome, use Firefox instead or see this [Stack Overflow solution](https://stackoverflow.com/questions/7580508/getting-chrome-to-accept-self-signed-localhost-certificate) for Chrome.
 
 ## Modifying the `.env` and `userlist` files
 
@@ -51,18 +51,18 @@ Follow steps for first install (step 1-6, unmodified `.env` file after `git clon
 ![Default Dummy Authenticator Sign in page](./docs/Dummy-Signin.png)
 
 ### Step 2
-Get a domain name and assign it to the JupyterHub server. Test if the JupyterHub server can be accessed through the fully qualified domain name using `https`.
+Get a domain name and assign it to the JupyterHub server IP address. Test if the JupyterHub server can be accessed through the fully qualified domain name using `https`. Test the domain name by running `./restarthub.sh` at the terminal after exiting from logs display with `ctrl-C`.
 
 ### Step 3
-Get GitHub OAuth credentials and record these in the `.env` file (around line 67), replacinf the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_CALLBACK_URL` with the correct entries from GitHub. In the `.env` file (around line 37) make sure you replace `JUPYTERHUB_AUTHENTICATOR=dummy_authenticator` with this entry, `JUPYTERHUB_AUTHENTICATOR=github_authenticator`. For high volume access, make sure you also obtain an access token from `https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/` and record the access token using the `.env` file `GITHUB_ACCESS_TOKEN` environment variable (around line 73). Test GitHub OAuth by restarting the containers using `./restarthub.sh`
+Get GitHub OAuth credentials and record these in the `.env` file (around line 67), replacing the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_CALLBACK_URL` with the correct entries from GitHub. In the `.env` file (around line 37) make sure you replace `JUPYTERHUB_AUTHENTICATOR=dummy_authenticator` with this entry, `JUPYTERHUB_AUTHENTICATOR=github_authenticator`. For high volume access, make sure you also obtain an access token from `https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/` and record the access token using the `.env` file `GITHUB_ACCESS_TOKEN` environment variable (around line 73). Test GitHub OAuth by restarting the containers using `./restarthub.sh`. The display should be similar to Figure 2 below.
 
-**Figure 1**. JupyterHub sign in page after launching containers.
+**Figure 2**. JupyterHub sign in page after launching containers.
 ![GitHub Sign in page](./docs/GitHub-Signin.png)
 
 ### Step 4
-To replace the self-signed SSL certificate with LetsEncrypt certificates, replace the `.env` file entry `JUPYTERHUB_SSL=use_ssl_ss` with `JUPYTERHUB_SSL=use_ssl_le` (around line 86), as well as the `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file (around line 92). Leave `CERT_SERVER` blank. Then run `./restarthub.sh` on a terminal.
+To replace the self-signed SSL certificate with LetsEncrypt certificates, replace the `.env` file entry `JUPYTERHUB_SSL=use_ssl_ss` with `JUPYTERHUB_SSL=use_ssl_le` (around line 86), as well as the `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file (around line 92). Leave `CERT_SERVER` blank. Then run `./restarthub.sh` on a terminal. The browser display should be similar to Figure 3 below.
 
-**Figure 2**. JupyterHub sign in page with LetsEncrypt SSL certificate installed.
+**Figure 3**. JupyterHub sign in page with LetsEncrypt SSL certificate installed.
 ![GitHub Sign in page](./docs/Hub-LE-https.png)
 
 # Installation Guide - Some Details for Remote Servers
