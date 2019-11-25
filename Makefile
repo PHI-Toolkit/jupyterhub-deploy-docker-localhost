@@ -63,7 +63,7 @@ notebook_base:
 		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
 		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
 		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
-		--file=$(DOCKERFILE_BASE) singleuser
+		--file=singleuser/$(DOCKERFILE_BASE) singleuser
 
 notebook_body:
 	docker build -t $(LOCAL_NOTEBOOK_BODY) \
@@ -74,7 +74,7 @@ notebook_body:
 		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
 		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
 		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
-		--file=singleuser/$(DOCKERFILE) singleuser
+		--file=singleuser/$(DOCKERFILE_BODY) singleuser
 
 notebook_image: #pull singleuser/Dockerfile
 	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
