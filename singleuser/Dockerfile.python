@@ -4,9 +4,9 @@ ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG NOTEBOOK_VERSION
 ARG NB_USER_PASS
-ARG GITHUB_ACCESS_TOKEN
-ARG GITHUB_CLIENT_ID
-ARG GITHUB_CLIENT_SECRET
+#ARG GITHUB_ACCESS_TOKEN
+#ARG GITHUB_CLIENT_ID
+#ARG GITHUB_CLIENT_SECRET
 
 RUN \
     conda update conda && \
@@ -176,6 +176,7 @@ RUN \
     jupyter contrib nbextension install --user && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter nbextensions_configurator enable --user && \
+    rm -fvR /home/jovyan/work/notebook-extensions && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     rm -rf /home/$NB_USER/.node-gyp && \
