@@ -60,9 +60,7 @@ notebook_base:
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
-		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
-		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
-		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
+		--build-arg JUPYTER_UI=$(JUPYTER_UI) \
 		--file=singleuser/$(DOCKERFILE_BASE) singleuser
 
 notebook_body:
@@ -71,9 +69,6 @@ notebook_body:
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
-		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
-		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
-		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
 		--file=singleuser/$(DOCKERFILE_BODY) singleuser
 
 notebook_image: #pull singleuser/Dockerfile
@@ -83,9 +78,6 @@ notebook_image: #pull singleuser/Dockerfile
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
-		--build-arg GITHUB_ACCESS_TOKEN=$(GITHUB_ACCESS_TOKEN) \
-		--build-arg GITHUB_CLIENT_ID=$(GITHUB_CLIENT_ID) \
-		--build-arg GITHUB_CLIENT_SECRET=$(GITHUB_CLIENT_SECRET) \
 		--build-arg GEN_CERT=$(GEN_CERT) \
 		--file=singleuser/$(DOCKERFILE_TAIL) singleuser
 
