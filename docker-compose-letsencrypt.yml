@@ -43,11 +43,12 @@ services:
     #logging:
     #    driver: syslog
     #    options:
-    #      syslog-address: "udp://192.168.50.128:514"
-    #      tag: docker/nginx-proxy
+    #      syslog-address: "udp://0.0.0.0:514"
+    #      syslog-format: rfc3164
+    #      tag: nginxproxy
   letsencrypt:
     depends_on:
-      - nginxproxy
+      - nginx-proxy
     build:
       context: server_apps/letsencrypt
       dockerfile: Dockerfile
