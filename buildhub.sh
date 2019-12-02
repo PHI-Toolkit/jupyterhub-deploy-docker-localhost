@@ -75,6 +75,7 @@ case $JUPYTERHUB_SSL in
     use_ssl_le)
         echo "Starting up JupyterHub-LetsEncrypt..."
         docker-compose -f docker-compose-letsencrypt.yml up -d
+        sleep 60
         cp secrets/$JH_FQDN/fullchain.pem secrets/jupyterhub.pem
         cp secrets/$JH_FQDN/key.pem secrets/jupyterhub.key
         ;;
