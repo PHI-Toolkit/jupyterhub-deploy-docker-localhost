@@ -24,5 +24,6 @@ case $JUPYTERHUB_SSL in
         ;;
     use_ssl_le)
         echo "LetsEncrypt SSL certificate will be created during LetsEncrypt container launch..."
+        echo "Run init.sh at the command line after buildhub.sh. You will be prompted to provide an admin password to execute init.sh."
         ;;
 esac
