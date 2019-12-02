@@ -18,14 +18,16 @@ RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \
     sudo chown -R 1000:100 /opt/conda/pkgs/cache/ && \
     sudo chmod a+x modules/*.sh && \
     sudo mkdir -p /srv/modules && \
+    sudo mkdir -p /home/jovyan/public_html && \
     sudo mv modules/* /srv/modules/. && \
     sudo chmod a+w -R /home/jovyan/work/shared && \
     sudo chmod a+w -R /home/jovyan/work/notebooks && \
-    sudo chmod a+w -R /home/jovyan/work/public_html && \
+    sudo chmod a+w -R /home/jovyan/public_html && \
     sudo chmod a+w /home/jovyan/work/notebooks/*.ipynb && \
     sudo chown -R jovyan:users /home/jovyan && \
     sudo chown -R jovyan:users /home/jovyan/work/shared && \
     sudo chown -R jovyan:users /home/jovyan/work/notebooks && \
+    sudo chown -R jovyan:users /home/jovyan/public_html && \
     mkdir -p /home/jovyan/.cache && \
     chmod -R a+w /home/jovyan/.cache && \
     chown -R jovyan:users /home/jovyan/.cache && \
