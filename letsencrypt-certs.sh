@@ -1,11 +1,12 @@
 #!/bin/bash
 # letsencrypt-certs.sh: renew LetsEncrypt certificates
-# updated 8/20/2019
+# updated 11/03/2019
 # maintainer: herman.tolentino@gmail.com
 #
 # change the default values of the exported variables as needed in .env
 #
 echo 'Running LetsEncrypt routine...'
+echo "This script is deprecated. LetsEncrypt cert generation is done through docker-compose-letsencrypt.yml."
 source .env
 if [[ ! -d secrets ]]; then
     echo "Creating 'secrets' directory..."
@@ -34,9 +35,9 @@ echo "JH_EMAIL = $JH_EMAIL"
 echo "CERT_SERVER = $CERT_SERVER"
 if [[ -f "secrets/fullchain.pem" ]]; then
     echo "LetsEncrypt files found. Testing file modification time..."
-    if test `find "./secrets/fullchain.pem" -mtime +80`; then
-    #if [[ test `find "./secrets/live/$JH_FQDN" -mindepth 1 -mtime +80`]]; then
-        echo "LetsEncrypt files old enough (>80 days)to renew."
+    filename=`find ./secrets/fullchain.pem -mtime +60 -print`
+    if [ ! -z "$filename" ]; then
+        echo "LetsEncrypt files old enough (>60 days)to renew."
         rm ./secrets/*.pem
         rm ./secrets/*.key
     else
@@ -76,7 +77,7 @@ docker run --rm -it \
       ln -s /etc/letsencrypt/live/$JH_FQDN/* /etc/letsencrypt/ && \
       find /etc/letsencrypt -type d -exec chmod 755 {} +"
 rm secrets/*.pem
-rm secrets/*.key
+#rm secrets/*.key
 rm secrets/README
 cp secrets/live/$JH_FQDN/fullchain.pem secrets/fullchain.pem
 cp secrets/live/$JH_FQDN/privkey.pem secrets/privkey.pem
