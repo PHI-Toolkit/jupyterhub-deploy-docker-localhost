@@ -11,9 +11,12 @@ case $JUPYTERHUB_SSL in
         ;;
     use_ssl_le)
         echo "Starting up JupyterHub-LetsEncrypt..."
+        if [[ ! -f  secrets/jupyterhub.pem ]]; then
+            echo "Copying JupyterHub SSL certificate - please provide sudo password..."
+            sudo cp secrets/$JH_FQDN/fullchain.pem secrets/jupyterhub.pem
+            sudo cp secrets/$JH_FQDN/key.pem secrets/jupyterhub.key
+        fi
         docker-compose -f docker-compose-letsencrypt.yml up -d
-        cp secrets/$JH_FQDN/fullchain.pem secrets/jupyterhub.pem
-        cp secrets/$JH_FQDN/key.pem secrets/jupyterhub.key
         docker-compose -f docker-compose-letsencrypt.yml logs -f -t --tail='all'
         ;;
 esac
