@@ -110,14 +110,13 @@ RUN \
       'folium' \
       'neo4j-python-driver' \
       'py2neo' \
-      'rise' \
+      #'rise' \
       'tabulate' \
       'nodejs' \
       'nbconvert' \
       'psycopg2' \
-      #'holoviews=1.11*' \
-      'holoviews' \
-      'geoviews' \
+      #'holoviews' \
+      #'geoviews' \
       'python-snappy' \
       'graphviz' \
       'python-graphviz' \
@@ -131,7 +130,8 @@ RUN \
       'pysal' \
       'pandas-datareader' \
       'twisted' \
-      'ujson' && \
+      'ujson' \
+      'gensim' && \
     conda build purge-all && \
     conda clean --all -f -y
     #conda remove --quiet --yes --force qt pyqt
@@ -140,12 +140,8 @@ RUN \
     pip install --upgrade pip && \
     pip install  --no-cache-dir --upgrade "ipython[all]" && \
     pip install --no-cache-dir --upgrade \
-      #'pandas-datareader' \
       'twisted' \
-      #'hyper' \
-      #'h2' \
       'perspective-python' \
-      #'ujson' \
       'websocket' \
       'future' \
       'nbresuse' \
@@ -162,13 +158,16 @@ RUN \
       'gtts==2.0.3' \
       'tornado' \
       'pyzmq' \
-      #'uritemplate==3.0.0' \
-      #'pysal' \
+      'goose3' \
+      'newspaper3k' \
+      'geocoder' \
+      'pyldavis' \
+      'alphashape' \
+      'pyepsg' \
+      'chart-studio' \
       'pygeoj' \
-      #'blaze' \
       'geonamescache' \
       'hvplot' \
-      #'pyproj==1.9.6' \
       'recordlinkage' \
       'opencv-python' \
       'opencv-contrib-python' && \

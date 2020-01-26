@@ -42,8 +42,6 @@ RUN echo $LOGO_IMAGE && \
     chown -R $NB_USER /home/jovyan/.jupyter
 ADD css/custom.css /home/jovyan/.jupyter/custom/custom.css
 ADD css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
-# Address iopub data error message with custom config
-ADD jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
 ADD git/.gitconfig /home/jovyan/.gitconfig
 
 RUN \
@@ -52,7 +50,7 @@ RUN \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup && \
     # JupyterLab related packages
     pip install --no-cache-dir \
-        'plotly==4.3.0' \
+        'plotly==4.5.0' \
         'plotly-geo==1.0.0' \
         'dash==1.1.1' \
         'dash-daq==0.1.0' \
@@ -60,7 +58,7 @@ RUN \
         'nbgitpuller' \
         'voila' \
         'voila-gridstack' \
-        'jupyterlab_sql'&& \
+        'jupyterlab_sql' && \
     # Extensions
     # Check this URL for most recent compatibilities
     # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
@@ -82,11 +80,9 @@ RUN \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
     jupyter serverextension enable --py nbresuse && \
-    #export NODE_OPTIONS=--max-old-space-size=4096 && \
-    #jupyter labextension install jupyterlab-plotly@1.3.0 && \
-    #jupyter labextension install plotlywidget@1.3.0 && \
-    #jupyter labextension install jupyterlab_tensorboard && \
-    #jupyter lab build && \
+    jupyter labextension install jupyterlab-plotly@1.3.0 && \
+    jupyter labextension install plotlywidget@1.3.0 && \
+    jupyter lab build && \
     jupyter labextension install @jupyterlab/toc && \
     jupyter labextension install jupyter-webrtc && \
     jupyter labextension install @jupyterlab/git && \
@@ -96,28 +92,26 @@ RUN \
     jupyter labextension install jupyterlab-topbar-extension && \
     jupyter labextension install jupyterlab-system-monitor && \
     jupyter labextension install jupyterlab-topbar-text && \
-    #jupyter labextension install jupyterlab_filetree && \
     jupyter labextension install jupyterlab-logout && \
     jupyter labextension install qgrid && \
     jupyter labextension install @jupyterlab/geojson-extension && \
     jupyter labextension install @mflevine/jupyterlab_html && \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
-    jupyter labextension install @lckr/jupyterlab_variableinspector && \
+    #jupyter labextension install @lckr/jupyterlab_variableinspector && \
     jupyter labextension install @jupyter-voila/jupyterlab-preview && \
-    #unset NODE_OPTIONS && \
     npm cache clean --force
 
+# special packages for special projects
 RUN \
     pip install --no-cache-dir \
+        'python-dateutil<2.8.1' \
         'ipywebrtc' \
         'fhirclient' \
         'contextily' \
         'streamz' \
         's3fs' \
         'notebook_autorun' \
-        'alphashape' \
-        'pyepsg' \
         # Tensor Flow
         # If with GPU  select tensorflow with GPU, comment out the other
         #'keras' \
@@ -131,8 +125,6 @@ RUN \
         'google-api-python-client' \
         'scholarly' \
         'pymed' \
-        'goose3' \
-        'pycorenlp' \
         'ipysheet' \
         'spacy-langdetect' \
         'pyfasttext' \
@@ -152,13 +144,16 @@ RUN \
         #'progressbar2' \
         'elasticsearch-dsl' \
         'pandasticsearch[pandas]' \
-        'geocoder' \
-        'newspaper3k' \
-        'pyldavis' \
-        'chart-studio' \
-        'mediacloud-cliff' \
+        'wikiapi' \
         'html5lib' \
-        'Faker'
+        'Faker' \
+        'mediacloud-cliff'
+
+# Address iopub data error message with custom config
+ADD jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
+#RUN python spacy_coreweb.py && \
+#    python spacy_wordvectors.py && \
+#    python spacy_entwiki.py
 
 USER root
 
