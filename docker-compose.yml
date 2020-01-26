@@ -29,7 +29,7 @@ services:
   nginx-proxy:
     build:
       context: nginx-proxy/
-      dockerfile: Dockerfile.alpine
+      dockerfile: Dockerfile
     image: nginx_proxy
     ports:
       - "80:80"

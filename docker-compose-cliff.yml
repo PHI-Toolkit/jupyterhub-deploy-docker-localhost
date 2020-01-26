@@ -1,0 +1,33 @@
+# docker-compose file to build CLIFF-CLAVIN server
+# Steps:
+# 1. Build the docker image: docker-compose -f docker-compose-cliff.yml build
+# 2. Start up the Docker container (takes a while to build): docker-compose -f docker-compose-cliff.yml up -d
+# 3. Monitor the progress of the build: docker-compose -f docker-compose-cliff.yml logs -t -f --tail='all'
+# 4. Continue to run in the background: Press Ctrl-C, the CLIFF-CLAVIN server will be running in the background.
+#
+# Maintainer: Herman Tolentino
+# Last Update: 06 Jan 2020
+version: "3"
+
+services:
+  cliff:
+    hostname: cliff
+    build:
+      dockerfile: server_apps/cliff/Dockerfile
+      args:
+        CLIFF_VERSION: 2.6.0
+      context: .
+    environment:
+      CLIFF_VERSION: 2.6.0
+    container_name: cliff
+    restart: always
+    env_file:
+      - .env
+    image: cliff
+    ports:
+      - "8080:8080"
+
+networks:
+  default:
+    external:
+      name: jupyterhubnet

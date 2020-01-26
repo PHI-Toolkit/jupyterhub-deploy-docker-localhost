@@ -29,11 +29,11 @@ services:
   nginx-proxy:
     build:
       context: nginx-proxy/
-      dockerfile: Dockerfile.alpine
-    image: nginxproxy
+      dockerfile: Dockerfile
+    image: nginx_proxy
     ports:
       - "80:80"
-    container_name: nginxproxy
+    container_name: nginx_proxy
     restart: always
     volumes:
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
@@ -57,7 +57,7 @@ services:
     container_name: letsencrypt
     environment:
       DEFAULT_EMAIL: herman.tolentino@gmail.com
-      NGINX_PROXY_CONTAINER: nginxproxy
+      NGINX_PROXY_CONTAINER: nginx_proxy
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./secrets:/etc/nginx/certs:rw"
