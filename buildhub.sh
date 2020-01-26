@@ -1,5 +1,6 @@
 #!/bin/bash
-# 2019-05-24
+# modified 2020-01-01
+# author Herman Tolentino
 
 if [[ ! -f .env ]]; then
     echo "Copying environment template..."
@@ -59,7 +60,7 @@ case $JUPYTERHUB_SSL in
 esac
 # Get jupyterhub host IP address
 echo "Obtaining JupyterHub host ip address..."
-FILE1='secrets/jupyterhub_host_ip'
+FILE1='/tmp/jupyterhub_host_ip'
 if [ -f $FILE1 ]; then
     rm $FILE1
 else
@@ -70,37 +71,21 @@ echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
     use_ssl_ss)
         echo "Starting up JupyterHub..."
-        docker-compose -f docker-compose.yml up -d
+        docker-compose up -d
         ;;
     use_ssl_le)
         echo "Starting up JupyterHub-LetsEncrypt..."
         docker-compose -f docker-compose-letsencrypt.yml up -d
-        sleep 60
-        cp secrets/$JH_FQDN/fullchain.pem secrets/jupyterhub.pem
-        cp secrets/$JH_FQDN/key.pem secrets/jupyterhub.key
         ;;
 esac
-echo "Saving data to $FILE1..."
-echo "JUPYTERHUB_SERVICE_HOST_IP='`docker inspect --format '{{ .NetworkSettings.Networks.jupyterhubnet.IPAddress }}' jupyterhub`'" >> $FILE1
-echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
-case $JUPYTERHUB_SSL in
-    use_ssl_ss)
-        echo "Shutting down JupyterHub..."
-        docker-compose -f docker-compose.yml down
-        ;;
-    use_ssl_le)
-        echo "Shutting down JupyterHub-LetsEncrypt..."
-        docker-compose -f docker-compose-letsencrypt.yml down
-        ;;
-esac
+docker inspect --format "{{ .NetworkSettings.Networks.jupyterhubnet.IPAddress }}" jupyterhub >> /tmp/jupyterhub_host_ip
+bash ./stophub.sh
 echo 'Set Jupyterhub Host IP:'
-cat $FILE1
-source $FILE1
-rm $FILE1
-echo "JUPYTERHUB_SERVICE_HOST_IP is now set to:"
-echo $JUPYTERHUB_SERVICE_HOST_IP
-echo "..."
-sed -i -e "s/REPLACE_IP/$JUPYTERHUB_SERVICE_HOST_IP/g" .env
+REPLACE_LINE="JUPYTERHUB_SERVICE_HOST_IP=`cat /tmp/jupyterhub_host_ip`"
+echo "$REPLACE_LINE"
+sed "s#.*JUPYTERHUB_SERVICE_HOST_IP.*#$REPLACE_LINE#g" .env > /tmp/envfile
+cat /tmp/envfile > .env
+rm /tmp/envfile
 docker stop $(docker ps -a | grep jupyter- | awk '{print $1}')
 docker rm $(docker ps -a | grep jupyter- | awk '{print $1}')
 docker rmi $(docker images -q jupyterhub:latest)
