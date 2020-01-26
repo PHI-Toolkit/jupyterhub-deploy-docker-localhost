@@ -1,4 +1,6 @@
 #!/bin/bash
+# modified 2020-01-01
+# author Herman Tolentino
 source .env
 if [[ "$(docker ps -a | grep jupyter- | awk '{print $1}')" != "" ]]; then
     docker stop $(docker ps -a | grep jupyter- | awk '{print $1}')
