@@ -137,9 +137,9 @@ RUN \
     #conda remove --quiet --yes --force qt pyqt
 
 RUN \
-    pip install --upgrade pip && \
-    pip install  --no-cache-dir --upgrade "ipython[all]" && \
-    pip install --no-cache-dir --upgrade \
+    python -m pip install --upgrade pip && \
+    python -m pip install  --no-cache-dir --upgrade "ipython[all]" && \
+    python -m pip install --no-cache-dir --upgrade \
       'twisted' \
       'websocket' \
       'future' \

@@ -49,11 +49,11 @@ RUN \
     sudo chown -R jovyan:users /opt/ && \
     cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup && \
     # JupyterLab related packages
-    pip install --no-cache-dir \
+    python -m pip install --no-cache-dir \
         'plotly==4.5.0' \
         'plotly-geo==1.0.0' \
-        'dash==1.1.1' \
-        'dash-daq==0.1.0' \
+        'dash==1.8.0' \
+        'dash-daq==0.3.3' \
         'jupyterlab-git' \
         'nbgitpuller' \
         'voila' \
@@ -98,13 +98,12 @@ RUN \
     jupyter labextension install @mflevine/jupyterlab_html && \
     jupyter labextension install @jupyterlab/vega3-extension && \
     jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
-    #jupyter labextension install @lckr/jupyterlab_variableinspector && \
     jupyter labextension install @jupyter-voila/jupyterlab-preview && \
     npm cache clean --force
 
 # special packages for special projects
 RUN \
-    pip install --no-cache-dir \
+    python -m pip install --no-cache-dir \
         'python-dateutil<2.8.1' \
         'ipywebrtc' \
         'fhirclient' \
