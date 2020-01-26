@@ -1,4 +1,5 @@
 #!/bin/bash
+[ -d secrets ] || mkdir secrets
 if [[ -f secrets/pg_pass ]]; then
     pg_pass=$(cat secrets/pg_pass)
 else

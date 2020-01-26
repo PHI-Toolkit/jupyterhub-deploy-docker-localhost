@@ -1,4 +1,5 @@
 #!/bin/bash
+[ -d secrets ] || mkdir secrets
 if [[ -f secrets/proxy_token ]]; then
     proxy_token=$(cat secrets/proxy_token)
 else
