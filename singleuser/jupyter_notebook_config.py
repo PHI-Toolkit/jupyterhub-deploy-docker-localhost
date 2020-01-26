@@ -11,7 +11,7 @@ c = get_config()
 c.NotebookApp.ip = '*'
 c.NotebookApp.port = 8888
 c.NotebookApp.open_browser = False
-c.NotebookApp.iopub_data_rate_limit=10000000000
+c.NotebookApp.iopub_data_rate_limit=10000000
 
 # Generate a self-signed certificate
 if 'GEN_CERT' in os.environ:
