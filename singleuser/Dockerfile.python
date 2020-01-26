@@ -141,7 +141,6 @@ RUN \
     pip install  --no-cache-dir --upgrade "ipython[all]" && \
     pip install --no-cache-dir --upgrade \
       'twisted' \
-      'perspective-python' \
       'websocket' \
       'future' \
       'nbresuse' \
