@@ -82,23 +82,23 @@ RUN \
     jupyter serverextension enable --py nbresuse && \
     jupyter labextension install jupyterlab-plotly@1.3.0 && \
     jupyter labextension install plotlywidget@1.3.0 && \
-    jupyter lab build && \
-    jupyter labextension install @jupyterlab/toc && \
-    jupyter labextension install jupyter-webrtc && \
-    jupyter labextension install @jupyterlab/git && \
-    jupyter labextension install @jupyterlab/latex && \
-    jupyter labextension install @jupyterlab/google-drive && \
-    jupyter labextension install jupyterlab-chart-editor && \
-    jupyter labextension install jupyterlab-topbar-extension && \
-    jupyter labextension install jupyterlab-system-monitor && \
-    jupyter labextension install jupyterlab-topbar-text && \
-    jupyter labextension install jupyterlab-logout && \
-    jupyter labextension install qgrid && \
-    jupyter labextension install @jupyterlab/geojson-extension && \
-    jupyter labextension install @mflevine/jupyterlab_html && \
-    jupyter labextension install @jupyterlab/vega3-extension && \
-    jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
-    jupyter labextension install @jupyter-voila/jupyterlab-preview && \
+    #jupyter lab build && \
+    #jupyter labextension install @jupyterlab/toc && \
+    #jupyter labextension install jupyter-webrtc && \
+    #jupyter labextension install @jupyterlab/git && \
+    #jupyter labextension install @jupyterlab/latex && \
+    #jupyter labextension install @jupyterlab/google-drive && \
+    #jupyter labextension install jupyterlab-chart-editor && \
+    #jupyter labextension install jupyterlab-topbar-extension && \
+    #jupyter labextension install jupyterlab-system-monitor && \
+    #jupyter labextension install jupyterlab-topbar-text && \
+    #jupyter labextension install jupyterlab-logout && \
+    #jupyter labextension install qgrid && \
+    #jupyter labextension install @jupyterlab/geojson-extension && \
+    #jupyter labextension install @mflevine/jupyterlab_html && \
+    #jupyter labextension install @jupyterlab/vega3-extension && \
+    #jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
+    #jupyter labextension install @jupyter-voila/jupyterlab-preview && \
     npm cache clean --force
 
 # special packages for special projects
