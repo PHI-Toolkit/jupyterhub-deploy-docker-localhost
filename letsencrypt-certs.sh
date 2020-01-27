@@ -79,15 +79,21 @@ docker run --rm -it \
 rm secrets/*.pem
 #rm secrets/*.key
 rm secrets/README
-cp secrets/live/$JH_FQDN/fullchain.pem secrets/fullchain.pem
-cp secrets/live/$JH_FQDN/privkey.pem secrets/privkey.pem
-chown -R ${INSTALL_USER} secrets/
-chmod a+r secrets/privkey.pem
-cp secrets/privkey.pem secrets/$JH_FQDN.key
-cp secrets/fullchain.pem secrets/$JH_FQDN.pem
-cp secrets/privkey.pem secrets/jupyterhub.key
-cp secrets/fullchain.pem secrets/jupyterhub.pem
-cp secrets/jupyterhub.key secrets/default.key
-cp secrets/jupyterhub.pem secrets/default.pem
+docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/$JH_FQDN/fullchain.pem /srv/jupyterhub/secrets/jupyterhub.pem'
+docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/$JH_FQDN/key.pem /srv/jupyterhub/secrets/jupyterhub.key'
+#chown -R ${INSTALL_USER} secrets/
+#chmod a+r secrets/privkey.pem
+docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/privkey.pem /srv/jupyterhub/secrets/$JH_FQDN.key'
+docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/fullchain.pem /srv/jupyterhub/secrets/$JH_FQDN.pem'
+docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/privkey.pem /srv/jupyterhub/secrets/jupyterhub.key'
+docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/fullchain.pem /srv/jupyterhub/secrets/jupyterhub.pem'
+docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/privkey.pem /srv/jupyterhub/secrets/defaut.key'
+docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/fullchain.pem /srv/jupyterhub/secrets/default.pem'
+#cp secrets/privkey.pem secrets/$JH_FQDN.key
+#cp secrets/fullchain.pem secrets/$JH_FQDN.pem
+#cp secrets/privkey.pem secrets/jupyterhub.key
+#cp secrets/fullchain.pem secrets/jupyterhub.pem
+#cp secrets/jupyterhub.key secrets/default.key
+#cp secrets/jupyterhub.pem secrets/default.pem
 
 echo "LetsEncrypt routine completed..."
