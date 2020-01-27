@@ -15,13 +15,13 @@ RUN /opt/conda/bin/conda update --all -c conda-forge && \
         'jupyter_client=5.3.3' \
         'psycopg2=2.7' \
         'conda-build' && \
-    /opt/conda/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/conda/bin/pip install --no-cache-dir \
+    python -m pip install --no-cache-dir --upgrade pip && \
+    python -m pip install --no-cache-dir \
     'oauthenticator' \
     'dockerspawner' && \
     conda build purge-all
 
-RUN pip install --no-cache-dir \
+RUN python -m pip install --no-cache-dir \
     'jupyterhub-tmpauthenticator==0.6' \
     'jupyterhub-dummyauthenticator==0.3.1' \
     'jupyterhub-hashauthenticator==0.4.0' \
