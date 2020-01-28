@@ -14,7 +14,7 @@ case $JUPYTERHUB_SSL in
         export SSL_LOC='Atlanta'
         export SSL_ORG='geeks'
         export SSL_OU='geeks'
-        export SSL_CN='geeks.io'
+        export SSL_CN='epispider.io'
         echo "Generating self-signed certificates..."
         openssl req -x509 -nodes -days 365 -newkey rsa:1024 \
           -keyout secrets/jupyterhub.key -out secrets/jupyterhub.pem \
