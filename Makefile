@@ -45,7 +45,7 @@ pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
 notebook_base:
-	docker build -t $(LOCAL_NOTEBOOK_BASE) \
+	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(LOCAL_NOTEBOOK_BASE) \
 		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
@@ -56,7 +56,7 @@ notebook_base:
 		--file=singleuser/$(DOCKERFILE_BASE) singleuser
 
 notebook_body:
-	docker build -t $(LOCAL_NOTEBOOK_BODY) \
+	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(LOCAL_NOTEBOOK_BODY) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
@@ -64,7 +64,7 @@ notebook_body:
 		--file=singleuser/$(DOCKERFILE_BODY) singleuser
 
 notebook_image: #pull singleuser/Dockerfile
-	docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
+	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(LOCAL_NOTEBOOK_IMAGE) \
 		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \

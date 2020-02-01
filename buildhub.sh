@@ -1,6 +1,13 @@
 #!/bin/bash
-# modified 2020-01-01
+# modified 2020-01-28
 # author Herman Tolentino
+source .env
+
+# manage PostGreSQL data volume
+if [[ $POSTGRES_DELETE_DB == 1 ]]; then
+    docker volume rm $DB_VOLUME_HOST
+    docker volume create $DB_VOLUME_HOST
+fi
 
 if [[ ! -f .env ]]; then
     echo "Copying environment template..."
@@ -8,16 +15,18 @@ if [[ ! -f .env ]]; then
 fi
 # generate PostGreSQL password and proxy token
 # update .env with values
-echo "Generating PostGreSQL passwords and JupyterHub proxy tokens..."
-./pg_pass.sh
-./proxy_token.sh
-
+if [[ ! -f secrets/pg_pass ]]; then
+    echo "Generating PostGreSQL password..."
+    ./pg_pass.sh
+fi
+if [[ ! -f secrets/proxy_token ]]; then
+    echo "Generating JupyterHub proxy token..."
+    ./proxy_token.sh
+fi
 if [[ ! -f userlist ]]; then
     echo "Copying userlist template..."
-  cp userlist-template userlist
+    cp userlist-template userlist
 fi
-
-source .env
 
 ./stophub.sh
 
@@ -51,11 +60,11 @@ echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
     use_ssl_ss)
         echo "Shutting down JupyterHub..."
-        docker-compose -f docker-compose.yml down
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml down
         ;;
     use_ssl_le)
         echo "Shutting down JupyterHub-LetsEncrypt..."
-        docker-compose -f docker-compose-letsencrypt.yml down
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml down
         ;;
 esac
 # Get jupyterhub host IP address
@@ -71,11 +80,11 @@ echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
     use_ssl_ss)
         echo "Starting up JupyterHub..."
-        docker-compose up -d
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose up -d
         ;;
     use_ssl_le)
         echo "Starting up JupyterHub-LetsEncrypt..."
-        docker-compose -f docker-compose-letsencrypt.yml up -d
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml up -d
         ;;
 esac
 docker inspect --format "{{ .NetworkSettings.Networks.jupyterhubnet.IPAddress }}" jupyterhub >> /tmp/jupyterhub_host_ip
@@ -100,11 +109,11 @@ echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
     use_ssl_ss)
         echo "Rebuilding JupyterHub..."
-        docker-compose -f docker-compose.yml build
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml build
         ;;
     use_ssl_le)
         echo "Rebuilding JupyterHub-LetsEncrypt..."
-        docker-compose -f docker-compose-letsencrypt.yml build
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml build
         ;;
 esac
 

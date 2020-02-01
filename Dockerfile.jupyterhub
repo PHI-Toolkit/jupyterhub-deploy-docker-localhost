@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 # Base: https://github.com/jupyterhub/jupyterhub/blob/master/Dockerfile
-# Version 20190818
+# Version 20200131
 #
 ARG JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION}
 ARG JUPYTER_UI
@@ -9,25 +9,33 @@ FROM jupyterhub/jupyterhub-onbuild:${JUPYTERHUB_VERSION}
 LABEL maintainer='herman.tolentino@gmail.com'
 
 ENV JUPYTER_UI ${JUPYTER_UI}
+
+RUN apt-get update && \
+    apt-get install -y wget && \
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    bash ~/miniconda.sh -b -p /opt/miniconda && \
+    ls -la /opt/miniconda && \
+    rm ~/miniconda.sh
+
+ENV PATH /opt/miniconda/bin:$PATH
+
 # Install dockerspawner, oauth, postgres
-RUN /opt/conda/bin/conda update --all -c conda-forge && \
-    /opt/conda/bin/conda install -c conda-forge -yq \
+RUN conda update -y conda && \
+    conda update --all -c conda-forge && \
+    conda install -c conda-forge -yq \
         'jupyter_client=5.3.3' \
         'psycopg2=2.7' \
         'conda-build' && \
-    python -m pip install --no-cache-dir --upgrade pip && \
-    python -m pip install --no-cache-dir \
+    conda build purge-all && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
     'oauthenticator' \
-    'dockerspawner' && \
-    conda build purge-all
-
-RUN python -m pip install --no-cache-dir \
+    'dockerspawner' \
     'jupyterhub-tmpauthenticator==0.6' \
     'jupyterhub-dummyauthenticator==0.3.1' \
     'jupyterhub-hashauthenticator==0.4.0' \
-    'jupyterhub-nativeauthenticator'
-
-RUN mkdir -p /srv/jupyterhub/secrets/
+    'jupyterhub-nativeauthenticator' && \
+    mkdir -p /srv/jupyterhub/secrets/
 
 ENV SSL_KEY /srv/jupyterhub/secrets/jupyterhub.key
 ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.pem
@@ -35,7 +43,7 @@ ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.pem
 # copy services
 COPY services/cull_idle_servers.py /srv/jupyterhub/cull_idle_servers.py
 COPY services/announcement.py /srv/jupyterhub/announcement.py
-COPY templates /srv/jupyterhub/templates
+COPY services/templates /srv/jupyterhub/templates
 
 RUN touch /etc/proxy_token && \
     openssl rand -hex 32 >> /etc/proxy_token && \
@@ -43,10 +51,12 @@ RUN touch /etc/proxy_token && \
 
 COPY userlist /srv/jupyterhub/userlist
 
-# change jupyterhub logo
+# Change jupyterhub logo
+# The hub logo directory below should match the jupyterhub_config.py entry for logo_file.
+# The custom logo image is written over the original hub logo image.
 ARG LOGO_IMAGE
 RUN echo $LOGO_IMAGE
-COPY singleuser/css/*.png /opt/conda/share/jupyter/hub/static/images/
-RUN cp /opt/conda/share/jupyter/hub/static/images/$LOGO_IMAGE /opt/conda/share/jupyter/hub/static/images/jupyter.png
+COPY singleuser/css/*.png /opt/miniconda/share/jupyterhub/static/images/
+RUN cp /opt/miniconda/share/jupyterhub/static/images/$LOGO_IMAGE /opt/miniconda/share/jupyterhub/static/images/jupyter.png
 
 VOLUME /srv/jupyterhub/secrets
