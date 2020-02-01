@@ -48,7 +48,7 @@ services:
     #      tag: nginxproxy
   letsencrypt:
     depends_on:
-      - nginx_proxy
+      - nginx-proxy
     build:
       context: server_apps/letsencrypt
       dockerfile: Dockerfile
