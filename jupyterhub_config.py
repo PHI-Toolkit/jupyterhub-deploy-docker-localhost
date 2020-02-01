@@ -7,35 +7,12 @@
 #
 import os
 import sys
-import tmpauthenticator
 
 c = get_config()
 
-from dockerspawner import DockerSpawner
 from jupyter_client.localinterfaces import public_ips
 
-class DemoFormSpawner(DockerSpawner):
-    def _options_form_default(self):
-        default_stack = "jupyter/minimal-notebook"
-        return """
-        <label for="stack">Select your desired stack</label>
-        <select name="stack" size="1">
-        <option value="jupyter/r-notebook">R: </option>
-        <option value="jupyter/tensorflow-notebook">Tensorflow: </option>
-        <option value="jupyter/datascience-notebook">Datascience: </option>
-        <option value="jupyter/all-spark-notebook">Spark: </option>
-        </select>
-        """.format(stack=default_stack)
-
-    def options_from_form(self, formdata):
-        options = {}
-        options['stack'] = formdata['stack']
-        container_image = ''.join(formdata['stack'])
-        print("SPAWN: " + container_image + " IMAGE" )
-        self.container_image = container_image
-        return options
-
-c.JupyterHub.logo_file = '/opt/conda/share/jupyter/hub/static/images/jupyter.png'
+c.JupyterHub.logo_file = '/opt/miniconda/share/jupyterhub/static/images/jupyter.png'
 
 #c.JupyterHub.spawner_class = DemoFormSpawner
 # We rely on environment variables to configure JupyterHub so that we
