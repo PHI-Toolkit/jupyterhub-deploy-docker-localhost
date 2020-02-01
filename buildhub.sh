@@ -1,6 +1,11 @@
 #!/bin/bash
 # modified 2020-01-28
 # author Herman Tolentino
+if [[ ! -f .env ]]; then
+    echo "Copying environment template..."
+    cp .env-template .env
+fi
+
 source .env
 
 # manage PostGreSQL data volume
@@ -9,10 +14,6 @@ if [[ $POSTGRES_DELETE_DB == 1 ]]; then
     docker volume create $DB_VOLUME_HOST
 fi
 
-if [[ ! -f .env ]]; then
-    echo "Copying environment template..."
-    cp .env-template .env
-fi
 # generate PostGreSQL password and proxy token
 # update .env with values
 if [[ ! -f secrets/pg_pass ]]; then
