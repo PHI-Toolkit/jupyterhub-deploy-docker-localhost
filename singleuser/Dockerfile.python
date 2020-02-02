@@ -9,9 +9,8 @@ ARG NB_USER_PASS
 #ARG GITHUB_CLIENT_SECRET
 
 RUN \
-    conda update conda && \
+    conda update -y conda && \
     conda install -c conda-forge --yes python-libarchive-c conda-package-handling libarchive && \
-    conda install -c conda-forge --yes "conda=$CONDA_VERSION" && \
     conda install -c conda-forge --yes --verbose \
       # uncomment nomkl as necessary
       #'nomkl=2.0*' \
@@ -47,14 +46,11 @@ RUN \
       'textblob' && \
       #'hyper' \
       #'h2' && \
-      #conda remove --quiet --yes --force qt pyqt && \
       conda build purge-all && \
-      conda clean --all -f -y && \
-      conda remove --quiet --yes --force qt pyqt
-      #conda remove --quiet --yes --force qt pyqt
+      conda clean --all -f -y
 
 RUN \
-    conda update -n base conda && \
+    conda update -y conda && \
     conda install -c conda-forge --yes \
       #'gdal=2.4*' \
       #'libgdal=2.4*' \
@@ -136,7 +132,7 @@ RUN \
       'movingpandas' && \
     conda build purge-all && \
     conda clean --all -f -y
-    #conda remove --quiet --yes --force qt pyqt
+    conda remove --quiet --yes --force qt pyqt
 
 RUN \
     python -m pip install --upgrade pip && \
