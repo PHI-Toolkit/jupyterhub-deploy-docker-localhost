@@ -1,6 +1,6 @@
 #!/bin/bash
 source .env
-echo "Starting up log tracking (Press ctrl-C to stop tracking, JupyterHub will continue running.)"
+echo "Starting up log tracking (Press ctrl-C to stop tracking, you may have to do this twice. JupyterHub will continue running in the background.)"
 echo "..."
 echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
