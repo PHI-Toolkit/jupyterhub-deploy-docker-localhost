@@ -49,7 +49,8 @@ RUN \
       #'h2' && \
       #conda remove --quiet --yes --force qt pyqt && \
       conda build purge-all && \
-      conda clean --all -f -y
+      conda clean --all -f -y && \
+      conda remove --quiet --yes --force qt pyqt
       #conda remove --quiet --yes --force qt pyqt
 
 RUN \
@@ -131,7 +132,8 @@ RUN \
       'pandas-datareader' \
       'twisted' \
       'ujson' \
-      'gensim' && \
+      'gensim' \
+      'movingpandas' && \
     conda build purge-all && \
     conda clean --all -f -y
     #conda remove --quiet --yes --force qt pyqt
