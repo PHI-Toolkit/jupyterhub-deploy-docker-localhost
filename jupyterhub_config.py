@@ -98,7 +98,7 @@ if os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'dummy_authenticator':
 # DEFAULT in .env
 # 1. Dummy Authenticator  do not use this for production!
     c.JupyterHub.authenticator_class = 'dummyauthenticator.DummyAuthenticator'
-    c.DummyAuthenticator.password = "geeks@localhost"
+    c.DummyAuthenticator.password = os.environ['DUMMY_AUTH_PASSWORD']
 elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'hash_authenticator':
 # 2. Authenticate users with GitHub OAuth
     c.JupyterHub.authenticator_class = 'hashauthenticator.HashAuthenticator'
@@ -161,7 +161,7 @@ c.JupyterHub.services = [
     {
         'name': 'announcement',
         'url': 'http://127.0.0.1:8888',
-        'command': [sys.executable, "-m", "announcement"],
+        'command': ["python", "-m", "jupyterhub_announcement"],
     }
 ]
 # Do not comment out this line below!
