@@ -53,6 +53,8 @@ make network volumes
 docker volume create --name=nginx_vhostd
 docker volume create --name=nginx_html
 
+./create-network.sh
+
 echo "Creating SSL certificate..."
 ./create-certs.sh
 
