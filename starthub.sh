@@ -19,8 +19,8 @@ case $JUPYTERHUB_SSL in
         FULLCHAINPEM_SIZE=$(stat -c%s "$FULLCHAINPEM_NAME")
         JUPYTERPEM_NAME=secrets/$JH_FQDN/key.pem
         JUPYTERPEM_SIZE=$(stat -c%s "$JUPYTERPEM_NAME")
-        DEFAULTKEY_NAME=secrets/default.key
-        DEFAULTKEY_SIZE=$(stat -c%s "$DEFAULTKEY_NAME")
+        DEFAULTCRT_NAME=secrets/default.crt
+        DEFAULTCRT_SIZE=$(stat -c%s "$DEFAULTCRT_NAME")
         COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml up -d
         sleep 5
         if [[ $FULLCHAINPEM_SIZE != $JUPYTERPEM_SIZE ]]; then
@@ -29,10 +29,9 @@ case $JUPYTERHUB_SSL in
             docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/$JH_FQDN/fullchain.pem /srv/jupyterhub/secrets/jupyterhub.pem'
             docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/$JH_FQDN/key.pem /srv/jupyterhub/secrets/jupyterhub.key'
         fi
-        if [[ $DEFAULTKEY_SIZE != $JUPYTERPEM_SIZE ]]; then
-            docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/jupyterhub.pem /srv/jupyterhub/secrets/default.pem'
+        if [[ $DEFAULTCRT_SIZE != $JUPYTERPEM_SIZE ]]; then
+            docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/$JH_FQDN/fullchain.pem /srv/jupyterhub/secrets/default.crt'
             docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/jupyterhub.key /srv/jupyterhub/secrets/default.key'
-            docker exec jupyterhub bash -c 'openssl x509 -outform der -in /srv/jupyterhub/secrets/default.pem -out /srv/jupyterhub/secrets/default.crt'
         fi
         echo "JupyterHub-LetsEncrypt started. Press ctrl-C to stop tracking, JupyterHub will continue running."
         echo "Run stophub.sh on the command line to stop the JupyterHub-LetsEncrypt servers."
