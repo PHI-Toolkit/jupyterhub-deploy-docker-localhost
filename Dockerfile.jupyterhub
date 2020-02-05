@@ -10,12 +10,12 @@ LABEL maintainer='herman.tolentino@gmail.com'
 
 ENV JUPYTER_UI ${JUPYTER_UI}
 
+COPY ./miniconda.sh ./miniconda.sh
 RUN apt-get update && \
     apt-get install -y wget git && \
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    bash ~/miniconda.sh -b -p /opt/miniconda && \
+    bash ./miniconda.sh -b -p /opt/miniconda && \
     ls -la /opt/miniconda && \
-    rm ~/miniconda.sh
+    rm ./miniconda.sh
 
 ENV PATH /opt/miniconda/bin:$PATH
 
