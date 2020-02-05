@@ -31,7 +31,7 @@ if [[ ! -f userlist ]]; then
 fi
 
 # download miniconda to copy into Docker.jupyterhub
-if [[ ! -f ./miniconda.sh && ]]; then
+if [[ ! -f ./miniconda.sh ]]; then
     echo "Downloading miniconda..."
     MINICONDA_FILE=https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
     while true;do
