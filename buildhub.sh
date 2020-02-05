@@ -117,6 +117,7 @@ case $JUPYTERHUB_SSL in
     use_ssl_le)
         echo "Starting up JupyterHub-LetsEncrypt..."
         COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml up -d
+        sleep 10
         ;;
 esac
 docker inspect --format "{{ .NetworkSettings.Networks.jupyterhubnet.IPAddress }}" jupyterhub >> /tmp/jupyterhub_host_ip
