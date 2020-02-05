@@ -9,14 +9,14 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 # Installation Guide - Quick
 
 ## First install on localhost machine
-1. Install `Docker`, `docker-compose`, `git`. (...or run  `sudo install-docker-bionic.sh`.)
-2. Open terminal app and cd to preferred workspace directory
+1. Install `Docker`, `docker-compose`, `git`. (...or run  `sudo install-docker-bionic.sh` - be sure to change `$INSTALL_USER` variable to your local username.)
+2. Open terminal app and `cd` to preferred workspace directory
 3. `git clone` this repository: `git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost.git`
 4. `cd jupyterhub-deploy-docker-localhost`, locate buildhub.sh, make sure it is executable and run this script on command line.
-5. Wait for the `buildhub.sh` script to finish, then locate `starthub.sh`, make sure it is executable, then run `./starthub.sh` on a terminal. To check:
+5. Wait for the `buildhub.sh` script to finish, watch for build errors. Then locate `starthub.sh`, make sure it is executable, then run `./starthub.sh` on a terminal. You will see container logs being displayed as the containers start up. Before running `./starthub.sh` you may want to check:
     5.1 Built Docker contaiiners: run `docker images` on the terminal.
     5.2 Running containers (after running `./starthub.sh`: run `docker ps` on the terminal.
-6. Open Chrome or Firefox browser and proceed to https://localhost. (Look up default login credentials on .env file.)
+6. Open Chrome, Chrome-based Edge, Safari, or Firefox browser and proceed to https://localhost. (Look up default login credentials on .env file.)
 
 ### Changing the UI to JupyterLab
 
@@ -30,13 +30,13 @@ Follow steps 1-6 above and replace localhost with IP address of remote server. S
 
 ## Modifying the `.env` and `userlist` files
 
-The `.env` is automatically created after the first run of the `buildhub.sh` script. It contains all configurable parameters for this application:
+The `.env` is automatically created after the first run of the `buildhub.sh` script. It contains configurable parameters for this application, including:
 1. Authentication - includes `dummy_authenticator` (default), `github_authenticator`
 2. SSL Certificate - self-signed (default) or LetsEncrypt
 3. Database for user data - SQLite or PostGreSQL
 4. Custom logo (filename pointer to image)
 5. Jupyter Notebook UI or JupyterLab
-6. Versions of JupyterHub, JupyterLab and Jupyter Notebook
+6. Versions of JupyterHub, JupyterLab, Jupyter Notebook, and PostGRESQL Hub backend
 7. OAuth, Notebook and Hub, PostGreSQL Authentication Credentials
 8. Single-user Notebook server timeout (when idle servers are culled)
 
@@ -57,10 +57,10 @@ Follow steps for first install (step 1-6, unmodified `.env` file after `git clon
 ![Default Dummy Authenticator Sign in page](./docs/Dummy-Signin.png)
 
 ### Step 2
-Get a domain name and assign it to the JupyterHub server IP address. Test if the JupyterHub server can be accessed through the fully qualified domain name using `https`. Test the domain name by running `./restarthub.sh` at the terminal after exiting from logs display with `ctrl-C`.
+Obtain a domain name and assign it to the JupyterHub server IP address. Test if the JupyterHub server can be accessed through the fully qualified domain name (FQDN) using `https`. Test the domain name by running `./restarthub.sh` at the terminal after exiting from logs display with `ctrl-C`.
 
 ### Step 3
-Get GitHub OAuth credentials and record these in the `.env` file (around line 67), replacing the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_CALLBACK_URL` with the correct entries from GitHub. In the `.env` file (around line 37) make sure you replace `JUPYTERHUB_AUTHENTICATOR=dummy_authenticator` with this entry, `JUPYTERHUB_AUTHENTICATOR=github_authenticator`. For high volume access, make sure you also obtain an access token from `https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/` and record the access token using the `.env` file `GITHUB_ACCESS_TOKEN` environment variable (around line 73). Other important edits to do at this step:
+Obtain GitHub OAuth credentials and record these in the `.env` file (around line 67), replacing the `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_CALLBACK_URL` with the correct entries from GitHub. In the `.env` file (around line 37) make sure you replace `JUPYTERHUB_AUTHENTICATOR=dummy_authenticator` with this entry, `JUPYTERHUB_AUTHENTICATOR=github_authenticator`. For high volume access, make sure you also obtain an access token from `https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/` and record the access token using the `.env` file `GITHUB_ACCESS_TOKEN` environment variable (around line 73). Other important edits to do at this step:
 1. Make sure you add your GitHub username to the `userlist` file as described above, especially if you see the `403 : Forbidden` error in your browser.
 2. Run `docker-compose build hub` to include the revised `userlist` file in the JupyterHub container. If you have already selected `use_ssl_le` in the `.env` file, run `docker-compose -f docker-compose-letsencrypt.yml build hub` instead.
 3. Test GitHub OAuth by restarting the containers using `./restarthub.sh`. The display should be similar to Figure 2 below.
@@ -69,7 +69,7 @@ Get GitHub OAuth credentials and record these in the `.env` file (around line 67
 ![GitHub Sign in page](./docs/GitHub-Signin.png)
 
 ### Step 4
-To replace the self-signed SSL certificate with LetsEncrypt certificates, replace the `.env` file entry `JUPYTERHUB_SSL=use_ssl_ss` with `JUPYTERHUB_SSL=use_ssl_le` (around line 86), as well as the `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file (around line 92). Leave `CERT_SERVER` blank. Then run `./restarthub.sh` on a terminal. The browser display should be similar to Figure 3 below.
+To replace the self-signed SSL certificate with LetsEncrypt certificates, replace the `.env` file entry `JUPYTERHUB_SSL=use_ssl_ss` with `JUPYTERHUB_SSL=use_ssl_le` (around line 86), as well as the `JH_FQDN`, `JH_EMAIL` and `CERT_SERVER` variables in the `.env` file (around line 92). Leave `CERT_SERVER` blank for production. Then run `./restarthub.sh` on a terminal. The browser display should be similar to Figure 3 below.
 
 **Figure 3**. JupyterHub sign in page with LetsEncrypt SSL certificate installed.
 ![GitHub Sign in page](./docs/Hub-LE-https.png)
@@ -79,15 +79,6 @@ To replace the self-signed SSL certificate with LetsEncrypt certificates, replac
 ## Prepare Jupyter Notebook server
 Git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost. Change to the `jupyterhub-deploy-docker-localhost` folder and run the steps below.
 
-## Install Docker, Docker Compose and make on your remote Virtual Machine (VM)
-
-1. Run the `install-docker-bionic.sh` to install Docker and Docker Compose on a VM running Ubuntu Bionic.
-2. If the VM is not running Bionic Beaver, run the `upgrade-distro.sh` script. Be sure to replace the source and destination OS in the `sed` statement.
-3. Make sure to exit the VM and log back in for changes to take effect. Run `docker images` to check if you have access to docker without sudo. If running `docker images` generates an error, run `sudo usermod -aG docker [replace-with-your-username]`.
-
-*References*
-* Install Docker: https://docs.docker.com/install/
-* Install Docker Compose: https://docs.docker.com/compose/install/
 
 ## JupyterHub Authentication
 
@@ -98,7 +89,7 @@ This build of JupyterHub has three options for Authentication. Go to about Line 
 * hash_authenticator
 * native_authenticator (new)
 
-There is no need to change or update any .env settings for initial one-user (you) launch and testing. The default setting `dummy_authenticator` uses the default user `jovyan` whose password you can set in the `.env` file.
+There is no need to change or update any .env settings for initial one-user (you) launch and testing from a localhost machine. The default setting `dummy_authenticator` uses the default user `jovyan` whose password you can set in the `.env` file.
 
 ### GitHub authentication
 #### Obtain your GitHub Account Credentials
@@ -161,6 +152,9 @@ https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
 # JupyterHub Logs / Launch Issues
 
+## Upgrading the miniconda version
+* Delete the `miniconda.sh` file from the cloned directory. Run `buildhub.sh` to download an updated Miniconda3 version to be included in the `Dockerfile.jupyterhub` image.
+* 
 ## Logs: Old base64 cookie-secret detected in /data/jupyterhub_cookie_secret.
 * While jupyterhub is running, type the following commands:
 > `$ docker exec -it jupyterhub /bin/bash`
