@@ -10,6 +10,7 @@ source .env
 
 # manage PostGreSQL data volume
 if [[ $POSTGRES_DELETE_DB == 1 ]]; then
+    echo "Creating PostgreSQL data volumes..."
     docker volume rm $DB_VOLUME_HOST
     docker volume create $DB_VOLUME_HOST
 fi
@@ -29,6 +30,12 @@ if [[ ! -f userlist ]]; then
     cp userlist-template userlist
 fi
 
+# download miniconda to copy into Docker.jupyterhub
+if [[ ! -f ./miniconda.sh ]]; then
+    echo "Downloading miniconda..."
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ./miniconda.sh
+fi
+
 ./stophub.sh
 
 if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
@@ -39,12 +46,14 @@ else
 fi
 
 # get images for base notebooks for Dockerfile.custom and Dockerfile.stacks
+# uncommend other jupyter notebook containers below as needed
 if [[ "$(docker images -q jupyter/minimal-notebook)" == "" ]]; then
     echo "Pulling jupyter stacks images..."
-    docker pull jupyter/datascience-notebook:$IMAGE_TAG
-    docker pull jupyter/scipy-notebook:$IMAGE_TAG
-    docker pull jupyter/r-notebook:$IMAGE_TAG
+    #docker pull jupyter/datascience-notebook:$IMAGE_TAG
+    #docker pull jupyter/scipy-notebook:$IMAGE_TAG
+    #docker pull jupyter/r-notebook:$IMAGE_TAG
     docker pull jupyter/minimal-notebook:$IMAGE_TAG
+    # legacy letsencrypt service
     docker pull quay.io/letsencrypt/letsencrypt:latest
 fi
 
@@ -55,8 +64,25 @@ docker volume create --name=nginx_html
 
 ./create-network.sh
 
-echo "Creating SSL certificate..."
-./create-certs.sh
+echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
+case $JUPYTERHUB_SSL in
+    use_ssl_ss)
+        echo "Creating SSL certificate..."
+        ./create-certs.sh
+        ;;
+    use_ssl_le)
+        # make letsencrypt server apps executable
+        echo "Making LetsEncrypt apps executable..."
+        chmod a+x server_apps/letsencrypt/app/cert_status
+        chmod a+x server_apps/letsencrypt/app/entrypoint.sh
+        chmod a+x server_apps/letsencrypt/app/force_renew
+        chmod a+x server_apps/letsencrypt/app/functions.sh
+        chmod a+x server_apps/letsencrypt/app/letsencrypt_service
+        chmod a+x server_apps/letsencrypt/app/signal_le_service
+        chmod a+x server_apps/letsencrypt/app/start.sh
+        ;;
+esac
+
 
 echo "Building Docker images..."
 echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
