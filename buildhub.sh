@@ -33,7 +33,7 @@ fi
 # download miniconda to copy into Docker.jupyterhub
 if [[ ! -f ./miniconda.sh ]]; then
     echo "Downloading miniconda..."
-    MINICONDA_FILE=https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
+    MINICONDA_FILE=https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     while true;do
         wget -T 15 -c $MINICONDA_FILE -O ./miniconda.sh && break
     done
