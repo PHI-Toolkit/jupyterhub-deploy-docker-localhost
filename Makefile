@@ -17,14 +17,6 @@ self-signed-cert:
 	# make a self-signed cert
 	create-certs.sh
 
-secrets/jupyterhub.crt:
-	@echo "Need an SSL certificate in secrets/jupyterhub.crt"
-	@exit 1
-
-secrets/jupyterhub.key:
-	@echo "Need an SSL key in secrets/jupyterhub.key"
-	@exit 1
-
 userlist:
 	@echo "Add usernames, one per line, to ./userlist, such as:"
 	@echo "    zoe admin"
@@ -40,9 +32,6 @@ else
 endif
 
 check-files: userlist $(cert_files) .env
-
-pull:
-	docker pull $(DOCKER_NOTEBOOK_IMAGE)
 
 notebook_base:
 	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(LOCAL_NOTEBOOK_BASE) \
