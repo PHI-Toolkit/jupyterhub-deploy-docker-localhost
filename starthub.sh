@@ -15,19 +15,28 @@ case $JUPYTERHUB_SSL in
         ;;
     use_ssl_le)
         echo "Starting up JupyterHub-LetsEncrypt..."
-        FULLCHAIN_NAME=secrets/$JH_FQDN/fullchain.pem
-        FULLCHAIN_SIZE=$(stat -c%s "$FULLCHAIN_NAME")
-        KEY_NAME=secrets/$JH_FQDN/key.pem
-        KEY_SIZE=$(stat -c%s "$KEY_NAME")
+        FULLCHAINPEM_NAME=secrets/$JH_FQDN/fullchain.pem
+        FULLCHAINPEM_SIZE=$(stat -c%s "$FULLCHAINPEM_NAME")
+        JUPYTERPEM_NAME=secrets/$JH_FQDN/key.pem
+        JUPYTERPEM_SIZE=$(stat -c%s "$JUPYTERPEM_NAME")
+        DEFAULTKEY_NAME=secrets/default.key
+        DEFAULTKEY_SIZE=$(stat -c%s "$DEFAULTKEY_NAME")
         COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml up -d
-        if [[ $FULLCHAIN_SIZE != $KEY_SIZE ]]; then
+        sleep 5
+        if [[ $FULLCHAINPEM_SIZE != $JUPYTERPEM_SIZE ]]; then
             echo "Copying JupyterHub SSL certificate..."
             docker exec jupyterhub bash -c 'echo JH_FQDN: $JH_FQDN'
             docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/$JH_FQDN/fullchain.pem /srv/jupyterhub/secrets/jupyterhub.pem'
             docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/$JH_FQDN/key.pem /srv/jupyterhub/secrets/jupyterhub.key'
         fi
+        if [[ $DEFAULTKEY_SIZE != $JUPYTERPEM_SIZE ]]; then
+            docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/jupyterhub.pem /srv/jupyterhub/secrets/default.pem'
+            docker exec jupyterhub bash -c 'cp /srv/jupyterhub/secrets/jupyterhub.key /srv/jupyterhub/secrets/default.key'
+            docker exec jupyterhub bash -c 'openssl x509 -outform der -in /srv/jupyterhub/secrets/default.pem -out /srv/jupyterhub/secrets/default.crt'
+        fi
         echo "JupyterHub-LetsEncrypt started. Press ctrl-C to stop tracking, JupyterHub will continue running."
         echo "Run stophub.sh on the command line to stop the JupyterHub-LetsEncrypt servers."
         COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml logs -f -t --tail='all'
         ;;
+
 esac
