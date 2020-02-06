@@ -61,7 +61,7 @@ RUN \
       'pyproj' \
       #'blaze' \
       'geos' \
-      'osmnx' \
+      'osmnx=0.11.0' \
       'pillow' \
       # folium unit
       #'fiona=1.8*' \
