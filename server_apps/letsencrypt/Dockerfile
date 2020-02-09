@@ -48,6 +48,6 @@ RUN chmod +rx /app/install_simp_le.sh \
 COPY /app/ /app/
 
 WORKDIR /app
-
+HEALTHCHECK --interval=2m --timeout=3s --retries=3 CMD ping -c 1 $HOSTNAME/ || fail
 ENTRYPOINT [ "/bin/bash", "/app/entrypoint.sh" ]
 CMD [ "/bin/bash", "/app/start.sh" ]

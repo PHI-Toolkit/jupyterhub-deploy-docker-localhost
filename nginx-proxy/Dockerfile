@@ -5,7 +5,7 @@ LABEL maintainer="Jason Wilder mail@jasonwilder.com"
 RUN apt-get update \
  && apt-get install -y -q --no-install-recommends \
     ca-certificates \
-    wget \
+    wget curl \
  && apt-get clean \
  && rm -r /var/lib/apt/lists/*
 
@@ -32,6 +32,6 @@ WORKDIR /app/
 ENV DOCKER_HOST unix:///tmp/docker.sock
 
 VOLUME ["/etc/nginx/certs", "/etc/nginx/dhparam"]
-
+HEALTHCHECK --interval=2m --timeout=3s --retries=3 CMD curl --fail http://$HOSTNAME/ || exit 1
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["forego", "start", "-r"]

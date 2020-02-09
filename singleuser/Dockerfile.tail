@@ -116,7 +116,7 @@ RUN \
         #'tensorflow_hub' \
         #'tensorflow_datasets' \
         # End of Tensor Flow
-        #'biopython' \
+        'biopython' \
         'pygithub' \
         'google-api-python-client' \
         'scholarly' \
@@ -177,6 +177,8 @@ RUN \
     chmod -R a+w /opt/conda/pkgs/cache/ && \
     if [ "$NB_USER_PASS" != "" ]; then echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
       sed -i 's/ NOPASSWD://g' /etc/sudoers; fi
+
+HEALTHCHECK --interval=2m --timeout=3s --retries=3 CMD curl --silent http://$HOSTNAME:8888 || fail
 
 RUN \
     cd shared && \
