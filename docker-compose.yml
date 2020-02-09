@@ -54,6 +54,7 @@ services:
       - "./secrets:/srv/jupyterhub/secrets"
     healthcheck:
       test: "curl -f -k https://localhost/hub/health || false"
+      interval: 2m
       timeout: 3s
       retries: 3
     ports:

@@ -45,10 +45,6 @@ services:
       - "./secrets:/etc/nginx/certs:rw"
       - "nginx_vhostd:/etc/nginx/vhost.d:rw"
       - "nginx_html:/usr/share/nginx/html:rw"
-    healthcheck:
-      test: "curl -f https://localhost/ || false"
-      timeout: 3s
-      retries: 3
     #logging:
     #    driver: syslog
     #    options:
@@ -95,7 +91,8 @@ services:
       - "data:${DATA_VOLUME_CONTAINER}"
       - "./secrets:/srv/jupyterhub/secrets"
     healthcheck:
-      test: "curl -f https://localhost/hub/health || false"
+      test: "curl -f -k https://localhost/hub/health || false"
+      interval: 2m
       timeout: 3s
       retries: 3
     ports:
