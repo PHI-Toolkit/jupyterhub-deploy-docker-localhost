@@ -68,7 +68,7 @@ c.DockerSpawner.debug = True
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = '0.0.0.0'
-c.JupyterHub.ip = '0.0.0.0'
+#c.JupyterHub.ip = '0.0.0.0'
 c.JupyterHub.hub_connect_ip = os.environ['JUPYTERHUB_SERVICE_HOST_IP']
 c.JupyterHub.hub_port = 8080
 #c.JupyterHub.generate_certs = True
@@ -86,6 +86,8 @@ c.JupyterHub.hub_connect_url = f"http://{ipaddress}:8081"
 # 2. Update SSL option: use_ssl_le or use_ssl_ss
 if os.environ['JUPYTERHUB_SSL'] =='no_ssl':
     c.JupyterHub.port = 8000
+    c.JupyterHub.ssl_key = ''
+    c.JupyterHub.ssl_cert = ''
     #c.JupyterHub.internal_certs_location = 'internal-ssl'
 else:
     c.JupyterHub.port = 443
@@ -109,6 +111,10 @@ elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'github_authenticator':
 # 3. Authenticate users with GitHub OAuth
     c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
     c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
+    c.GitHubConfig.access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
+    c.GitHubConfig.client_id = os.environ.get('GITHUB_CLIENT_ID')
+    c.GitHubConfig.client_secret = os.environ.get('GITHUB_CLIENT_SECRET')
+
 elif os.environ['JUPYTERHUB_AUTHENTICATOR'] == 'native_authenticator':
 # 4. Authenticate users with Native Authenticator
     c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'
@@ -128,10 +134,6 @@ else:
 # 5. JupyterHub tmpauthenticator
 # this creates temporary users
     c.JupyterHub.authenticator_class = tmpauthenticator.TmpAuthenticator
-
-c.GitHubConfig.access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
-c.GitHubConfig.client_id = os.environ.get('GITHUB_CLIENT_ID')
-c.GitHubConfig.client_secret = os.environ.get('GITHUB_CLIENT_SECRET')
 
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
@@ -188,3 +190,4 @@ with open(os.path.join(pwd, 'userlist')) as f:
 c.Authenticator.whitelist = whitelist
 c.Authenticator.admin_users = admin
 c.JupyterHub.admin_access = True
+c.JupyterHub.upgrade_db = True
