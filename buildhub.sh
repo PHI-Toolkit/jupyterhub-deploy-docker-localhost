@@ -41,23 +41,20 @@ fi
 
 ./stophub.sh
 
-if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
-  echo "JupyterHub image does not exist."
-else
-  echo "Deleting Docker images..."
-  docker rmi $(docker images -a | grep jupyterhub | awk '{print $3}')
+if [[ $DOCKER_BUILD_CACHE_OPTION == '--no-cache' ]]; then
+    if [[ "$(docker images -q jupyterhub:latest)" == "" ]]; then
+      echo "JupyterHub image does not exist."
+    else
+      echo "Deleting JupyterHub Docker image..."
+      docker rmi $(docker images -a | grep jupyterhub | awk '{print $3}')
+    fi
 fi
 
 # get images for base notebooks for Dockerfile.custom and Dockerfile.stacks
 # uncommend other jupyter notebook containers below as needed
 if [[ "$(docker images -q jupyter/minimal-notebook)" == "" ]]; then
     echo "Pulling jupyter stacks images..."
-    #docker pull jupyter/datascience-notebook:$IMAGE_TAG
-    #docker pull jupyter/scipy-notebook:$IMAGE_TAG
-    #docker pull jupyter/r-notebook:$IMAGE_TAG
     docker pull jupyter/minimal-notebook:$IMAGE_TAG
-    # legacy letsencrypt service
-    docker pull quay.io/letsencrypt/letsencrypt:latest
 fi
 
 echo "Creating network and data volumes..."
@@ -90,6 +87,10 @@ esac
 echo "Building Docker images..."
 echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
+    no_ssl)
+        echo "Shutting down JupyterHub..."
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml down
+        ;;
     use_ssl_ss)
         echo "Shutting down JupyterHub..."
         COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml down
@@ -110,6 +111,10 @@ fi
 unset JUPYTERHUB_SERVICE_HOST_IP
 echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
+    no_ssl)
+    echo "Starting up JupyterHub..."
+    COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose up -d
+        ;;
     use_ssl_ss)
         echo "Starting up JupyterHub..."
         COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose up -d
@@ -128,10 +133,13 @@ echo "$REPLACE_LINE"
 sed "s#.*JUPYTERHUB_SERVICE_HOST_IP.*#$REPLACE_LINE#g" .env > /tmp/envfile
 cat /tmp/envfile > .env
 rm /tmp/envfile
-docker stop $(docker ps -a | grep jupyter- | awk '{print $1}')
-docker rm $(docker ps -a | grep jupyter- | awk '{print $1}')
-docker rmi $(docker images -q jupyterhub:latest)
-docker rmi $(docker images -q postgres-hub:latest)
+if [[ ! "$(docker ps -a | grep jupyter-)" ]]; then
+    echo "Removing running notebook servers..."
+    docker stop $(docker ps -a | grep jupyter- | awk '{print $1}')
+    docker rm $(docker ps -a | grep jupyter- | awk '{print $1}')
+fi
+#docker rmi $(docker images -q jupyterhub:latest)
+#docker rmi $(docker images -q postgres-hub:latest)
 #docker rmi -f $(docker images -q jupyterhub-user:latest)
 if [ ! -f 'singleuser/drive.jupyterlab-settings' ]; then
     echo "Copying Google drive JupyterLab settings template..."
@@ -140,13 +148,20 @@ fi
 echo "Rebuilding JupyterHub and Single-user Docker images..."
 echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
+    no_ssl)
+        echo "Rebuilding JupyterHub..."
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml \
+            $DOCKER_BUILD_CACHE_OPTION build
+        ;;
     use_ssl_ss)
         echo "Rebuilding JupyterHub..."
-        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml build
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml \
+            $DOCKER_BUILD_CACHE_OPTION build
         ;;
     use_ssl_le)
         echo "Rebuilding JupyterHub-LetsEncrypt..."
-        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml build
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml \
+            $DOCKER_BUILD_CACHE_OPTION build
         ;;
 esac
 
