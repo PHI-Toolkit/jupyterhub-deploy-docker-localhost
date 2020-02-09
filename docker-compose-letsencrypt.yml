@@ -25,6 +25,11 @@ services:
       - .env
     volumes:
       - "db:${DB_VOLUME_CONTAINER}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
 
   nginx-proxy:
     build:
@@ -40,6 +45,10 @@ services:
       - "./secrets:/etc/nginx/certs:rw"
       - "nginx_vhostd:/etc/nginx/vhost.d:rw"
       - "nginx_html:/usr/share/nginx/html:rw"
+    healthcheck:
+      test: "curl -f https://localhost/ || false"
+      timeout: 3s
+      retries: 3
     #logging:
     #    driver: syslog
     #    options:
@@ -85,11 +94,13 @@ services:
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "data:${DATA_VOLUME_CONTAINER}"
       - "./secrets:/srv/jupyterhub/secrets"
+    healthcheck:
+      test: "curl -f https://localhost/hub/health || false"
+      timeout: 3s
+      retries: 3
     ports:
       - "443:443"
       - "8000:8000"
-    #links:
-    #  - hub-db
     env_file:
       - .env
     environment:
@@ -110,13 +121,9 @@ services:
       LETSENCRYPT_HOST: ${JH_FQDN}
       LETSENCRYPT_EMAIL: ${JH_EMAIL}
       VIRTUAL_HOST: ${JH_FQDN}
-      VIRTUAL_PORT: 443
-    # option 1: default command
+      VIRTUAL_PORT: ${VIRTUAL_PORT}
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py --log-level=${JUPYTERHUB_LOG_LEVEL}
-    # option 2: to upgrade jupyterhub db (if postgres), uncomment 2 lines below
-    #command: >
-    #  jupyterhub upgrade-db
 
 volumes:
   data:
