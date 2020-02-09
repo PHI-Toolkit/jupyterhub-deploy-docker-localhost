@@ -28,6 +28,7 @@ cd; git clone https://github.com/Berico-Technologies/CLAVIN.git
 #echo "Building Lucene index of placenames--this is the slow one"
 #MAVEN_OPTS="-Xmx8g" mvn exec:java -Dexec.mainClass="com.bericotech.clavin.index.IndexDirectoryBuilder"
 
+
 wget https://github.com/berkmancenter/mediacloud-clavin-build-geonames-index/releases/download/2019-09-06/IndexDirectory.tar.gz
 tar zxvf IndexDirectory.tar.gz
 mkdir /etc/cliff2
