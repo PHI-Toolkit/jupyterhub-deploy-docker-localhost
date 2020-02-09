@@ -16,6 +16,10 @@ fi
 unset JUPYTERHUB_SERVICE_HOST_IP
 echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
+    no_ssl)
+        echo "Starting up JupyterHub..."
+        docker-compose up -d
+        ;;
     use_ssl_ss)
         echo "Starting up JupyterHub..."
         docker-compose up -d
