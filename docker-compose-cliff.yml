@@ -26,8 +26,12 @@ services:
     image: cliff
     ports:
       - "8080:8080"
+    healthcheck:
+      test: "curl -f http://localhost:8080/ || false"
+      timeout: 3s
+      retries: 3
 
 networks:
   default:
     external:
-      name: jupyterhubnet
+      name: ${DOCKER_NETWORK_NAME}
