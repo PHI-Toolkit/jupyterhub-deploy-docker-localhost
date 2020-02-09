@@ -8,6 +8,10 @@ if [[ "$(docker ps -a | grep jupyter- | awk '{print $1}')" != "" ]]; then
 fi
 
 case $JUPYTERHUB_SSL in
+    no_ssl)
+        echo "Shutting down JupyterHub..."
+        docker-compose -f docker-compose.yml down
+        ;;
     use_ssl_ss)
         echo "Shutting down JupyterHub..."
         docker-compose -f docker-compose.yml down
