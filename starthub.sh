@@ -6,6 +6,13 @@ echo "Starting up JupyterHub"
 echo "..."
 echo "JUPYTERHUB_SSL = $JUPYTERHUB_SSL"
 case $JUPYTERHUB_SSL in
+    no_ssl)
+        echo "Starting up JupyterHub..."
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml up -d
+        echo "JupyterHub started. Press ctrl-C to stop tracking, JupyterHub will continue running."
+        echo "Run stophub.sh on the command line to stop the JupyterHub server."
+        COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml logs -f -t --tail='all'
+        ;;
     use_ssl_ss)
         echo "Starting up JupyterHub..."
         COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose.yml up -d
@@ -22,7 +29,7 @@ case $JUPYTERHUB_SSL in
         DEFAULTCRT_NAME=secrets/default.crt
         DEFAULTCRT_SIZE=$(stat -c%s "$DEFAULTCRT_NAME")
         COMPOSE_DOCKER_CLI_BUILD=$COMPOSE_DOCKER_CLI_BUILD docker-compose -f docker-compose-letsencrypt.yml up -d
-        sleep 5
+        sleep 10
         if [[ $FULLCHAINPEM_SIZE != $JUPYTERPEM_SIZE ]]; then
             echo "Copying JupyterHub SSL certificate..."
             docker exec jupyterhub bash -c 'echo JH_FQDN: $JH_FQDN'
