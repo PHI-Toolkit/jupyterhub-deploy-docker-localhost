@@ -68,6 +68,11 @@ services:
       - "./secrets:/etc/nginx/certs:rw"
       - "nginx_vhostd:/etc/nginx/vhost.d:rw"
       - "nginx_html:/usr/share/nginx/html:rw"
+    healthcheck:
+      test: "ping -c 1 localhost || fail"
+      interval: 3m
+      timeout: 3s
+      retries: 3
 
   hub:
     #depends_on:
