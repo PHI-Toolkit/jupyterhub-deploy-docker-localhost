@@ -130,7 +130,6 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
 proxy_set_header X-Forwarded-Ssl $proxy_x_forwarded_ssl;
 proxy_set_header X-Forwarded-Port $proxy_x_forwarded_port;
-proxy_set_header Referer $ref;
 
 # Mitigate httpoxy attack (see README for details)
 proxy_set_header Proxy "";
@@ -247,7 +246,19 @@ server {
 	listen [::]:80 {{ $default_server }};
 	{{ end }}
 	access_log /var/log/nginx/access.log vhost;
-	return 301 https://$host$request_uri;
+
+	# Do not HTTPS redirect Let'sEncrypt ACME challenge
+	location /.well-known/acme-challenge/ {
+		auth_basic off;
+		allow all;
+		root /usr/share/nginx/html;
+		try_files $uri =404;
+		break;
+	}
+
+	location / {
+		return 301 https://$host$request_uri;
+	}
 }
 {{ end }}
 
@@ -301,6 +312,8 @@ server {
 		root   {{ trim $vhost_root }};
 		include fastcgi_params;
 		fastcgi_pass {{ trim $upstream_name }};
+		{{ else if eq $proto "grpc" }}
+		grpc_pass {{ trim $proto }}://{{ trim $upstream_name }};
 		{{ else }}
 		proxy_pass {{ trim $proto }}://{{ trim $upstream_name }};
 		{{ end }}
@@ -348,6 +361,8 @@ server {
 		root   {{ trim $vhost_root }};
 		include fastcgi_params;
 		fastcgi_pass {{ trim $upstream_name }};
+		{{ else if eq $proto "grpc" }}
+		grpc_pass {{ trim $proto }}://{{ trim $upstream_name }};
 		{{ else }}
 		proxy_pass {{ trim $proto }}://{{ trim $upstream_name }};
 		{{ end }}

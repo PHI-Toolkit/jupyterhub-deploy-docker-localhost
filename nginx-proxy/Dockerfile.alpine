@@ -1,9 +1,9 @@
-FROM nginx:1.17.3-alpine
+FROM nginx:1.17.6-alpine
 LABEL maintainer="Jason Wilder mail@jasonwilder.com"
 
 # Install wget and install/updates certificates
 RUN apk add --no-cache --virtual .run-deps \
-    ca-certificates bash wget openssl \
+    ca-certificates bash wget curl openssl \
     && update-ca-certificates
 
 
@@ -28,7 +28,7 @@ WORKDIR /app/
 
 ENV DOCKER_HOST unix:///tmp/docker.sock
 
-VOLUME ["/etc/nginx/certs", "/etc/nginx/dhparam", "/etc/nginx/vhost.d", "/usr/share/nginx/html"]
+VOLUME ["/etc/nginx/certs", "/etc/nginx/dhparam"]
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["forego", "start", "-r"]
