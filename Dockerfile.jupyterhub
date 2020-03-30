@@ -12,7 +12,7 @@ ENV JUPYTER_UI ${JUPYTER_UI}
 
 COPY ./miniconda.sh ./miniconda.sh
 RUN apt-get update && \
-    apt-get install -y wget git && \
+    apt-get install -y --no-install-recommends wget git && \
     bash ./miniconda.sh -b -p /opt/miniconda && \
     ls -la /opt/miniconda && \
     rm ./miniconda.sh
