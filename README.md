@@ -20,7 +20,7 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 
 ### Changing the UI to JupyterLab
 
-You can easily switch to the JupyterLab:
+You can easily switch to the JupyterLab user interface:
 1. Temporarily by editing the URL, and replacing `tree` with `lab`.
 2. Permanently by switching the `.env` file entry `JUPYTER_UI=notebook` with `JUPYTER_UI=/lab` (slash is important).
 
@@ -152,25 +152,25 @@ https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
 # JupyterHub Logs / Launch Issues
 
-## Upgrading the miniconda version
+### Upgrading the miniconda version
 * Delete the `miniconda.sh` file from the cloned directory. Run `buildhub.sh` to download an updated Miniconda3 version to be included in the `Dockerfile.jupyterhub` image.
-* 
-## Logs: Old base64 cookie-secret detected in /data/jupyterhub_cookie_secret.
+*
+### Logs: Old base64 cookie-secret detected in /data/jupyterhub_cookie_secret.
 * While jupyterhub is running, type the following commands:
 > `$ docker exec -it jupyterhub /bin/bash`
 * This brings you to the jupyterhub bash prompt. Type the following command to regenerate a new cookie secret:
 > `# openssl rand -hex 32 > "/data/jupyterhub_cookie_secret"`
 
-## Browser: 403 : Forbidden
+### Browser: 403 : Forbidden
 * Add your GitHub username to the `userlist` file as described above.
 
-## JupyterHub Logs: socket.gaierror: [Errno -2] Name or service not known
+### JupyterHub Logs: socket.gaierror: [Errno -2] Name or service not known
 * If you see this error in the logs it means the JUPYTERHUB_SERVICE_HOST_IP is misconfigured.
 
-## Windows user
+### Windows user
 * There may be slight differences in how Chrome or Firefox behaves compared to installations on Linux or Mac (YMMV).
 
-## HTTP Error
+### HTTP Error
 If you get the error:
 > An HTTP error occurred when trying to retrieve this URL.
 HTTP errors are often intermittent, and a simple retry will get you on your way.
@@ -178,5 +178,9 @@ ConnectionError(ReadTimeoutError("HTTPSConnectionPool(host='conda.anaconda.org',
 
 ...and the `buildhub.sh` script is building the user container image (running Dockerfile.custom), just run `make notebook_base`, then `make notebook_body`, and lastly `make notebook_image` to resume rebuilding the Jupyter Notebook singleuser container image (shows up as `jupyterhub-user` if you run `docker images` on the terminal).
 
-## `[Errno 111] Connection Refused` or in the JupyterHub logs after running `starthub.sh` you see the error message `error: [ConfigProxy] Proxy error:  Error: connect EHOSTUNREACH 172.18.0.3:8080` or `tornado.curl_httpclient.CurlError: HTTP 599: Failed to connect to 172.18.0.X port 8080: Connection refused`
+### `[Errno 111] Connection Refused` or in the JupyterHub logs after running `starthub.sh` you see the error message `error: [ConfigProxy] Proxy error:  Error: connect EHOSTUNREACH 172.18.0.3:8080` or `tornado.curl_httpclient.CurlError: HTTP 599: Failed to connect to 172.18.0.X port 8080: Connection refused`
 This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after restarting Docker server (after server reboot). To address this error, run the script `get_service_host_ip.sh` at the command line, which will provide you with the new JUPYTERHUB_SERVICE_HOST_IP value. This script automatically replaces the old value in the `.env` file with this new IP address.
+
+### 500 : Internal Server Error, Error in Authenticator.pre_spawn_start: ImageNotFound 404 Client Error: Not Found ("pull access denied for phitoolkit/jupyterhub-user, repository does not exist or may require 'docker login': denied: requested access to the resource is denied"), You can try restarting your server from the home page.
+
+Check if the notebook server image `phitoolkit/jupyterhub-user` exists. if not, run `make notebook_base`, `make notebook_body`, and `make notebook_image`, before running `starhub.sh`.
