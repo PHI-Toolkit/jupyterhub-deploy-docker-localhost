@@ -85,7 +85,7 @@ services:
       VIRTUAL_PORT: ${VIRTUAL_PORT}
     command: >
       jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py --log-level=${JUPYTERHUB_LOG_LEVEL}
-
+    
 volumes:
   data:
     external:
