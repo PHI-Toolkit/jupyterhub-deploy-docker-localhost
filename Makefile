@@ -40,7 +40,6 @@ notebook_base:
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
 		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
-		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
 		--build-arg JUPYTER_UI=$(JUPYTER_UI) \
 		--file=singleuser/$(DOCKERFILE_BASE) singleuser
 
@@ -49,7 +48,6 @@ notebook_body:
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
-		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
 		--file=singleuser/$(DOCKERFILE_BODY) singleuser
 
 notebook_image: #pull singleuser/Dockerfile
@@ -60,6 +58,7 @@ notebook_image: #pull singleuser/Dockerfile
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
 		--build-arg GEN_CERT=$(GEN_CERT) \
+		--build-arg MAPBOX_API_KEY=$(MAPBOX_API_KEY) \
 		--file=singleuser/$(DOCKERFILE_TAIL) singleuser
 
 build: check-files network volumes
