@@ -4,10 +4,6 @@ FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG NOTEBOOK_VERSION
-ARG NB_USER_PASS
-#ARG GITHUB_ACCESS_TOKEN
-#ARG GITHUB_CLIENT_ID
-#ARG GITHUB_CLIENT_SECRET
 ARG LOGO_IMAGE
 ARG JUPYTER_UI
 ENV JUPYTER_UI ${JUPYTER_UI}
@@ -24,6 +20,7 @@ RUN \
     conda config --prepend channels conda-forge && \
     #conda config --set channel_priority strict && \
     conda config --describe channel_priority && \
+    conda config --set unsatisfiable_hints True && \
     conda config --set ssl_verify no && \
     conda update \
       'openssl' \
@@ -54,11 +51,12 @@ RUN \
     conda install -c conda-forge --yes \
       "jupyterhub=$JUPYTERHUB_VERSION" \
       "jupyterlab=$JUPYTERLAB_VERSION" \
-      'jupyter_client=5.3.3' \
-      'jupyter_console' \
       "notebook=$NOTEBOOK_VERSION" \
-      'libsodium' && \
-    conda install -c anaconda -y 'libspatialite' && \
+      'libsodium' \
+      'python-libarchive-c' \
+      'conda-package-handling' \
+      'libarchive' \
+      'jupyter_client=5.3.4' && \
     conda build purge-all && \
     conda clean --all -f -y
 
@@ -69,7 +67,7 @@ RUN \
     apt-get update && \
     apt-get install -y --no-install-recommends \
       software-properties-common apt-utils ffmpeg \
-      libssl1.0.0 libssl-dev libxtst6 xvfb xdotool wmctrl \
+      libssl1.0.0 libssl-dev libxtst6 xvfb xdotool wmctrl cmake \
       zip unzip file fonts-dejavu tzdata nano graphviz graphviz-dev \
       libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev libpng-dev python-dev && \
     add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable && \

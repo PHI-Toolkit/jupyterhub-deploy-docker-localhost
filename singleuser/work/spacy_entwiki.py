@@ -25,7 +25,7 @@ else:
     #!wget https://github.com/explosion/spacy-models/releases/download/en_vectors_web_lg-2.1.0/en_vectors_web_lg-2.1.0.tar.gz -O /home/jovyan/work/shared/en_vectors_web_lg-2.1.0/en_vectors_web_lg-2.1.0.tar.gz
 
 print('Installing model '+model_name+' ...')
-os.system('pip install --no-cache-dir /home/jovyan/work/shared/'+model_name+'-'+model_version+'/'+model_name+'-'+model_version+'.tar.gz')
+os.system('python -m pip install --no-cache-dir /home/jovyan/work/shared/'+model_name+'-'+model_version+'/'+model_name+'-'+model_version+'.tar.gz')
 try:
     import xx_ent_wiki_sm
     print('Install successful, model '+model_name+'.')

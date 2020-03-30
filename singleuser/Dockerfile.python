@@ -3,148 +3,122 @@ FROM phitoolkit/notebook-base:latest
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG NOTEBOOK_VERSION
-ARG NB_USER_PASS
-#ARG GITHUB_ACCESS_TOKEN
-#ARG GITHUB_CLIENT_ID
-#ARG GITHUB_CLIENT_SECRET
 
 RUN \
     conda update -y conda && \
-    conda install -c conda-forge --yes python-libarchive-c conda-package-handling libarchive && \
     conda install -c conda-forge --yes --verbose \
       # uncomment nomkl as necessary
       #'nomkl=2.0*' \
       # begin stack entries
       'conda-forge::blas=*=openblas' \
-      'ipywidgets=7.5*' \
-      'pandas=0.25*' \
-      'numexpr=2.6*' \
-      'matplotlib-base=3.1*' \
-      'scipy=1.3*' \
-      'seaborn=0.9*' \
-      'scikit-learn=0.21*' \
-      'scikit-image=0.15*' \
-      'sympy=1.4*' \
-      'cython=0.29*' \
-      'patsy=0.5*' \
-      'statsmodels=0.10*' \
-      'cloudpickle=1.2*' \
-      'dill=0.3*' \
-      'dask=2.2.*' \
-      'numba=0.45*' \
-      'bokeh=1.3*' \
-      'sqlalchemy=1.3*' \
-      'hdf5=1.10*' \
-      'h5py=2.9*' \
+      'ipywidgets=7.5.*' \
+      'pandas=0.25.*' \
+      'numexpr=2.7.*' \
+      'matplotlib=3.1.*' \
+      'matplotlib-base=3.1.*' \
+      'scipy=1.4.*' \
+      'seaborn=0.9.*' \
+      'scikit-learn=0.22.*' \
+      'scikit-image=0.16.*' \
+      'sympy=1.5.*' \
+      'cython=0.29.*' \
+      'patsy=0.5.*' \
+      'statsmodels=0.11.*' \
+      'cloudpickle=1.2.*' \
+      'dill=0.3.*' \
+      'dask=2.9.*' \
+      'numba=0.48.*' \
+      'bokeh=1.4.*' \
+      'sqlalchemy=1.3.*' \
+      'hdf5=1.10.*' \
+      'h5py=2.10.*' \
       'vincent=0.4.*' \
       'beautifulsoup4' \
       'protobuf' \
       'xlrd' \
+      'xarray' && \
       # end of stack entries
-      'icu' \
-      'wrapt' \
-      'textblob' && \
-      #'hyper' \
-      #'h2' && \
       conda build purge-all && \
-      conda clean --all -f -y
+      conda clean --all -f -y && \
+      conda remove --quiet --yes --force qt pyqt
+
+RUN \
+    conda install -c conda-forge --yes --verbose \
+      'libstdcxx-ng=7.3*' \
+      'libgcc-ng=7.3*' \
+      'folium=0.10*' \
+      'proj4=5.2*' \
+      'pyproj=1.9.5.1' \
+      'geos=3.7*' \
+      'rtree' && \
+      conda build purge-all && \
+      conda clean --all -f -y && \
+      conda remove --quiet --yes --force qt pyqt
 
 RUN \
     conda update -y conda && \
     conda install -c conda-forge --yes \
-      #'gdal=2.4*' \
-      #'libgdal=2.4*' \
-      #'proj4=5.2.0' \
-      'gdal' \
-      'libgdal' \
-      'proj4' \
-      'pyproj' \
-      #'blaze' \
-      'geos' \
-      'osmnx=0.11.0' \
-      'pillow' \
-      # folium unit
-      #'fiona=1.8*' \
-      #'libkml=1.3*' \
-      #'kealib=1.4*' \
-      'fiona' \
-      'libkml' \
-      'kealib' \
-      # end of folium unit
-      'rasterio' \
-      'geojson' \
-      'pyshp' \
-      'shapely' \
-      'geopandas' \
-      'mplleaflet' \
-      'xarray' \
-      'pyke' \
       'netcdf4' \
       'cf_units' \
       'setuptools' \
-      #'bkcharts' \
-      'basemap' \
-      'basemap-data-hires' \
       'networkx' \
-      'cartopy' \
       'datashader' \
-      #'openpyxl' \
-      #'bqplot' \
-      'qgrid' \
-      'vega' \
-      'vega_datasets' \
+      'altair' \
       'numpy' \
-      'jupyter_contrib_core' \
-      'jupyter_contrib_nbextensions' \
-      'jupyter_nbextensions_configurator' \
       'widgetsnbextension' \
       'wordcloud' \
-      'altair' \
-      'Automat' \
-      'fuzzywuzzy' \
-      'python-levenshtein' \
-      #'folium=0.10*' \
-      'folium' \
-      'neo4j-python-driver' \
-      'py2neo' \
-      #'rise' \
-      'tabulate' \
-      'nodejs' \
       'nbconvert' \
       'psycopg2' \
-      #'holoviews' \
-      #'geoviews' \
       'python-snappy' \
       'graphviz' \
       'python-graphviz' \
-      'selenium' \
-      'phantomjs' \
-      'missingno' \
-      'camelot-py' \
-      'spacy' \
-      'uritemplate' \
-      'blaze' \
-      'pysal' \
-      'pandas-datareader' \
       'twisted' \
       'ujson' \
       'gensim' \
-      'movingpandas' && \
+      'nbdime' && \
     conda build purge-all && \
     conda clean --all -f -y && \
     conda remove --quiet --yes --force qt pyqt
 
 RUN \
-    python -m pip install --upgrade pip && \
-    python -m pip install  --no-cache-dir --upgrade "ipython[all]" && \
-    python -m pip install --no-cache-dir --upgrade \
+    python -m pip install --no-cache-dir --upgrade 'pip' && \
+    python -m pip install  --no-cache-dir --upgrade \
+      'ipython[all]' && \
+    python -m pip install  --no-cache-dir \
+      'gtts==2.1.1' \
+      'python-dateutil<2.8.1' \
+      'osmnx==0.11.0' \
+      'qgrid==1.3.0' \
+      # This scipy 1.4.1 is for tensorflow 2.0
+      'scipy==1.4.1' \
+      'pyproj==1.9.6' \
+      'geopandas==0.6.3' \
+      'plotly==4.5.4' \
+      'plotly-geo==1.0.0' \
+      'dash==1.9.1' \
+      'dash-daq==0.3.3' && \
+    # Note: The cartopy installation below is a workaround:
+    # https://github.com/SciTools/cartopy/issues/1377
+    python -m pip install --no-cache-dir 'git+https://github.com/SciTools/cartopy.git' --no-binary cartopy && \
+    python -m pip install --no-cache-dir  \
+      'camelot-py[cv]' \
+      'spacy[lookups]' \
+      'shapely' \
       'twisted' \
+      'fuzzywuzzy[speedup]' \
+      'missingno' \
+      'geojson' \
+      'jupyter_contrib_core' \
+      'mplleaflet' \
+      'uritemplate' \
+      'movingpandas' \
+      'pandas-datareader' \
+      'pyshp' \
+      'tabulate' \
+      'py2neo' \
       'websocket' \
-      'future' \
       'nbresuse' \
       'dedupe' \
-      'nx_altair' \
-      'Dora' \
       'apiclient' \
       'jupyter_disqus' \
       'jupyterlab_latex' \
@@ -152,8 +126,8 @@ RUN \
       'sklearn-pandas' \
       'jupyterlab_geojson' \
       'jupyterlab-widgets' \
-      'gtts==2.0.3' \
-      'tornado' \
+      'jupyterlab-git' \
+      'jupyterlab-sql' \
       'pyzmq' \
       'goose3' \
       'newspaper3k' \
@@ -162,16 +136,22 @@ RUN \
       'alphashape' \
       'pyepsg' \
       'chart-studio' \
-      'pygeoj' \
       'geonamescache' \
       'hvplot' \
       'recordlinkage' \
       'opencv-python' \
-      'opencv-contrib-python' && \
+      'opencv-contrib-python' \
+      'vega' \
+      'vega_datasets'
+
+RUN \
     # Activate ipywidgets extension in the environment that runs the notebook server
-    jupyter contrib nbextension install --user && \
-    jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
-    jupyter nbextensions_configurator enable --user && \
+    jupyter nbextension install --py qgrid && \
+    jupyter nbextension enable --py qgrid && \
+    jupyter serverextension enable --py jupyterlab_git && \
+    jupyter serverextension enable jupyterlab_sql --py --sys-prefix && \
+    jupyter nbextension install --py widgetsnbextension --sys-prefix && \
+    jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
     rm -fvR /home/jovyan/work/notebook-extensions && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
