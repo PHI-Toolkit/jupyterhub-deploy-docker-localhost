@@ -56,8 +56,7 @@ c.DockerSpawner.notebook_dir = notebook_dir
 #c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
 c.DockerSpawner.volumes = {
     'jupyterhub-user-{username}': notebook_dir,
-    'jupyter-shared': '/home/jovyan/work/shared/',
-    'jupyter-public': '/home/jovyan/public_html'
+    'jupyter-shared': '/home/jovyan/work/shared/'
 }
 
 #c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
