@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  neo4j:
+    build:
+      context: .
+      dockerfile: server_apps/neo4j/Dockerfile.neo4j
+      args:
+        NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+    restart: always
+    container_name: neo4j
+    image: neo4j:latest
+    env_file:
+      - .env
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+      - "7473:7473"
+    env_file:
+      - .env
+    environment:
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_dbms_shell_enabled: "true"
+      NEO4J_dbms_memory_pagecache_size: "1G"
+      VIRTUAL_HOST: neo4j
+      VIRTUAL_PORT: 7473
+    volumes:
+      - ./server_apps/neo4j/plugins:/plugins
+      - ./server_apps/neo4j/data:/data
+      - ./server_apps/neo4j/import:/import
+      - ./server_apps/neo4j/logs:/logs
+      - ./secrets:/ssl
+    healthcheck:
+          test: curl --fail -s http://localhost:7474/ || exit 1
+          interval: 1m30s
+          timeout: 10s
+          retries: 3
+
+networks:
+  default:
+    external:
+      name: ${DOCKER_NETWORK_NAME}
