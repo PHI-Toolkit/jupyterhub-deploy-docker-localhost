@@ -48,9 +48,11 @@ RUN \
       'libgcc-ng=7.3*' \
       'folium=0.10*' \
       'proj4=5.2*' \
-      'pyproj=1.9.5.1' \
+      'pyproj>=1.9.3,<2' \
       'geos=3.7*' \
-      'rtree' && \
+      'rtree' \
+      'nodejs=10.*' \
+      'basemap' && \
       conda build purge-all && \
       conda clean --all -f -y && \
       conda remove --quiet --yes --force qt pyqt
@@ -93,10 +95,10 @@ RUN \
       'scipy==1.4.1' \
       'pyproj==1.9.6' \
       'geopandas==0.6.3' \
-      'plotly==4.5.4' \
+      'plotly==4.6.0' \
       'plotly-geo==1.0.0' \
-      'dash==1.9.1' \
-      'dash-daq==0.3.3' && \
+      'dash==1.10.0' \
+      'dash-daq==0.4.0' && \
     # Note: The cartopy installation below is a workaround:
     # https://github.com/SciTools/cartopy/issues/1377
     python -m pip install --no-cache-dir 'git+https://github.com/SciTools/cartopy.git' --no-binary cartopy && \
@@ -126,8 +128,6 @@ RUN \
       'sklearn-pandas' \
       'jupyterlab_geojson' \
       'jupyterlab-widgets' \
-      'jupyterlab-git' \
-      'jupyterlab-sql' \
       'pyzmq' \
       'goose3' \
       'newspaper3k' \
@@ -148,8 +148,6 @@ RUN \
     # Activate ipywidgets extension in the environment that runs the notebook server
     jupyter nbextension install --py qgrid && \
     jupyter nbextension enable --py qgrid && \
-    jupyter serverextension enable --py jupyterlab_git && \
-    jupyter serverextension enable jupyterlab_sql --py --sys-prefix && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
     rm -fvR /home/jovyan/work/notebook-extensions && \
@@ -157,4 +155,5 @@ RUN \
     rm -rf /home/$NB_USER/.cache/yarn && \
     rm -rf /home/$NB_USER/.node-gyp && \
     fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    fix-permissions /home/$NB_USER && \
+    mkdir -p /usr/share/proj
