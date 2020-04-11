@@ -92,7 +92,8 @@ RUN \
         'mediacloud-cliff' \
         'jupyter-datatables' \
         'pydeck' \
-        'rasterstats'
+        'rasterstats' \
+        'sentinelsat'
 
 # Address iopub data error message with custom config
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
