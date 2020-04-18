@@ -57,7 +57,11 @@ RUN \
         'nbgitpuller' \
         'voila' \
         'voila-gridstack' \
-        'keplergl'
+        'keplergl' && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-sidecar && \
+    #jupyter labextension install @jupyterlab/plotly-extension && \
+    nbdime extensions --enable --sys-prefix
 
 # special packages for special projects
 RUN \
