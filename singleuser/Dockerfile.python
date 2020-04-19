@@ -77,8 +77,7 @@ RUN \
       'twisted' \
       'ujson' \
       'gensim' \
-      'nbdime' \
-      'jupyterlab-plotly-extension' && \
+      'nbdime' && \
     conda build purge-all && \
     conda clean --all -f -y && \
     conda remove --quiet --yes --force qt pyqt
