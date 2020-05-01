@@ -77,7 +77,8 @@ RUN \
       'twisted' \
       'ujson' \
       'gensim' \
-      'nbdime' && \
+      'nbdime' \
+      'pysal' && \
     conda build purge-all && \
     conda clean --all -f -y && \
     conda remove --quiet --yes --force qt pyqt

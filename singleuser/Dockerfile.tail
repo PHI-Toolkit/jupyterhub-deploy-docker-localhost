@@ -66,6 +66,7 @@ RUN \
     jupyter labextension install jupyterlab-plotly@4.6.0 --no-build && \
     jupyter labextension install plotlywidget@4.6.0 --no-build && \
     jupyter labextension install @jupyter-widgets/jupyterlab-sidecar --no-build && \
+    jupyter labextension install @jupyterlab/geojson-extension --no-build && \
     jupyter lab build && \
     unset NODE_OPTIONS && \
     nbdime extensions --enable --sys-prefix
@@ -104,7 +105,10 @@ RUN \
         'jupyter-datatables' \
         'pydeck' \
         'rasterstats' \
-        'sentinelsat'
+        'sentinelsat' \
+        'pmdarima' \
+        'tenacity' \
+        'pydap'
 
 # Address iopub data error message with custom config
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
