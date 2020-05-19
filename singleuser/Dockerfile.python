@@ -12,23 +12,23 @@ RUN \
       # begin stack entries
       'conda-forge::blas=*=openblas' \
       'ipywidgets=7.5.*' \
-      'pandas=0.25.*' \
+      'pandas=1.0*' \
       'numexpr=2.7.*' \
-      'matplotlib=3.1.*' \
-      'matplotlib-base=3.1.*' \
+      'matplotlib=3.2.*' \
+      'matplotlib-base=3.2.*' \
       'scipy=1.4.*' \
-      'seaborn=0.9.*' \
+      'seaborn=0.10.*' \
       'scikit-learn=0.22.*' \
       'scikit-image=0.16.*' \
       'sympy=1.5.*' \
       'cython=0.29.*' \
       'patsy=0.5.*' \
       'statsmodels=0.11.*' \
-      'cloudpickle=1.2.*' \
+      'cloudpickle=1.4.*' \
       'dill=0.3.*' \
-      'dask=2.9.*' \
+      'dask=2.15.*' \
       'numba=0.48.*' \
-      'bokeh=1.4.*' \
+      'bokeh=2.0.*' \
       'sqlalchemy=1.3.*' \
       'hdf5=1.10.*' \
       'h5py=2.10.*' \
@@ -36,6 +36,8 @@ RUN \
       'beautifulsoup4' \
       'protobuf' \
       'xlrd' \
+      'widgetsnbextension=3.5.*' \
+      'ipympl=0.5.*' \
       'xarray' && \
       # end of stack entries
       conda build purge-all && \
@@ -46,7 +48,7 @@ RUN \
     conda install -c conda-forge --yes --verbose \
       'libstdcxx-ng=7.3*' \
       'libgcc-ng=7.3*' \
-      'folium=0.10*' \
+      'folium=0.11*' \
       'proj4=5.2*' \
       'pyproj>=1.9.3,<2' \
       'geos=3.7*' \
@@ -67,7 +69,6 @@ RUN \
       'datashader' \
       'altair' \
       'numpy' \
-      'widgetsnbextension' \
       'wordcloud' \
       'nbconvert' \
       'psycopg2' \
@@ -79,6 +80,7 @@ RUN \
       'gensim' \
       'nbdime' \
       'pysal' && \
+    conda install -c stcorp 'harp' && \
     conda build purge-all && \
     conda clean --all -f -y && \
     conda remove --quiet --yes --force qt pyqt
@@ -95,7 +97,7 @@ RUN \
       # This scipy 1.4.1 is for tensorflow 2.0
       'scipy==1.4.1' \
       'pyproj==1.9.6' \
-      'geopandas==0.6.3' \
+      'geopandas' \
       'plotly==4.6.0' \
       'plotly-geo==1.0.0' \
       'dash==1.10.0' \
@@ -103,6 +105,7 @@ RUN \
     # Note: The cartopy installation below is a workaround:
     # https://github.com/SciTools/cartopy/issues/1377
     python -m pip install --no-cache-dir 'git+https://github.com/SciTools/cartopy.git' --no-binary cartopy && \
+    python -m pip install jupyter-tabnine --user && \
     python -m pip install --no-cache-dir  \
       'camelot-py[cv]' \
       'spacy[lookups]' \
@@ -151,6 +154,9 @@ RUN \
     jupyter nbextension enable --py qgrid && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
+    jupyter nbextension install --py jupyter_tabnine --user && \
+    jupyter nbextension enable --py jupyter_tabnine --user && \
+    jupyter serverextension enable --py jupyter_tabnine --user && \
     rm -fvR /home/jovyan/work/notebook-extensions && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \

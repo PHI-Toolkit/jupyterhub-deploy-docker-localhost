@@ -108,7 +108,11 @@ RUN \
         'sentinelsat' \
         'pmdarima' \
         'tenacity' \
-        'pydap'
+        'pydap'  \
+        'pystan' \
+        'dataflows' \
+        'datapackage' \
+        'jupyter-server-proxy'
 
 # Address iopub data error message with custom config
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
@@ -142,7 +146,10 @@ RUN \
     chmod -R a+w /opt/conda/pkgs/cache/ && \
     if [ "$NB_USER_PASS" != "" ]; then echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
       sed -i 's/ NOPASSWD://g' /etc/sudoers; fi && \
-    unset NB_USER_PASS
+    unset NB_USER_PASS && \
+    echo 'export VISUAL=nano' >> ~/.bashrc && \
+    echo 'export EDITOR="$VISUAL"' >> ~/.bashrc && \
+    export VISUAL=nano && export EDITOR="$VISUAL"
 
 HEALTHCHECK --interval=2m --timeout=3s --retries=3 CMD curl --silent http://$HOSTNAME:8888 || fail
 
