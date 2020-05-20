@@ -17,6 +17,7 @@ COPY work/load_spacy.sh .
 COPY spacy_*.py .
 COPY work/load_tensorflow.sh .
 COPY work/load_h3.sh .
+COPY work/load_harp.sh .
 COPY work/epsg /usr/share/proj/.
 
 RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \

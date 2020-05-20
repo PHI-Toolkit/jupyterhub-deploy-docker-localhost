@@ -15,7 +15,7 @@ RUN \
       'pandas=1.0*' \
       'numexpr=2.7.*' \
       'matplotlib=3.2.*' \
-      'matplotlib-base=3.2.*' \
+      'matplotlib-base=3.*' \
       'scipy=1.4.*' \
       'seaborn=0.10.*' \
       'scikit-learn=0.22.*' \
@@ -80,7 +80,6 @@ RUN \
       'gensim' \
       'nbdime' \
       'pysal' && \
-    conda install -c stcorp 'harp' && \
     conda build purge-all && \
     conda clean --all -f -y && \
     conda remove --quiet --yes --force qt pyqt
