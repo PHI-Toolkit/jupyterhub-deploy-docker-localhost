@@ -69,7 +69,8 @@ RUN \
       software-properties-common apt-utils ffmpeg \
       libssl1.0.0 libssl-dev libxtst6 xvfb xdotool wmctrl cmake \
       zip unzip file fonts-dejavu tzdata nano graphviz graphviz-dev \
-      libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev libpng-dev python-dev && \
+      libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev libpng-dev python-dev \
+      git-lfs mc && \
     add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable && \
     apt-get update && \
     ln -sf /usr/share/zoneinfo/EST /etc/localtime && \

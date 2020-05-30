@@ -15,7 +15,7 @@ RUN \
       'pandas=1.0*' \
       'numexpr=2.7.*' \
       'matplotlib=3.2.*' \
-      'matplotlib-base=3.*' \
+      'matplotlib-base=3.2.*' \
       'scipy=1.4.*' \
       'seaborn=0.10.*' \
       'scikit-learn=0.22.*' \
@@ -84,6 +84,13 @@ RUN \
     conda clean --all -f -y && \
     conda remove --quiet --yes --force qt pyqt
 
+# comment out next 5 lines below if errors persist
+RUN \
+  conda install -c stcorp 'harp' && \
+  conda build purge-all && \
+  conda clean --all -f -y && \
+  conda remove --quiet --yes --force qt pyqt
+
 RUN \
     python -m pip install --no-cache-dir --upgrade 'pip' && \
     python -m pip install  --no-cache-dir --upgrade \
@@ -97,7 +104,7 @@ RUN \
       'scipy==1.4.1' \
       'pyproj==1.9.6' \
       'geopandas' \
-      'plotly==4.6.0' \
+      'plotly==4.8.0' \
       'plotly-geo==1.0.0' \
       'dash==1.10.0' \
       'dash-daq==0.4.0' && \
@@ -125,9 +132,7 @@ RUN \
       'nbresuse' \
       'dedupe' \
       'apiclient' \
-      'jupyter_disqus' \
       'jupyterlab_latex' \
-      'sidecar' \
       'sklearn-pandas' \
       'jupyterlab_geojson' \
       'jupyterlab-widgets' \

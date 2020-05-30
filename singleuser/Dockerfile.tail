@@ -17,7 +17,6 @@ COPY work/load_spacy.sh .
 COPY spacy_*.py .
 COPY work/load_tensorflow.sh .
 COPY work/load_h3.sh .
-COPY work/load_harp.sh .
 COPY work/epsg /usr/share/proj/.
 
 RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \
@@ -113,7 +112,8 @@ RUN \
         'pystan' \
         'dataflows' \
         'datapackage' \
-        'jupyter-server-proxy'
+        'jupyter-server-proxy' \
+        'jupyter_plotly_dash'
 
 # Address iopub data error message with custom config
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
@@ -150,7 +150,8 @@ RUN \
     unset NB_USER_PASS && \
     echo 'export VISUAL=nano' >> ~/.bashrc && \
     echo 'export EDITOR="$VISUAL"' >> ~/.bashrc && \
-    export VISUAL=nano && export EDITOR="$VISUAL"
+    export VISUAL=nano && export EDITOR="$VISUAL" && \
+    git lfs install
 
 HEALTHCHECK --interval=2m --timeout=3s --retries=3 CMD curl --silent http://$HOSTNAME:8888 || fail
 
