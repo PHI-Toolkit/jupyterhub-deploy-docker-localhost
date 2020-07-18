@@ -1,4 +1,4 @@
-# Version: 20190203
+# Version: 2020-07-18
 ARG DOCKER_NOTEBOOK_IMAGE
 FROM $DOCKER_NOTEBOOK_IMAGE
 ARG JUPYTERHUB_VERSION
@@ -11,16 +11,17 @@ ENV JUPYTER_UI ${JUPYTER_UI}
 LABEL maintainer='herman.tolentino@gmail.com'
 
 RUN \
-    conda config --show-sources
-    #mv /opt/conda/conda-meta/pinned /opt/conda/conda-meta/pinned.bak
-
-RUN \
-    conda update conda && \
-    conda install -c conda-forge -y 'conda-build=3.18*' && \
+    conda config --set channel_priority false && \
+    echo "python=3.7.6" > /opt/conda/conda-meta/pinned && \
+    echo "conda=4.6.12" >> /opt/conda/conda-meta/pinned && \
+    conda config --show-sources && \
+    conda config --set auto_update_conda false && \
+    conda config --set allow_conda_downgrades true && \
+    conda install --no-pin 'conda=4.6.12' 'python=3.7*' && \
+    conda install -c conda-forge -y 'conda-build' && \
     conda config --prepend channels conda-forge && \
-    #conda config --set channel_priority strict && \
     conda config --describe channel_priority && \
-    conda config --set unsatisfiable_hints True && \
+    #conda config --set unsatisfiable_hints True && \
     conda config --set ssl_verify no && \
     conda update \
       'openssl' \
@@ -67,7 +68,7 @@ RUN \
     apt-get update && \
     apt-get install -y --no-install-recommends \
       software-properties-common apt-utils ffmpeg \
-      libssl1.0.0 libssl-dev libxtst6 xvfb xdotool wmctrl cmake \
+      libssl1.1 libssl-dev libxtst6 xvfb xdotool wmctrl cmake \
       zip unzip file fonts-dejavu tzdata nano graphviz graphviz-dev \
       libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev libpng-dev python-dev \
       git-lfs mc && \
