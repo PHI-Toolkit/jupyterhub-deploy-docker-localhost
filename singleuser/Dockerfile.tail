@@ -9,7 +9,8 @@ ARG MAPBOX_API_KEY
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 ENV MAPBOX_API_KEY $MAPBOX_API_KEY
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
-    fix-permissions /home/$NB_USER
+    fix-permissions /home/$NB_USER && \
+    echo "Set disable_coredump false" >> /etc/sudo.conf
 
 USER $NB_USER
 COPY work .

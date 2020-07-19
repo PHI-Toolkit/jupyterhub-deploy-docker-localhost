@@ -1,4 +1,4 @@
-# Version: 20190524
+# Version: 2020-07-18
 FROM phitoolkit/notebook-base:latest
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
@@ -79,7 +79,12 @@ RUN \
       'networkx' \
       'datashader' \
       'altair' \
-      'numpy' \
+      'numpy' && \
+    conda build purge-all && \
+    conda clean --all -f -y
+
+RUN \
+  conda install -c conda-forge --yes \
       'wordcloud' \
       'nbconvert' \
       'psycopg2' \
