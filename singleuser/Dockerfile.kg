@@ -1,0 +1,59 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+ARG DOCKER_NOTEBOOK_BASE
+FROM $DOCKER_NOTEBOOK_BASE
+
+USER root
+RUN \
+    # uncomment the line below if necessary
+    #/bin/bash upgrade-distro.sh
+    ln -sf /bin/bash /bin/sh && \
+    ln -s /bin/tar /bin/gtar && \
+    echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER ${NB_UID}
+
+WORKDIR /home/jovyan/work
+
+COPY py*.yaml .
+
+RUN \
+    mamba config --set channel_priority false && \
+    echo "python>=$PYTHON_VERSION" > /opt/conda/conda-meta/pinned && \
+    echo "conda>=$CONDA_VERSION" > /opt/conda/conda-meta/pinned && \
+    mamba config --show-sources && \
+    mamba config --set auto_update_conda false && \
+    mamba config --set allow_conda_downgrades true && \
+    mamba install --no-pin "conda=$CONDA_VERSION" "python=$PYTHON_VERSION" && \
+    mamba config --prepend channels conda-forge && \
+    mamba config --describe channel_priority && \
+    #conda config --set unsatisfiable_hints True && \
+    mamba config --set ssl_verify no && \
+    mamba update \
+      'openssl>=1.1*' \
+      'ca-certificates' \
+      'certifi' && \
+    mamba config --set ssl_verify yes
+
+ENV DEBIAN_FRONTEND noninteractive
+
+WORKDIR /home/jovyan/work
+
+RUN pip install jupyter_kernel_gateway==1.1.2
+
+RUN \
+    sudo chown 1000:1000 ${HOME}/work/*.yaml && \
+    mamba env create -f pypy3-base.yaml -p ${CONDA_DIR}/envs/pypy && \
+    source activate ${CONDA_DIR}/envs/pypy && \
+    mamba list > pypy3-base.txt && \
+    python -m ipykernel install --user --name pypy --display-name "pypy3 (base)" && \
+    mamba clean --all -f -y && \
+    conda deactivate && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
+
+# run kernel gateway, not notebook server
+CMD ["jupyter", "kernelgateway", "--KernelGatewayApp.ip=0.0.0.0"]
+
+HEALTHCHECK --interval=2m --timeout=3s --retries=3 CMD curl --silent http://$HOSTNAME:9889 || fail

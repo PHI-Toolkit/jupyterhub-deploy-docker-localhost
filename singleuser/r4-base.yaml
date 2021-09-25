@@ -1,0 +1,27 @@
+name: r4-base
+channels:
+  - anaconda
+  - r
+  - conda-forge
+dependencies:
+  - jupyter
+  - jupyterlab
+  - jupyter_client
+  - r-base
+  - r-essentials
+  - r-caret
+  - r-crayon
+  - r-devtools
+  - r-forecast
+  - r-hexbin
+  - r-htmltools
+  - r-htmlwidgets
+  - r-irkernel
+  - r-nycflights13
+  - r-randomforest
+  - r-rcurl
+  - r-rmarkdown
+  - r-rsqlite
+  - r-shiny
+  - r-tidyverse
+  - rpy2

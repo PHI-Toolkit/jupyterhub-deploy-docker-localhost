@@ -1,178 +1,123 @@
-# Version: 2020-07-18
+# Version: 2021-03-21
 FROM phitoolkit/notebook-base:latest
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG NOTEBOOK_VERSION
+ARG PLOTLY_VERSION
+
+
+ENV CONDA_ENVS_PATH=/opt/conda/envs \
+    CONDA_PKGS_DIRS=/opt/conda/pkgs \
+    CONDA_DIR=/opt/conda
+
+USER ${NB_UID}
 
 RUN \
-    #conda update -y conda && \
-    conda install -c conda-forge --yes --verbose \
-      # uncomment nomkl as necessary
-      #'nomkl=2.0*' \
-      # begin stack entries
-      'conda-forge::blas=*=openblas' \
-      'ipywidgets=7.5.*' \
-      'pandas=1.0*' \
-      'numexpr=2.7.*' \
-      #'matplotlib=3.2.2' \
-      #'matplotlib-base=3.2.2' \
-      'matplotlib' \
-      'matplotlib-base' \
-      'scipy=1.5.*' \
-      'seaborn=0.10.*' \
-      'scikit-learn=0.22.*' \
-      'scikit-image=0.16.*' \
-      'sympy=1.5.*' \
-      'cython=0.29.*' \
-      'patsy=0.5.*' \
-      'statsmodels=0.11.*' \
-      'cloudpickle=1.4.*' \
-      'dill=0.3.*' \
-      'dask=2.15.*' \
-      'numba=0.48.*' \
-      'bokeh=2.0.*' \
-      'sqlalchemy=1.3.*' \
-      #'hdf5=1.10.*' \
-      'hdf5' \
-      'h5py=2.10.*' \
-      'vincent=0.4.*' \
-      'beautifulsoup4' \
-      'protobuf' \
-      'xlrd' \
-      'widgetsnbextension=3.5.*' \
-      'ipympl=0.5.*' \
-      'xarray' && \
-      # end of stack entries
-      conda build purge-all && \
-      conda clean --all -f -y
+    pwd && \
+    sudo mkdir -p /usr/share/proj && \
+    mkdir -p /home/jovyan/install-packages && \
+    mkdir -p /home/jovyan/kernel-config-files
 
-# comment out next 5 lines below if errors persist
-RUN \
-    conda install -c stcorp --yes 'harp' && \
-    conda build purge-all && \
-    conda clean --all -f -y
+COPY work/epsg /usr/share/proj/.
+
+WORKDIR /home/jovyan/work/
+
+COPY *.yaml /home/jovyan/kernel-config-files/.
+COPY *.R /home/jovyan/kernel-config-files/.
+COPY *.json /home/jovyan/kernel-config-files/.
+COPY install-*.sh /home/jovyan/install-packages/.
 
 RUN \
-    conda install -c conda-forge --yes --verbose \
-      #'libstdcxx-ng=7.3*' \
-      #'libgcc-ng=7.3*' \
-      'libstdcxx-ng=9.2.0' \
-      'libgcc-ng=9.2.0' \
-      'folium=0.11*' \
-      #'proj4=5.2*' \
-      'proj=7.0.0' \
-      #'pyproj>=1.9.3,<2' \
-      #'geos=3.7*' \
-      'geos' \
-      'rtree' \
-      'nodejs=10.*' \
-      'cartopy' \
-      'basemap' && \
-      conda build purge-all && \
-      conda clean --all -f -y
+    sudo mv /home/jovyan/kernel-config-files/jupyter_server_config.json /opt/conda/etc/jupyter/jupyter_server_config.d/. && \
+    sudo chown "${NB_UID}":"${NB_GID}" ${HOME}/kernel-config-files/*.yaml && \
+    sudo chown "${NB_UID}":"${NB_GID}" ${HOME}/kernel-config-files/*.R && \
+    sudo chown "${NB_UID}":"${NB_GID}" -R ${HOME}/install-packages/ && \
+    sudo chmod a+w -R /home/jovyan/kernel-config-files/ && \
+    sudo chmod a+x /home/jovyan/install-packages/*.sh && \
+    sudo mkdir -p "${CONDA_DIR}/envs/py3-remote-sensing" && \
+    sudo mkdir -p "${CONDA_DIR}/envs/py3-nlp" && \
+    sudo mkdir -p "${CONDA_DIR}/envs/r4-base" && \
+    sudo chmod a+w -R "${CONDA_DIR}/envs/" && \
+    sudo chown "${NB_UID}":"${NB_GID}" -R "${CONDA_DIR}/" && \
+    sudo chmod a+w -R /home/jovyan/work/ && \
+    sudo chown "${NB_UID}":"${NB_GID}" -R "/home/${NB_USER}/work/" && \
+    sudo mkdir -p /usr/local/share/jupyter/ && \
+    sudo chown -R "${NB_UID}":"${NB_GID}" /usr/local/share/jupyter/
 
 RUN \
-    conda install -c conda-forge --yes \
-      'netcdf4' \
-      'cf_units'  \
-      'setuptools' \
-      'networkx' \
-      'datashader' \
-      'altair' \
-      'numpy' && \
-    conda build purge-all && \
-    conda clean --all -f -y
+    mamba env update -v -n base -f /home/jovyan/kernel-config-files/py3-base1.yaml && \
+    mamba clean --all -f -y && \
+    mamba config --set auto_stack 1 && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
 
 RUN \
-  conda install -c conda-forge --yes \
-      'wordcloud' \
-      'nbconvert' \
-      'psycopg2' \
-      'twisted' \
-      'ujson' \
-      'gensim' \
-      'nbdime' && \
-    conda build purge-all && \
-    conda clean --all -f -y
+    mamba env create -v -f /home/jovyan/kernel-config-files/py3-remote-sensing.yaml -p ${CONDA_DIR}/envs/py3-remote-sensing && \
+    source activate ${CONDA_DIR}/envs/py3-remote-sensing && \
+    mamba list > /home/jovyan/kernel-config-files/py3-remote-sensing.txt && \
+    python -m ipykernel install --user --name py3-remote-sensing --display-name "Python3 (RS)" && \
+    mamba clean --all -f -y && \
+    conda deactivate && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
 
 RUN \
-    conda install -c conda-forge -y h3 h3-py && \
-    conda build purge-all && \
-    conda clean --all -f -y
+    mamba env create -v -f /home/jovyan/kernel-config-files/py3-nlp.yaml -p ${CONDA_DIR}/envs/py3-nlp && \
+    source activate ${CONDA_DIR}/envs/py3-nlp && \
+    mamba list > /home/jovyan/kernel-config-files/py3-nlp.txt && \
+    python -m ipykernel install --user --name py3-nlp --display-name "Python3 (NLP)" && \
+    mamba clean --all -f -y && \
+    conda deactivate && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
 
 RUN \
-    python -m pip install --no-cache-dir --upgrade 'pip' && \
-    python -m pip install  --no-cache-dir --upgrade \
-      'ipython[all]' && \
-    python -m pip install  --no-cache-dir \
-      'gtts==2.1.1' \
-      'python-dateutil<2.8.1' \
-      'osmnx==0.15.0' \
-      'qgrid==1.3.0' \
-      'pyproj==2.6.1.post1' \
-      'geopandas==0.8.0' \
-      'plotly==4.9.0' \
-      'plotly-geo==1.0.0' \
-      'dash==1.13.4' \
-      'dash-daq==0.5.0' \
-      'pysal==2.2.0' && \
-    # Note: The cartopy installation below is a workaround:
-    # https://github.com/SciTools/cartopy/issues/1377
-    #python -m pip install --no-cache-dir 'git+https://github.com/SciTools/cartopy.git' --no-binary cartopy && \
-    python -m pip install jupyter-tabnine --user && \
-    python -m pip install --no-cache-dir  \
-      'camelot-py[cv]' \
-      'spacy[lookups]' \
-      'shapely' \
-      'twisted' \
-      'fuzzywuzzy[speedup]' \
-      'missingno' \
-      'geojson' \
-      'jupyter_contrib_core' \
-      'mplleaflet' \
-      'uritemplate' \
-      'movingpandas' \
-      'pandas-datareader' \
-      'pyshp' \
-      'tabulate' \
-      'py2neo' \
-      'websocket' \
-      'nbresuse' \
-      'dedupe' \
-      'apiclient' \
-      'jupyterlab_latex' \
-      'sklearn-pandas' \
-      'jupyterlab_geojson' \
-      'jupyterlab-widgets' \
-      'pyzmq' \
-      'goose3' \
-      'newspaper3k' \
-      'geocoder' \
-      'pyldavis' \
-      'alphashape' \
-      'pyepsg' \
-      'chart-studio' \
-      'geonamescache' \
-      'hvplot' \
-      'recordlinkage' \
-      'opencv-python' \
-      'opencv-contrib-python' \
-      'vega' \
-      'vega_datasets'
+    mamba create -v -y -p ${CONDA_DIR}/envs/r4-base -c r -c anaconda -c conda-forge r-base r-essentials r-irkernel && \
+    source activate ${CONDA_DIR}/envs/r4-base && \
+    mamba env update -f /home/jovyan/kernel-config-files/r4-base.yaml -p ${CONDA_DIR}/envs/r4-base && \
+    Rscript -e "install.packages('devtools',repos = 'http://cran.us.r-project.org')" && \
+    Rscript -e "devtools::install_github('IRkernel/IRkernel')" && \
+    Rscript -e "IRkernel::installspec(user = TRUE, name = 'r4-base', displayname = 'R 4.1.0')" && \
+    conda deactivate && \
+    mamba clean --all -f -y && \
+    fix-permissions "${CONDA_DIR}" && \
+    fix-permissions "/home/${NB_USER}"
 
 RUN \
     # Activate ipywidgets extension in the environment that runs the notebook server
+    source activate && \
     jupyter nbextension install --py qgrid && \
     jupyter nbextension enable --py qgrid && \
     jupyter nbextension install --py widgetsnbextension --sys-prefix && \
     jupyter nbextension enable widgetsnbextension --py --sys-prefix && \
-    jupyter nbextension install --py jupyter_tabnine --user && \
-    jupyter nbextension enable --py jupyter_tabnine --user && \
-    jupyter serverextension enable --py jupyter_tabnine --user && \
+    jupyter serverextension enable --sys-prefix --py jupyter_videochat && \
+    jupyter nbextension install --sys-prefix --symlink --overwrite --py pydeck && \
+    jupyter nbextension enable --sys-prefix --py pydeck && \
+    jupyter serverextension enable dask_labextension && \
+    sudo mkdir -p /usr/local/etc/jupyter && sudo chown -R jovyan:users /usr/local/etc/jupyter && \
+    ipcluster nbextension enable && \
     rm -fvR /home/jovyan/work/notebook-extensions && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
-    rm -rf /home/$NB_USER/.node-gyp && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER && \
-    mkdir -p /usr/share/proj
+    rm -rf /home/$NB_USER/.node-gyp
+
+RUN \
+    export NODE_OPTIONS=--max-old-space-size=4096 && \
+    export DECKGL_SEMVER=`python -c "import pydeck; print(pydeck.frontend_semver.DECKGL_SEMVER)"` && \
+    jupyter labextension install \
+        '@kiteco/jupyterlab-kite' \
+        '@jupyter-widgets/jupyterlab-manager' \
+        'jupyterlab-plotly' \
+        'plotlywidget' \
+        '@jupyterlab/geojson-extension' \
+        '@jupyter-widgets/jupyterlab-sidecar' \
+        '@jupyterlab/debugger' \
+        '@mamba-org/gator-lab' \
+        'jupyterlab-spreadsheet' \
+        'dask-labextension' \
+        '@jupyter-widgets/jupyterlab-manager' \
+        "@deck.gl/jupyter-widget@$DECKGL_SEMVER" \
+        'keplergl-jupyter' \
+        --no-build && \
+    jupyter lab build --dev-build=False --minimize=False && \
+    unset NODE_OPTIONS

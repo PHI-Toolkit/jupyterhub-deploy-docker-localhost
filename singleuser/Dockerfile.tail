@@ -1,45 +1,44 @@
-# Version: 2020-07-18
+# Version: 2021-03-21
 FROM phitoolkit/notebook-body:latest
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG NOTEBOOK_VERSION
+ARG PLOTLY_VERSION
 ARG NB_USER_PASS
 ARG GEN_CERT
 ARG MAPBOX_API_KEY
+
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 ENV MAPBOX_API_KEY $MAPBOX_API_KEY
-RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
-    fix-permissions /home/$NB_USER && \
-    echo "Set disable_coredump false" >> /etc/sudo.conf
+ENV LD_LIBRARY_PATH /lib:/usr/lib:/usr/local/lib
+ENV PROJ_LIB=/usr/share/proj
 
-USER $NB_USER
+USER ${NB_UID}
+
+WORKDIR /home/jovyan/work
+
 COPY work .
-COPY work/load_spacy.sh .
-COPY spacy_*.py .
-COPY work/load_tensorflow.sh .
-COPY work/load_h3.sh .
-COPY work/epsg /usr/share/proj/.
+COPY work/load_spacy.sh /home/jovyan/
+COPY work/spacy_*.py /home/jovyan/
+COPY work/load_tensorflow.sh /home/jovyan/
 COPY git/.gitconfig /home/jovyan/.gitconfig
 
-RUN sudo chown 1000:100 /home/jovyan/.conda/environments.txt && \
-    sudo mkdir -p /opt/conda/pkgs/cache/ && \
-    sudo chown -R 1000:100 /opt/conda/pkgs/cache/ && \
-    sudo mkdir -p /home/jovyan/public_html && \
+RUN \
+    ls -la /home/jovyan && \
     sudo chmod a+w -R /home/jovyan/work/shared && \
     sudo chmod a+w -R /home/jovyan/work/notebooks && \
-    sudo chmod a+w -R /home/jovyan/public_html && \
     sudo chmod a+w /home/jovyan/work/notebooks/*.ipynb && \
-    sudo chmod a+x /home/jovyan/work/*.sh && \
+    sudo chown 1000:100 /home/jovyan/*.sh && \
     sudo chown -R jovyan:users /home/jovyan && \
     sudo chown -R jovyan:users /home/jovyan/work/shared && \
     sudo chown -R jovyan:users /home/jovyan/work/notebooks && \
-    sudo chown -R jovyan:users /home/jovyan/public_html && \
-    mkdir -p /home/jovyan/.cache && \
-    chmod -R a+w /home/jovyan/.cache && \
-    chown -R jovyan:users /home/jovyan/.cache && \
-    conda build purge-all
-
-WORKDIR /home/jovyan/work
+    mkdir -p /home/jovyan/.cache/matplotlib && \
+    chmod -R a+w /home/jovyan/.cache/ && \
+    chown -R jovyan:users /home/jovyan/.cache/ && \
+    mkdir -p /home/jovyan/.config/matplotlib && \
+    chmod -R a+w /home/jovyan/.config/matplotlib && \
+    chown -R jovyan:users /home/jovyan/.config/matplotlib && \
+    ls -la /home/jovyan
 
 # Custom logo, create backup CSS file to enable restore if jupyter-themes overwrites it and the GEEKS logo
 ARG LOGO_IMAGE
@@ -48,88 +47,27 @@ RUN echo $LOGO_IMAGE && \
     chown -R $NB_USER /home/jovyan/.jupyter
 COPY css/custom.css /home/jovyan/.jupyter/custom/custom.css
 COPY css/$LOGO_IMAGE /home/jovyan/.jupyter/custom/non-default.png
+#COPY kite/kite-installer /home/jovyan/kite-installer
+
+#RUN \
+#    wget https://linux.kite.com/dls/linux/current -O kite-installer.sh && \
+#    sudo chmod a+x /home/jovyan/kite-installer.sh && \
+#    ls -la /home/jovyan && \
+#    /home/jovyan/kite-installer.sh install && \
+#    rm /home/jovyan/kite-installer.sh
 
 RUN \
-    sudo chown jovyan:users /home/jovyan/.jupyter/custom/non-default.png && \
-    sudo chown -R jovyan:users /opt/ && \
-    cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup && \
-    # JupyterLab related packages
-    python -m pip install --no-cache-dir \
-        'nbgitpuller' \
-        'voila' \
-        'voila-gridstack' \
-        'keplergl'
-
-RUN \
-    # Avoid "JavaScript heap out of memory" errors during extension installation
-    export NODE_OPTIONS=--max-old-space-size=4096 && \
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \
-    jupyter labextension install jupyterlab-plotly@4.6.0 --no-build && \
-    jupyter labextension install plotlywidget@4.6.0 --no-build && \
-    jupyter labextension install @jupyter-widgets/jupyterlab-sidecar --no-build && \
-    jupyter labextension install @jupyterlab/geojson-extension --no-build && \
-    jupyter lab build && \
-    unset NODE_OPTIONS && \
-    nbdime extensions --enable --sys-prefix
-
-# special packages for special projects
-RUN \
-    python -m pip install --no-cache-dir \
-        'ipywebrtc' \
-        'fhirclient' \
-        'streamz' \
-        's3fs' \
-        'notebook_autorun' \
-        'pygithub' \
-        'google-api-python-client' \
-        'scholarly' \
-        'pymed' \
-        'ipysheet' \
-        'pyfasttext' \
-        'git+https://github.com/aboSamoor/polyglot.git' \
-        'git+https://github.com/projectmesa/mesa.git' \
-        'pandasql' \
-        'requests-html' \
-        'nest_asyncio' \
-        'pyvirtualdisplay' \
-        'geopy' \
-        'wget' \
-        'redis' \
-        'hiredis' \
-        'ipython-sql' \
-        'elasticsearch-dsl' \
-        'pandasticsearch[pandas]' \
-        'wikiapi' \
-        'html5lib' \
-        'Faker' \
-        'mediacloud-cliff' \
-        'jupyter-datatables' \
-        'pydeck' \
-        'rasterstats' \
-        'sentinelsat' \
-        'pmdarima' \
-        'pydap'  \
-        'pystan' \
-        'dataflows' \
-        'datapackage' \
-        'jupyter-server-proxy' \
-        'jupyter_plotly_dash' \
-        'yacron' \
-        'xmltodict' \
-        'tables'
+    sudo chown 1000:1000 /home/jovyan/.jupyter/custom/non-default.png && \
+    cp /home/jovyan/.jupyter/custom/custom.css /home/jovyan/.jupyter/custom/custom.css.backup
 
 # Address iopub data error message with custom config
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
 
-USER root
-
-ENV LD_LIBRARY_PATH /lib:/usr/lib:/usr/local/lib
-ENV PROJ_LIB=/usr/share/proj
-
 RUN \
-    cd shared && \
-    bash download_cases.sh && \
-    chown -R jovyan:users /home/jovyan
+    wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O "awscliv2.zip" && \
+    unzip awscliv2.zip && rm *.zip && \
+    sudo ./aws/install && rm -fvR aws && \
+    /usr/local/bin/aws --version
 
 RUN \
     # This RUN segment sets up a temporary install of googletrans
@@ -140,23 +78,25 @@ RUN \
     cd /home/jovyan/work && \
     rm -fvR /home/jovyan/work/py-googletrans && \
     # end of googletrans install
-    conda list > condalist.txt && \
-    conda build purge-all && \
-    conda clean --all -f -y && \
-    rm -fvR /opt/conda/pkgs/* && \
-    apt-get clean -y && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    mkdir -p /opt/conda/pkgs/cache && \
-    chmod -R a+w /opt/conda/pkgs/cache/ && \
-    if [ "$NB_USER_PASS" != "" ]; then echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
-      sed -i 's/ NOPASSWD://g' /etc/sudoers; fi && \
-    unset NB_USER_PASS && \
+    mamba clean --all -f -y && \
+    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     echo 'export VISUAL=nano' >> ~/.bashrc && \
     echo 'export EDITOR="$VISUAL"' >> ~/.bashrc && \
     export VISUAL=nano && export EDITOR="$VISUAL" && \
     git lfs install
 
-HEALTHCHECK --interval=2m --timeout=3s --retries=3 CMD curl --silent http://$HOSTNAME:8888 || fail
+USER root
 
-USER $NB_USER
+RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
+    echo "Set disable_coredump false" >> /etc/sudo.conf && \
+    if [ "$NB_USER_PASS" != "" ]; then echo $NB_USER:$NB_USER_PASS | /usr/sbin/chpasswd;  \
+        sed -i 's/ NOPASSWD://g' /etc/sudoers; fi && \
+    unset NB_USER_PASS && \
+    groupadd docker && \
+    usermod -aG docker $NB_USER && \
+    touch /var/run/docker.sock && \
+    chown root:docker /var/run/docker.sock
+
+USER ${NB_UID}
+
+HEALTHCHECK --interval=2m --timeout=3s --retries=3 CMD curl --silent http://$HOSTNAME:8888 || fail

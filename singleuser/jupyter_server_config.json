@@ -1,0 +1,18 @@
+{
+  "VideoChat": {
+    "room_prefix": "geeks-jupyter-video-chat",
+    "rooms": [
+      {
+        "id": "everyday-chat",
+        "displayName": "Everyday-Chat",
+        "description": "Daily room for meeting with the team"
+      },
+      {
+        "id": "machine-learning-chat",
+        "displayName": "Machine-Learning-Chat",
+        "description": "Room for the machine learning chats"
+      }
+    ],
+    "jitsi_server": "meet.jit.si"
+  }
+}
