@@ -1,23 +1,3 @@
-#!/bin/bash
-# modified 2020-01-01
-# author Herman Tolentino
-source .env
-if [[ "$(docker ps -a | grep jupyter- | awk '{print $1}')" != "" ]]; then
-    docker stop $(docker ps -a | grep jupyter- | awk '{print $1}')
-    docker rm $(docker ps -a | grep jupyter- | awk '{print $1}')
-fi
-
-case $JUPYTERHUB_SSL in
-    no_ssl)
-        echo "Shutting down JupyterHub..."
-        docker-compose -f docker-compose.yml down
-        ;;
-    use_ssl_ss)
-        echo "Shutting down JupyterHub..."
-        docker-compose -f docker-compose.yml down
-        ;;
-    use_ssl_le)
-        echo "Shutting down JupyterHub-LetsEncrypt..."
-        docker-compose -f docker-compose-letsencrypt.yml down
-        ;;
-esac
+version https://git-lfs.github.com/spec/v1
+oid sha256:e0ae2c118fda392f3e1c78190589bb24c04cee3554d388856f1352e0156d532c
+size 691
