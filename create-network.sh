@@ -1,8 +1,3 @@
-#!/bin/bash
-source .env
-if [ ! "$(docker network ls | grep $DOCKER_NETWORK_NAME)" ]; then
-  echo "Creating nginx-proxy network ..."
-  docker network create $DOCKER_NETWORK_NAME
-else
-  echo "$DOCKER_NETWORK_NAME network exists."
-fi
+version https://git-lfs.github.com/spec/v1
+oid sha256:ff2c72593d6e42acf82d939115165bff238aa829892e76a289867a119af6a89b
+size 231
