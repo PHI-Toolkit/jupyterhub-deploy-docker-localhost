@@ -12,18 +12,18 @@ version: "3"
 services:
   cliff:
     hostname: cliff
-    build:
-      dockerfile: server_apps/cliff/Dockerfile
-      args:
-        CLIFF_VERSION: 2.6.0
-      context: .
+    image: rahulbot/cliff-clavin
+    #build:
+    #  dockerfile: server_apps/cliff/Dockerfile.1
+    #  args:
+    #    CLIFF_VERSION: 2.6.1
+      #context: server_apps/cliff/.
     environment:
-      CLIFF_VERSION: 2.6.0
+      CLIFF_VERSION: 2.6.1
     container_name: cliff
     restart: always
     env_file:
       - .env
-    image: cliff
     ports:
       - "8080:8080"
     healthcheck:

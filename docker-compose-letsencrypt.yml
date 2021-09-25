@@ -6,31 +6,32 @@ version: "3"
 
 services:
 
-  hub-db:
-    build:
-      context: .
-      dockerfile: server_apps/postgres-hub/Dockerfile.postgres
-      args:
-        JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
-        POSTGRES_VERSION: ${POSTGRES_VERSION}
-    image: postgres-hub
-    container_name: jupyterhub-db
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      PGDATA: ${DB_VOLUME_CONTAINER}
-      JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
-      POSTGRES_PASSWORD: ${JPY_PSQL_PASSWORD}
-    env_file:
-      - .env
-    volumes:
-      - "db:${DB_VOLUME_CONTAINER}"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
+  #hub-db:
+  #  build:
+  #    context: .
+  #    dockerfile: server_apps/postgres-hub/Dockerfile.postgres
+  #    args:
+  #      JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
+  #      POSTGRES_VERSION: ${POSTGRES_VERSION}
+  #  image: postgres-hub
+  #  container_name: jupyterhub-db
+  #  restart: always
+  #  environment:
+  #    POSTGRES_DB: ${POSTGRES_DB}
+  #    PGDATA: ${DB_VOLUME_CONTAINER}
+  #    JPY_PSQL_PASSWORD: ${JPY_PSQL_PASSWORD}
+  #    POSTGRES_PASSWORD: ${JPY_PSQL_PASSWORD}
+  #  env_file:
+  #    - .env
+  #  volumes:
+  #    - "db:${DB_VOLUME_CONTAINER}"
+  #  healthcheck:
+  #    test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #    interval: 30s
+  #    timeout: 30s
+  #    retries: 3
 
+ # https://github.com/nginx-proxy/nginx-proxy
   nginx-proxy:
     build:
       context: nginx-proxy/
@@ -45,24 +46,33 @@ services:
       - "./secrets:/etc/nginx/certs:rw"
       - "nginx_vhostd:/etc/nginx/vhost.d:rw"
       - "nginx_html:/usr/share/nginx/html:rw"
+    healthcheck:
+      test: "ping -c 1 localhost || fail"
+      interval: 3m
+      timeout: 3s
+      retries: 3
     #logging:
     #    driver: syslog
     #    options:
     #      syslog-address: "udp://0.0.0.0:514"
     #      syslog-format: rfc3164
     #      tag: nginxproxy
+
+  # https://github.com/nginx-proxy/acme-companion
   letsencrypt:
     depends_on:
       - nginx-proxy
-    build:
-      context: server_apps/letsencrypt
-      dockerfile: Dockerfile
+    #build:
+    #  context: server_apps/letsencrypt
+    #  dockerfile: Dockerfile
     restart: always
-    image: letsencrypt
+    #image: letsencrypt
+    image: jrcs/letsencrypt-nginx-proxy-companion
     container_name: letsencrypt
     environment:
       DEFAULT_EMAIL: herman.tolentino@gmail.com
       NGINX_PROXY_CONTAINER: nginx_proxy
+      CERTS_UPDATE_INTERVAL: 86400
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./secrets:/etc/nginx/certs:rw"
@@ -125,7 +135,7 @@ services:
       VIRTUAL_HOST: ${JH_FQDN}
       VIRTUAL_PORT: ${VIRTUAL_PORT}
     command: >
-      jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py --log-level=${JUPYTERHUB_LOG_LEVEL}
+      jupyterhub --ip=0.0.0.0 -f /srv/jupyterhub/jupyterhub_config.py --log-level=${JUPYTERHUB_LOG_LEVEL} &>> /var/log/jupyter/jupyterhub.log
 
 volumes:
   data:
