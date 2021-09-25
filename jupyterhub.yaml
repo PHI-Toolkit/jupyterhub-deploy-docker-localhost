@@ -1,0 +1,16 @@
+channels:
+  - conda-forge
+dependencies:
+  - jupyter_client
+  - psycopg2
+  - conda-build
+  - oauthenticator
+  - dockerspawner
+  - jupyter-videochat
+  - pip
+  - pip:
+    - jupyterhub-tmpauthenticator
+    - jupyterhub-dummyauthenticator
+    - jupyterhub-hashauthenticator
+    - jupyterhub-nativeauthenticator
+    - html-sanitizer
