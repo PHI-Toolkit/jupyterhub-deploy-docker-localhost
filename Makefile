@@ -35,27 +35,38 @@ check-files: userlist $(cert_files) .env
 
 notebook_base:
 	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(LOCAL_NOTEBOOK_BASE) $(DOCKER_BUILD_CACHE_OPTION) \
+		--ulimit nofile=1024 \
+		--progress auto \
 		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
-		--build-arg DOCKER_NOTEBOOK_IMAGE=$(DOCKER_NOTEBOOK_IMAGE) \
+		--build-arg DOCKER_NOTEBOOK_BASE=$(DOCKER_NOTEBOOK_BASE) \
 		--build-arg JUPYTER_UI=$(JUPYTER_UI) \
+		--build-arg CONDA_VERSION=$(CONDA_VERSION) \
+		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
 		--file=singleuser/$(DOCKERFILE_BASE) singleuser
 
 notebook_body:
 	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(LOCAL_NOTEBOOK_BODY) $(DOCKER_BUILD_CACHE_OPTION) \
+		--ulimit nofile=1024 \
+		--progress auto \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
+		--build-arg PLOTLY_VERSION=$(PLOTLY_VERSION) \
 		--file=singleuser/$(DOCKERFILE_BODY) singleuser
 
 notebook_image: #pull singleuser/Dockerfile
 	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(LOCAL_NOTEBOOK_IMAGE) $(DOCKER_BUILD_CACHE_OPTION) \
+		--squash \
+		--ulimit nofile=1024 \
+		--progress $(BUILDKIT_PROGRESS) \
 		--build-arg LOGO_IMAGE=$(LOGO_IMAGE) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		--build-arg JUPYTERLAB_VERSION=$(JUPYTERLAB_VERSION) \
 		--build-arg NOTEBOOK_VERSION=$(NOTEBOOK_VERSION) \
+		--build-arg PLOTLY_VERSION=$(PLOTLY_VERSION) \
 		--build-arg NB_USER_PASS=$(NB_USER_PASS) \
 		--build-arg GEN_CERT=$(GEN_CERT) \
 		--build-arg MAPBOX_API_KEY=$(MAPBOX_API_KEY) \
