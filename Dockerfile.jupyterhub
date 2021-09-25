@@ -10,32 +10,28 @@ LABEL maintainer='herman.tolentino@gmail.com'
 
 ENV JUPYTER_UI ${JUPYTER_UI}
 
-COPY ./miniconda.sh ./miniconda.sh
+#COPY ./miniconda.sh ./miniconda.sh
 RUN apt-get update && \
     apt-get install -y --no-install-recommends wget git && \
-    bash ./miniconda.sh -b -p /opt/miniconda && \
-    ls -la /opt/miniconda && \
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh -O miniconda.sh && \
+    chmod a+x miniconda.sh
+RUN \
+    rm -r /tmp/* && \
+    bash ./miniconda.sh -b -p /opt/conda && \
+    ls -la /opt/conda && \
     rm ./miniconda.sh
 
-ENV PATH /opt/miniconda/bin:$PATH
+ENV PATH /opt/conda/bin:$PATH
+
+COPY jupyterhub.yaml .
 
 # Install dockerspawner, oauth, postgres
 RUN conda update -y conda && \
     conda update --all -c conda-forge && \
-    conda install -c conda-forge -yq \
-        'jupyter_client=5.3.3' \
-        'psycopg2=2.7' \
-        'conda-build' \
-        'oauthenticator=0.11.0' \
-        'dockerspawner=0.11.1' && \
-    conda build purge-all && \
-    pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir \
-    'jupyterhub-tmpauthenticator==0.6' \
-    'jupyterhub-dummyauthenticator==0.3.1' \
-    'jupyterhub-hashauthenticator==0.4.0' \
-    'jupyterhub-nativeauthenticator' && \
-    mkdir -p /srv/jupyterhub/secrets/
+    conda env update --verbose -n base -f jupyterhub.yaml && \
+    conda clean --all -f -y && \
+    mkdir -p /srv/jupyterhub/secrets/ && \
+    mkdir -p /opt/conda/etc/jupyter/jupyter_server_config.d/
 
 RUN pip install --no-cache-dir git+https://github.com/rcthomas/jupyterhub-announcement.git
 
@@ -46,8 +42,10 @@ ENV SSL_CERT /srv/jupyterhub/secrets/jupyterhub.pem
 COPY services/cull_idle_servers.py /srv/jupyterhub/cull_idle_servers.py
 COPY services/announcement.py /srv/jupyterhub/announcement.py
 COPY services/templates /srv/jupyterhub/templates
+COPY singleuser/jupyter_server_config.json /opt/conda/etc/jupyter/jupyter_server_config.d/.
 
-RUN touch /etc/proxy_token && \
+RUN jupyter serverextension enable --sys-prefix --py jupyter_videochat && \
+    touch /etc/proxy_token && \
     openssl rand -hex 32 >> /etc/proxy_token && \
     cat /etc/proxy_token
 
