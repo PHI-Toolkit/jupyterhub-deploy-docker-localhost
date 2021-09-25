@@ -1,13 +1,3 @@
-#!/bin/bash -e
-
-. /opt/bitnami/base/functions
-. /opt/bitnami/base/helpers
-
-print_welcome_page
-
-if [[ "$1" == "nami" && "$2" == "start" ]] || [[ "$1" == "/init.sh" ]]; then
-  nami_initialize neo4j
-  info "Starting neo4j... "
-fi
-
-exec tini -- "$@"
+version https://git-lfs.github.com/spec/v1
+oid sha256:001852c98921e4067e0f2476bfaf34c49671ecb254ef6fa62e3f990bfb3f84cc
+size 246
