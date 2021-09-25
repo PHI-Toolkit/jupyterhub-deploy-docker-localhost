@@ -36,6 +36,11 @@ else:
     spawn_cmd = os.environ.get('DOCKER_SPAWN_CMD', "start-singleuser.sh")
     c.DockerSpawner.extra_create_kwargs.update({ 'command': spawn_cmd })
 
+# Spawner timeout
+c.Spawner.http_timeout=60
+c.Spawner.start_timeout=60
+c.JupyterHub.tornado_settings = {'slow_spawn_timeout': 30}
+
 # Connect containers to this Docker network
 network_name = os.environ['DOCKER_NETWORK_NAME']
 c.DockerSpawner.use_internal_ip = True
@@ -56,7 +61,8 @@ c.DockerSpawner.notebook_dir = notebook_dir
 #c.DockerSpawner.volumes = { 'jupyterhub-user-{username}': notebook_dir }
 c.DockerSpawner.volumes = {
     'jupyterhub-user-{username}': notebook_dir,
-    'jupyter-shared': '/home/jovyan/work/shared/'
+    'jupyter-shared': '/home/jovyan/work/shared/',
+    'jupyter-user-{username}-condaenv':'/opt/conda/'
 }
 
 #c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'local' })
@@ -66,7 +72,7 @@ c.DockerSpawner.remove_containers = True
 c.DockerSpawner.debug = True
 
 # User containers will access hub by container name on the Docker network
-c.JupyterHub.hub_ip = '0.0.0.0'
+#c.JupyterHub.hub_ip = '0.0.0.0'
 #c.JupyterHub.ip = '0.0.0.0'
 c.JupyterHub.hub_connect_ip = os.environ['JUPYTERHUB_SERVICE_HOST_IP']
 c.JupyterHub.hub_port = 8080
@@ -140,13 +146,13 @@ data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
 c.JupyterHub.cookie_secret_file = os.path.join(data_dir,
     'jupyterhub_cookie_secret')
 
-if os.environ.get('HUB_DB_URL') == 'sqlite':
-    c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite' #default
-else:
+if os.environ.get('JUPYTERHUB_DB_URL') == 'postgres':
     c.JupyterHub.db_url = 'postgresql://postgres:{password}@{host}/{db}'.format(
         host=os.environ['POSTGRES_HOST'],
         password=os.environ['POSTGRES_PASSWORD'],
         db=os.environ['POSTGRES_DB'],)
+else:
+    c.JupyterHub.db_url = 'sqlite:///jupyterhub.sqlite' #default
 
 # services
 c.JupyterHub.template_paths = ['/srv/jupyterhub/templates']
@@ -186,7 +192,7 @@ with open(os.path.join(pwd, 'userlist')) as f:
             admin.add(name)
 
 # Whitlelist users and admins
-c.Authenticator.whitelist = whitelist
+c.Authenticator.allowed_users = whitelist
 c.Authenticator.admin_users = admin
 c.JupyterHub.admin_access = True
 c.JupyterHub.upgrade_db = True
