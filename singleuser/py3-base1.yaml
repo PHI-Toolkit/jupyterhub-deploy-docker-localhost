@@ -92,4 +92,3 @@ dependencies:
     - pydeck
     - keplergl
     - polars
-    - pickle5
