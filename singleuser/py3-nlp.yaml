@@ -30,16 +30,17 @@ dependencies:
   - tensorflow-hub
   - ipyparallel
   - proplot
+  - geopandas
   - feather-format
   - tqdm
   - requests
+  - qgrid
   - pip
   - pip:
     - ipython[all]
-    - gtts==2.1.1
-    - qgrid
-    - geopandas
-    - plotly
+    - gtts==2.2.3
+    - python-dateutil
+    - plotly>=${PLOTLY_VERSION}
     - plotly-geo
     - dash
     - dash-daq

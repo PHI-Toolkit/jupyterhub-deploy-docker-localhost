@@ -38,20 +38,21 @@ dependencies:
   - dask-labextension
   - ipykernel
   - descartes
+  - geopandas
   - alphashape
   - ipyparallel
   - proplot
   - feather-format
   - tqdm
   - requests
+  - qgrid
   - opencv
   - pip
   - pip:
     - ipython[all]
-    - gtts==2.1.1
-    - python-dateutil<2.8.1
-    - qgrid
-    - plotly
+    - gtts==2.2.3
+    - python-dateutil
+    - plotly>=${PLOTLY_VERSION}
     - plotly-geo
     - dash
     - dash-daq
@@ -81,7 +82,6 @@ dependencies:
     - jupyterlab_geojson
     - jupyterlab-git
     - jupyterlab_hdf
-    - jupyter-kite
     - jupyterlab-widgets
     - jupyterlab-system-monitor
     - jupyterlab-tour
