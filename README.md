@@ -4,7 +4,7 @@ This code base to deploy Jupyter Notebooks using JupyterHub is based on the open
 It also uses Docker (https://www.docker.com/) containers to manage the three pieces of software needed to run this set up:
 1. JupyterHub - takes care of authentication and spawning of single-user notebook servers (containers)
 2. Jupyter Notebooks - notebook environment with Python 3.6 kernel
-3. PostgreSQL or SQLite database backend to store notebook user data
+3. PostgreSQL database backend to store notebook user data (or one can use SQLite instead)
 
 # Installation Guide - Quick
 
@@ -12,17 +12,17 @@ It also uses Docker (https://www.docker.com/) containers to manage the three pie
 1. Install `Docker`, `docker-compose`, `git`. (...or run  `sudo install-docker-bionic.sh` - be sure to change `$INSTALL_USER` variable to your local username.)
 2. Open terminal app and `cd` to preferred workspace directory
 3. `git clone` this repository: `git clone https://github.com/PHI-Toolkit/jupyterhub-deploy-docker-localhost.git`
-4. `cd jupyterhub-deploy-docker-localhost`, locate buildhub.sh, make sure it is executable and run this script on command line.
+4. `cd jupyterhub-deploy-docker-localhost`, locate `buildhub.sh`, make sure it is executable and run this script on command line.
 5. Wait for the `buildhub.sh` script to finish, watch for build errors. Then locate `starthub.sh`, make sure it is executable, then run `./starthub.sh` on a terminal. You will see container logs being displayed as the containers start up. Before running `./starthub.sh` you may want to check:
-    5.1 Built Docker contaiiners: run `docker images` on the terminal.
+    5.1 Built Docker containers: run `docker images` on the terminal.
     5.2 Running containers (after running `./starthub.sh`: run `docker ps` on the terminal.
 6. Open Chrome, Chrome-based Edge, Safari, or Firefox browser and proceed to https://localhost. (Look up default login credentials on .env file.)
 
-### Changing the UI to JupyterLab
+### Changing the UI to Jupyter Notebook Classic
 
-You can easily switch to the JupyterLab user interface:
-1. Temporarily by editing the URL, and replacing `tree` with `lab`.
-2. Permanently by switching the `.env` file entry `JUPYTER_UI=notebook` with `JUPYTER_UI=/lab` (slash is important).
+JupyterLab is the default user interface. You can easily switch from the JupyterLab user interface to Jupyter Notebook Classic:
+1. Temporarily by editing the URL, and replacing `lab` with `tree`.
+2. Permanently by switching the `.env` file entry `JUPYTER_UI=/lab` with `JUPYTER_UI=notebook` (slash is important for `lab`).
 
 ## First install on remote server
 
@@ -38,7 +38,7 @@ The `.env` is automatically created after the first run of the `buildhub.sh` scr
 5. Jupyter Notebook UI or JupyterLab
 6. Versions of JupyterHub, JupyterLab, Jupyter Notebook, and PostGRESQL Hub backend
 7. OAuth, Notebook and Hub, PostGreSQL Authentication Credentials
-8. Single-user Notebook server timeout (when idle servers are culled)
+8. Single-user Notebook server timeout (when idle servers are culled or stopped)
 
 The `userlist` file is automatically created from `userlist-template` after the first run of the `buildhub.sh` script. For GitHub autentication, follow the template entry for recording GitHub username in the `userlist` file and assigning `admin` status. This can also be done through the `Admin` interface of JupyterHub.
 
@@ -89,7 +89,7 @@ This build of JupyterHub has three options for Authentication. Go to about Line 
 * hash_authenticator
 * native_authenticator (new)
 
-There is no need to change or update any .env settings for initial one-user (you) launch and testing from a localhost machine. The default setting `dummy_authenticator` uses the default user `jovyan` whose password you can set in the `.env` file.
+There is no need to change or update any .env settings for initial one-user (you) launch and testing from a localhost machine. The default setting `dummy_authenticator` uses the default user `jovyan` whose password you can set in the `.env` file before running `buildhub.sh`.
 
 ### GitHub authentication
 #### Obtain your GitHub Account Credentials
