@@ -89,15 +89,14 @@ WORKDIR /home/jovyan/work
 
 RUN \
     mamba install -n base -c conda-forge --yes \
-      "jupyterhub=$JUPYTERHUB_VERSION" \
-      "notebook=$NOTEBOOK_VERSION" \
-      "jupyterlab=$JUPYTERLAB_VERSION" \
+      "jupyterhub>=$JUPYTERHUB_VERSION" \
+      "notebook>=$NOTEBOOK_VERSION" \
+      "jupyterlab>=$JUPYTERLAB_VERSION" \
       "python>=$PYTHON_VERSION" \
       'jupyter_core>=4.6*' \
       'jupyter_client>=5.6*' \
-      'ipykernel' && \
-      'mamba' && \
-    mamba install -n base 'nodejs>=14' && \
+      'ipykernel' \
+      'nodejs>=14*' && \
     mamba clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
