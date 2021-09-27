@@ -12,3 +12,7 @@ proxy_token
 pg_pass
 server_apps/neo4j/data/databases
 server_apps/neo4j/data/dbms
+id_rsa*
+miniconda.sh
+kite
+singleuser/Dockerfile.multistage

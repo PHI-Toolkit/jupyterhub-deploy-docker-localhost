@@ -1,3 +1,18 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7574c42c57fbb6d2ee14bea4063eff521b451522c542182d7555efac49dc3f90
-size 433
+#!/bin/bash
+mamba install -y -c conda-forge -n py3-remote-sensing \
+    'proj-data'
+
+# install libpostal
+mkdir -p /home/jovyan/work/.data/libpostal
+git clone https://github.com/openvenues/libpostal
+cd libpostal
+chmod a+x bootstrap.sh
+./bootstrap.sh
+./configure --datadir=/home/jovyan/work/.data/libpostal
+make
+sudo make install
+sudo ldconfig
+
+source activate py3-remote-sensing
+$(which python) -m pip install postal
+conda deactivate
