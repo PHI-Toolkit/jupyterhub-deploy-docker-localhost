@@ -183,4 +183,21 @@ This error could be due to JUPYTERHUB_SERVICE_HOST_IP changing value after resta
 
 ### 500 : Internal Server Error, Error in Authenticator.pre_spawn_start: ImageNotFound 404 Client Error: Not Found ("pull access denied for phitoolkit/jupyterhub-user, repository does not exist or may require 'docker login': denied: requested access to the resource is denied"), You can try restarting your server from the home page.
 
-Check if the notebook server image `phitoolkit/jupyterhub-user` exists. if not, run `make notebook_base`, `make notebook_body`, and `make notebook_image`, before running `starhub.sh`.
+This error could be due to failed execution of `buildhub.sh`, specifically the section that takes care of building the notebook containers (Docker build commands through Makefile). Check if the notebook server image `phitoolkit/jupyterhub-user` exists. You can also check the Docker build logs (visible during execution) to see which specific Docker build step failed. Execute any of the following or in sequence:
+1. `make notebook_base`
+2. `make notebook_body`
+3. `make notebook_image`
+
+ if not, run `make notebook_base`, `make notebook_body`, and `make notebook_image`, before running `starhub.sh`.
+
+### "--squash" is only supported on a Docker daemon with experimental features enabled
+
+This Docker-related error may be encountered during execution of the last make command in `buildhub.sh` (see #3 `make` above). To enable experimental features in Docker:
+
+1. At the command line: `sudo nano /etc/docker/daemon.json`
+2. Enter the following, then save the file:
+   >  `{`
+   >  `experimental:true`
+   >  `}`
+3. At the command line: `sudo systemctl restart docker`
+4. At the command line: `docker version`
